@@ -20,23 +20,11 @@ class JournalService extends ChangeNotifier {
     
     // SQLite does not support web. If running on web, fallback to in-memory list
     if (kIsWeb) {
-      _loadInitialSampleEntries();
       _isInitialized = true;
       return;
     }
 
     await _loadFromDb();
-    
-    // If DB is empty, populate with samples
-    if (_entries.isEmpty) {
-      _loadInitialSampleEntries();
-      final db = await DatabaseHelper.instance.database;
-      if (db != null) {
-        for (final e in _entries) {
-          await db.insert('entries', e.toMap());
-        }
-      }
-    }
     _isInitialized = true;
   }
 

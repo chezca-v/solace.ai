@@ -163,6 +163,26 @@ class GemmaAi implements LocalAi {
     }
   }
 
+  @override
+  Future<String> generateDailyPrompt(UserContext ctx) async {
+    if (!_isReady) {
+      return 'Take a breath. How does your mind feel right now?';
+    }
+    try {
+      final prompt = Prompts.buildDailyPrompt(
+        goals: ctx.goals,
+        priorities: ctx.priorities,
+      );
+      final rawResponse = await _runInference(prompt);
+      if (rawResponse == null || rawResponse.trim().isEmpty) {
+        return 'Take a breath. How does your mind feel right now?';
+      }
+      return _cleanReflectionResponse(rawResponse);
+    } catch (e) {
+      return 'Take a breath. How does your mind feel right now?';
+    }
+  }
+
   Future<String?> _runInference(String prompt) async {
     final model = await FlutterGemma.getActiveModel(maxTokens: 512);
     final session = await model.createSession();

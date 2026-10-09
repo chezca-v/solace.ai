@@ -77,6 +77,21 @@ class AiService {
     );
   }
 
+  /// Generates a personalized daily check-in prompt based on context.
+  Future<String> generateDailyPrompt(UserContext ctx) async {
+    if (_isModelReady) {
+      try {
+        final prompt = await _gemmaEngine
+            .generateDailyPrompt(ctx)
+            .timeout(const Duration(seconds: 15));
+        if (prompt.trim().isNotEmpty) return prompt;
+      } catch (_) {
+        // Fallback on timeout or error
+      }
+    }
+    return await _ruleBasedEngine.generateDailyPrompt(ctx);
+  }
+
   /// Analyzes trade-offs and generates a side-by-side option comparison.
   Future<AiResult> compareOptions(String entry, UserContext ctx) async {
     if (_isModelReady) {

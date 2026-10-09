@@ -95,4 +95,34 @@ class Prompts {
 
     return buffer.toString();
   }
+
+  /// Builds a prompt to generate a personalized short daily check-in question.
+  static String buildDailyPrompt({
+    List<String> goals = const [],
+    List<String> priorities = const [],
+  }) {
+    final buffer = StringBuffer();
+    buffer.writeln(systemPrompt);
+    buffer.writeln();
+
+    if (goals.isNotEmpty || priorities.isNotEmpty) {
+      buffer.writeln('User Context:');
+      if (goals.isNotEmpty) {
+        buffer.writeln('Goals: ${goals.join(", ")}');
+      }
+      if (priorities.isNotEmpty) {
+        buffer.writeln('Priorities: ${priorities.join(", ")}');
+      }
+      buffer.writeln();
+    }
+
+    buffer.writeln(
+      'Based on the user\'s context, generate exactly one short, gentle question '
+      'to ask them how they are doing today. Keep it under 15 words. '
+      'Do not include any other text or explanation. '
+      'Example: "Take a breath. How does your mind feel right now?"',
+    );
+
+    return buffer.toString();
+  }
 }

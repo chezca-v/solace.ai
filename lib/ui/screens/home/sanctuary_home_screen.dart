@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import '../../../ai/ai_service.dart';
+import '../../../ai/local_ai.dart';
 import '../../../services/journal_service.dart';
 import '../../../services/onboarding_service.dart';
 import '../../theme/solace_theme.dart';
 import '../../widgets/sun_illustration.dart';
+import '../journal/journal_editor_screen.dart';
+import '../memories/memory_vault_screen.dart';
+import '../settings/settings_screen.dart';
 
 /// 06 — Sanctuary Home Dashboard
 class SanctuaryHomeScreen extends StatefulWidget {
@@ -31,58 +36,96 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
   int _currentNavIndex = 0;
   bool _isPlayingAmbient = false;
   final _journalService = JournalService.instance;
+  String? _dynamicPrompt;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDynamicPrompt();
+  }
+
+  Future<void> _loadDynamicPrompt() async {
+    final onboarding = OnboardingService.instance;
+    final ctx = UserContext(
+      goals: onboarding.selectedGoals.toList(),
+      priorities: onboarding.workingToward.isNotEmpty ? [onboarding.workingToward] : [],
+    );
+    final prompt = await AiService.instance.generateDailyPrompt(ctx);
+    if (mounted) {
+      setState(() => _dynamicPrompt = prompt);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: SolaceTheme.background,
-      body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 480),
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Top App Bar: Brand + On-Device Badge + Avatar
-                  _buildTopBar(),
-                  const SizedBox(height: 12),
+      body: _buildBody(),
+      bottomNavigationBar: _buildBottomNav(),
+    );
+  }
 
-                  // Sol Active On-Device Status Banner
-                  _buildSolStatusBanner(),
-                  const SizedBox(height: 16),
+  Widget _buildBody() {
+    switch (_currentNavIndex) {
+      case 0:
+        return _buildHomeTab();
+      case 1:
+        return JournalEditorScreen(onBack: () => setState(() => _currentNavIndex = 0));
+      case 2:
+        return MemoryVaultScreen(onBack: () => setState(() => _currentNavIndex = 0));
+      case 3:
+        return SettingsScreen(onBack: () => setState(() => _currentNavIndex = 0));
+      default:
+        return _buildHomeTab();
+    }
+  }
 
-                  // Sanctuary Greeting Section
-                  _buildGreetingSection(),
-                  const SizedBox(height: 16),
+  Widget _buildHomeTab() {
+    return SafeArea(
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 480),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Top App Bar: Brand + On-Device Badge + Avatar
+                _buildTopBar(),
+                const SizedBox(height: 12),
 
-                  // Sol's Gentle Prompt Card
-                  _buildGentlePromptCard(),
-                  const SizedBox(height: 16),
+                // Sol Active On-Device Status Banner
+                _buildSolStatusBanner(),
+                const SizedBox(height: 16),
 
-                  // Action Bar: + New Entry Button & Search
-                  _buildActionBar(),
-                  const SizedBox(height: 20),
+                // Sanctuary Greeting Section
+                _buildGreetingSection(),
+                const SizedBox(height: 16),
 
-                  // Mind Rhythm 7-Day Tracker
-                  _buildMindRhythmCard(),
-                  const SizedBox(height: 22),
+                // Sol's Gentle Prompt Card
+                _buildGentlePromptCard(),
+                const SizedBox(height: 16),
 
-                  // Your Recent Reflections Feed
-                  _buildRecentReflectionsSection(),
-                  const SizedBox(height: 16),
+                // Action Bar: + New Entry Button & Search
+                _buildActionBar(),
+                const SizedBox(height: 20),
 
-                  // Mindful Exhale Soundscape Player Card
-                  _buildMindfulAudioCard(),
-                  const SizedBox(height: 20),
-                ],
-              ),
+                // Mind Rhythm 7-Day Tracker
+                _buildMindRhythmCard(),
+                const SizedBox(height: 22),
+
+                // Your Recent Reflections Feed
+                _buildRecentReflectionsSection(),
+                const SizedBox(height: 16),
+
+                // Mindful Exhale Soundscape Player Card
+                _buildMindfulAudioCard(),
+                const SizedBox(height: 20),
+              ],
             ),
           ),
         ),
       ),
-      bottomNavigationBar: _buildBottomNav(),
     );
   }
 
@@ -309,7 +352,7 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
               ),
               const SizedBox(height: 2),
               Text(
-                'Good morning,\n${onboarding.userName.isNotEmpty ? onboarding.userName : 'Friend'}',
+                'Good morning,\n${OnboardingService.instance.userName.isNotEmpty ? OnboardingService.instance.userName : 'Friend'}',
                 style: const TextStyle(
                   fontFamily: SolaceTheme.fontFamily,
                   fontSize: 26,
@@ -351,16 +394,8 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
   }
 
   Widget _buildGentlePromptCard() {
-    final onboarding = OnboardingService.instance;
-    final priorities = onboarding.workingToward;
-    final goals = onboarding.selectedGoals;
-    
-    String promptText = 'Take a breath. How does your mind feel right now?';
-    if (priorities.isNotEmpty) {
-      promptText = 'Take a breath. You mentioned wanting clarity on: $priorities. How does your mind feel right now?';
-    } else if (goals.isNotEmpty) {
-      promptText = 'Take a breath. You are focusing on ${goals.first}. How does your mind feel right now?';
-    }
+    final promptText = _dynamicPrompt ?? 'Gathering your offline context...';
+
 
     return Container(
       width: double.infinity,
@@ -415,6 +450,7 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
+                  minimumSize: Size.zero,
                   backgroundColor: SolaceTheme.primary,
                   elevation: 0,
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
@@ -432,13 +468,9 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
                   shape: BoxShape.circle,
                 ),
                 child: IconButton(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Prompt refreshed offline!'),
-                        duration: Duration(seconds: 1),
-                      ),
-                    );
+                  onPressed: () async {
+                    setState(() => _dynamicPrompt = null);
+                    await _loadDynamicPrompt();
                   },
                   icon: const Icon(Icons.refresh_rounded, size: 18, color: SolaceTheme.primaryDark),
                   padding: EdgeInsets.zero,

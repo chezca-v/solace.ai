@@ -61,6 +61,18 @@ class RuleBasedAi implements LocalAi {
   @override
   Future<bool> init() async => true;
 
+  @override
+  Future<String> generateDailyPrompt(UserContext ctx) async {
+    if (ctx.priorities.isNotEmpty) {
+      final p = ctx.priorities.join(' and ');
+      return 'Take a breath. You mentioned wanting clarity on $p. How does your mind feel right now?';
+    } else if (ctx.goals.isNotEmpty) {
+      final g = ctx.goals.join(' and ');
+      return 'Take a gentle pause. As you work toward $g, how are you feeling today?';
+    }
+    return 'Take a breath. How does your mind feel right now?';
+  }
+
   /// Checks if the text contains any crisis or self-harm keywords.
   bool isCrisis(String text) {
     final lower = text.toLowerCase();

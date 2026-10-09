@@ -3,6 +3,7 @@ abstract class LocalAi {
   Future<bool> init();
   Future<AiResult> reflect(String entry, UserContext ctx);
   Future<AiResult> compareOptions(String entry, UserContext ctx);
+  Future<String> generateDailyPrompt(UserContext ctx);
   String get engineName;
 }
 
