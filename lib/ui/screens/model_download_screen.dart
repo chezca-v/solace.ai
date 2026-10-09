@@ -109,7 +109,7 @@ class _ModelDownloadScreenState extends State<ModelDownloadScreen> {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF6366F1).withOpacity(0.25),
+                        color: const Color(0xFF6366F1).withValues(alpha: 0.25),
                         blurRadius: 28,
                         spreadRadius: 4,
                       ),
@@ -248,9 +248,9 @@ class _ModelDownloadScreenState extends State<ModelDownloadScreen> {
                 const SizedBox(height: 32),
 
                 // Privacy Footnote
-                Row(
+                const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
+                  children: [
                     Icon(
                       Icons.lock_outline,
                       size: 16,

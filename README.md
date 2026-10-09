@@ -71,6 +71,7 @@ _(Optional: Describe where your detailed screenshot folders are located or showc
 | 2   | SQLite / `sqflite`                         | Local persistence      | Intended local storage for journal entries, preferences, and approved memories. |
 | 3   | `dio`, `path_provider`, `path`             | File management        | Declared packages for model download and application file paths.                |
 | 4   | `flutter_gemma`, `flutter_gemma_mediapipe` | On-device AI candidate | Declared dependencies; runtime integration and inference are not yet working.   |
+| 5   | Plus Jakarta Sans                         | Typography             | Bundled and applied through Flutter's shared theme across supported targets.    |
 
 ---
 
@@ -136,7 +137,7 @@ flutter run
 
 If more than one device is available, specify one with `flutter run -d <device-id>`. The current app still opens the starter counter screen.
 
-No `.env` file or backend service is required to run the current Flutter prototype. The root `.env.example` contains generic server/database placeholders and is not used by the Flutter app.
+No `.env` file or backend service is required to run the current Flutter prototype. The root `.env.example` documents that no environment variables are currently needed.
 
 ---
 
@@ -158,6 +159,7 @@ On-device inference and offline behavior must additionally be verified on the ac
 ```text
 solace.ai/
 ├── android/              # Android application
+├── assets/               # Shared bundled fonts, brand art, images, and animations
 ├── docs/                 # Product, architecture, and AI documentation
 ├── ios/                  # iOS application
 ├── lib/

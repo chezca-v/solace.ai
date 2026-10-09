@@ -37,8 +37,8 @@ class SanctuaryDashboardScreen extends StatelessWidget {
                     width: 1,
                   ),
                 ),
-                child: Column(
-                  children: const [
+                child: const Column(
+                  children: [
                     Icon(
                       Icons.shield_outlined,
                       size: 56,

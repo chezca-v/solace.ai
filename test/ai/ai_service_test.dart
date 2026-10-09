@@ -1,7 +1,7 @@
 import 'package:test/test.dart';
-import '../../lib/ai/ai_service.dart';
-import '../../lib/ai/local_ai.dart';
-import '../../lib/ai/rule_based_ai.dart';
+import 'package:solace_ai/ai/ai_service.dart';
+import 'package:solace_ai/ai/local_ai.dart';
+import 'package:solace_ai/ai/rule_based_ai.dart';
 
 class MockFailingGemma implements LocalAi {
   @override
