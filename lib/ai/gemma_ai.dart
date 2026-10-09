@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 import 'context_builder.dart';
 import 'json_parser.dart';
 import 'local_ai.dart';
@@ -15,33 +16,45 @@ import 'prompts.dart';
 
 /// On-device AI engine utilizing Google Gemma 3 1B IT via MediaPipe.
 class GemmaAi implements LocalAi {
-  /// Default sideload path for the int4 quantized Gemma 3 model on Android.
-  static const String defaultModelPath =
-      '/storage/emulated/0/Download/gemma3-1b-it-int4.task';
+  static const String modelFileName = 'gemma3-1b-it-int4.task';
 
-  final String modelPath;
+  final String? customModelPath;
+  String? _resolvedModelPath;
   bool _isReady = false;
 
-  GemmaAi({this.modelPath = defaultModelPath});
+  GemmaAi({String? modelPath}) : customModelPath = modelPath;
 
   @override
   String get engineName => 'Gemma 3 1B (on-device)';
 
+  /// Path to the active model task file.
+  String? get activeModelPath => _resolvedModelPath ?? customModelPath;
+
   @override
   Future<bool> init() async {
     try {
-      final file = File(modelPath);
+      String targetPath;
+      if (customModelPath != null && customModelPath!.trim().isNotEmpty) {
+        targetPath = customModelPath!;
+      } else {
+        final appDir = await getApplicationDocumentsDirectory();
+        targetPath = '${appDir.path}/$modelFileName';
+      }
+
+      final file = File(targetPath);
       final exists = await file.exists();
       if (!exists) {
         _isReady = false;
         return false;
       }
 
+      _resolvedModelPath = targetPath;
+
       // TODO: needs flutter_gemma dependency
       // Once dependencies are added, initialize MediaPipe and register model:
       // await FlutterGemma.initialize(inferenceEngines: const [MediaPipeEngine()]);
       // await FlutterGemma.installModel(modelType: ModelType.gemmaIt)
-      //     .fromFile(modelPath)
+      //     .fromFile(targetPath)
       //     .install();
 
       _isReady = true;

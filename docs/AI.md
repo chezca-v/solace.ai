@@ -8,31 +8,36 @@ Solace.ai provides private, local-first AI journaling companionship running comp
 * **Model Name:** Gemma 3 1B IT int4 (`gemma3-1b-it-int4.task`)
 * **Architecture:** Small Language Model (SLM) optimized for on-device natural language reflection and structured decision analysis.
 * **Source:** [litert-community/Gemma3-1B-IT](https://huggingface.co/litert-community/Gemma3-1B-IT) on Hugging Face.
+* **Direct Download URL:** `https://huggingface.co/litert-community/Gemma3-1B-IT/resolve/main/gemma3-1b-it-int4.task`
 * **Quantization & Format:** 4-bit integer quantization (int4) packed in MediaPipe `.task` format for mobile acceleration.
 * **License:** Gemma Terms of Use and Open License.
 
 ---
 
-## 2. How to Sideload the Model
-During local development and testing, sideload the `.task` model file to the Android device Download directory:
+## 2. In-App Model Downloader & Onboarding Flow
+Solace downloads the Gemma SLM directly into the application's internal documents directory during the initial onboarding experience:
 
-1. Download `gemma3-1b-it-int4.task` from Hugging Face.
-2. Connect your Android device via USB with USB debugging enabled.
-3. Push the file using ADB:
-   ```bash
-   adb push gemma3-1b-it-int4.task /storage/emulated/0/Download/gemma3-1b-it-int4.task
-   ```
-4. Alternatively, transfer the file directly to the phone's internal storage `Download/` folder using the Android File Transfer or Files app.
+1. **Internal Storage Location:**
+   `${getApplicationDocumentsDirectory().path}/gemma3-1b-it-int4.task`
+2. **Onboarding Screen (Step 5+):**
+   Immediately after profile configuration (Step 5), the app presents `ModelDownloadScreen` with the text *"Setting up your private offline brain..."* and a live progress indicator driven by `dio`.
+3. **Demo Bypass:**
+   Before displaying the download screen or starting the animation, the app checks if `File(filePath).exists()`. If the model is already present, the screen is skipped instantly, routing directly to the Sanctuary Dashboard.
 
 ---
 
-## 3. Dependencies to Add
-Add the following dependencies to `pubspec.yaml` when integrating the AI engine and local persistence:
+## 3. Dependencies
+Add or verify the following dependencies in `pubspec.yaml`:
 
 ```yaml
 dependencies:
   flutter:
     sdk: flutter
+
+  # Networking & File Management
+  dio: ^5.7.0
+  path_provider: ^2.1.5
+  path: ^1.9.1
 
   # On-Device AI
   flutter_gemma: ^1.11.2
@@ -40,8 +45,6 @@ dependencies:
 
   # Local Database & Storage
   sqflite: ^2.4.1
-  path: ^1.9.1
-  path_provider: ^2.1.5
 ```
 
 ---
@@ -69,11 +72,12 @@ dependencies:
 ## 6. Offline Test Steps (Airplane Mode)
 To verify that Solace operates 100% locally:
 
-1. Put the Android phone into **Airplane Mode** (disable Wi-Fi, Mobile Data, and Bluetooth).
-2. Launch the Solace app.
-3. Open a new journal entry and write a reflection or decision prompt (e.g., "Choosing between studying tonight or resting early").
-4. Submit the entry and observe the reflection and option breakdown generated on-device.
-5. Verify in the Settings screen that the engine status displays active on-device execution with zero network roundtrips.
+1. Complete initial model download or verify the `.task` file exists in the app documents directory.
+2. Put the Android phone into **Airplane Mode** (disable Wi-Fi, Mobile Data, and Bluetooth).
+3. Launch the Solace app (notice the instant demo bypass straight to the Sanctuary Dashboard).
+4. Open a new journal entry and write a reflection or decision prompt (e.g., "Choosing between studying tonight or resting early").
+5. Submit the entry and observe the reflection and option breakdown generated on-device.
+6. Verify in Settings that the engine status displays active on-device execution with zero network roundtrips.
 
 ---
 
