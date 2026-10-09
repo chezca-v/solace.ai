@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
 import '../../../theme/app_colors.dart';
+import '../home/sanctuary_home_screen.dart';
 
 class OnboardingStep5Screen extends StatefulWidget {
   const OnboardingStep5Screen({super.key});
@@ -100,8 +101,10 @@ class _OnboardingStep5ScreenState extends State<OnboardingStep5Screen> with Sing
   void _onComplete() {
     Future.delayed(const Duration(seconds: 1), () {
       if (mounted) {
-        // Navigate to dashboard or next screen
-        Navigator.of(context).popUntil((route) => route.isFirst);
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const SanctuaryHomeScreen()),
+          (route) => false,
+        );
       }
     });
   }

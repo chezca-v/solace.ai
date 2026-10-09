@@ -1,22 +1,54 @@
 import 'package:flutter/foundation.dart';
+import 'package:sqflite/sqflite.dart';
+import '../core/database/database_helper.dart';
 import '../models/journal_entry.dart';
 
 /// Manages private local journal entries and reflections
 class JournalService extends ChangeNotifier {
   static final JournalService instance = JournalService._internal();
-  JournalService._internal() {
-    _loadInitialSampleEntries();
-  }
+  JournalService._internal();
 
   factory JournalService() => instance;
 
-  final List<JournalEntry> _entries = [];
+  List<JournalEntry> _entries = [];
+  bool _isInitialized = false;
 
   List<JournalEntry> get entries => List.unmodifiable(_entries);
 
-  void _loadInitialSampleEntries() {
-    if (_entries.isNotEmpty) return;
+  Future<void> init() async {
+    if (_isInitialized) return;
+    
+    // SQLite does not support web. If running on web, fallback to in-memory list
+    if (kIsWeb) {
+      _loadInitialSampleEntries();
+      _isInitialized = true;
+      return;
+    }
 
+    await _loadFromDb();
+    
+    // If DB is empty, populate with samples
+    if (_entries.isEmpty) {
+      _loadInitialSampleEntries();
+      final db = await DatabaseHelper.instance.database;
+      if (db != null) {
+        for (final e in _entries) {
+          await db.insert('entries', e.toMap());
+        }
+      }
+    }
+    _isInitialized = true;
+  }
+
+  Future<void> _loadFromDb() async {
+    final db = await DatabaseHelper.instance.database;
+    if (db == null) return;
+    final List<Map<String, dynamic>> maps = await db.query('entries', orderBy: 'created_at DESC');
+    _entries = maps.map((map) => JournalEntry.fromMap(map)).toList();
+    notifyListeners();
+  }
+
+  void _loadInitialSampleEntries() {
     _entries.addAll([
       JournalEntry(
         id: 'entry-1',
@@ -43,24 +75,46 @@ class JournalService extends ChangeNotifier {
         wordCount: 96,
       ),
     ]);
-  }
-
-  void addEntry(JournalEntry entry) {
-    _entries.insert(0, entry);
     notifyListeners();
   }
 
-  void updateEntry(JournalEntry updated) {
+  Future<void> addEntry(JournalEntry entry) async {
+    _entries.insert(0, entry);
+    notifyListeners();
+    final db = await DatabaseHelper.instance.database;
+    if (db != null) {
+      await db.insert('entries', entry.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+    }
+  }
+
+  Future<void> updateEntry(JournalEntry updated) async {
     final index = _entries.indexWhere((e) => e.id == updated.id);
     if (index != -1) {
       _entries[index] = updated;
       notifyListeners();
+      final db = await DatabaseHelper.instance.database;
+      if (db != null) {
+        await db.update(
+          'entries',
+          updated.toMap(),
+          where: 'id = ?',
+          whereArgs: [updated.id],
+        );
+      }
     }
   }
 
-  void deleteEntry(String id) {
+  Future<void> deleteEntry(String id) async {
     _entries.removeWhere((e) => e.id == id);
     notifyListeners();
+    final db = await DatabaseHelper.instance.database;
+    if (db != null) {
+      await db.delete(
+        'entries',
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    }
   }
 
   JournalEntry? getEntryById(String id) {

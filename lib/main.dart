@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'theme/app_theme.dart';
 import 'dashboard_screen.dart';
+import 'services/journal_service.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await JournalService.instance.init();
   runApp(const SolaceApp());
 }
 
