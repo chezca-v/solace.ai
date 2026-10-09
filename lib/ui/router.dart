@@ -1,15 +1,19 @@
-import 'package:flutter/material.dart';
+//import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+<<<<<<< HEAD
 import 'screens/decision/decision_comparison_screen.dart';
 import 'screens/home/sanctuary_home_screen.dart';
 import 'screens/journal/entry_detail_screen.dart';
 import 'screens/journal/journal_editor_screen.dart';
 import 'screens/journal/voice_journaling_screen.dart';
 import 'screens/memories/memory_vault_screen.dart';
+=======
+>>>>>>> 2f3b8ea464cb694b060fb7f0a67c68af2572727a
 import 'screens/model_download_screen.dart';
 import 'screens/onboarding/journaling_goals_screen.dart';
 import 'screens/onboarding/personal_context_screen.dart';
 import 'screens/onboarding/support_preferences_screen.dart';
+<<<<<<< HEAD
 import 'screens/welcome_screen.dart';
 
 /// Global router defining navigation across Solace AI
@@ -31,17 +35,30 @@ final GoRouter solaceRouter = GoRouter(
         onContinue: () => context.go('/onboarding/preferences'),
         onBack: () => context.go('/welcome'),
         onSkip: () => context.go('/onboarding/preferences'),
-      ),
-    ),
+=======
+import 'screens/sanctuary_dashboard_screen.dart';
+import 'screens/welcome_screen.dart';
 
-    // 03 — Support Preferences (Step 2 of 4)
-    GoRoute(
-      path: '/onboarding/preferences',
-      builder: (context, state) => SupportPreferencesScreen(
-        onContinue: () => context.go('/onboarding/context'),
-        onBack: () => context.go('/onboarding/goals'),
-        onSkip: () => context.go('/onboarding/context'),
+GoRouter buildRouter() {
+  return GoRouter(
+    initialLocation: '/welcome',
+    routes: [
+      GoRoute(
+        path: '/welcome',
+        builder: (context, state) => WelcomeScreen(
+          onGetStarted: () => context.go('/onboarding/goals'),
+        ),
+>>>>>>> 2f3b8ea464cb694b060fb7f0a67c68af2572727a
       ),
+      GoRoute(
+        path: '/onboarding/goals',
+        builder: (context, state) => JournalingGoalsScreen(
+          onContinue: () => context.go('/onboarding/preferences'),
+          onBack: () => context.go('/welcome'),
+          onSkip: () => context.go('/onboarding/preferences'),
+        ),
+      ),
+<<<<<<< HEAD
     ),
 
     // 04 — Personal Context (Step 3 of 4)
@@ -72,16 +89,35 @@ final GoRouter solaceRouter = GoRouter(
         onSelectEntry: (id) => context.go('/entry/$id'),
         onMemoriesTab: () => context.go('/memories'),
         onJournalTab: () => context.go('/journal/new'),
+=======
+      GoRoute(
+        path: '/onboarding/preferences',
+        builder: (context, state) => SupportPreferencesScreen(
+          onContinue: () => context.go('/onboarding/context'),
+          onBack: () => context.go('/onboarding/goals'),
+          onSkip: () => context.go('/onboarding/context'),
+        ),
       ),
-    ),
-
-    // 07 — Journal Editor (Text)
-    GoRoute(
-      path: '/journal/new',
-      builder: (context, state) => JournalEditorScreen(
-        onBack: () => context.go('/'),
-        onOpenVoice: () => context.go('/journal/voice'),
+      GoRoute(
+        path: '/onboarding/context',
+        builder: (context, state) => PersonalContextScreen(
+          onContinue: () => context.go('/onboarding/download'),
+          onBack: () => context.go('/onboarding/preferences'),
+          onSkip: () => context.go('/onboarding/download'),
+        ),
       ),
+      GoRoute(
+        path: '/onboarding/download',
+        builder: (context, state) => const ModelDownloadScreen(
+          destinationScreen: SanctuaryDashboardScreen(),
+        ),
+>>>>>>> 2f3b8ea464cb694b060fb7f0a67c68af2572727a
+      ),
+      GoRoute(
+        path: '/',
+        builder: (_, __) => const SanctuaryDashboardScreen(),
+      ),
+<<<<<<< HEAD
     ),
 
     // 07A & 07B — Voice Journaling (Recording & Transcribed Reflection)
@@ -126,3 +162,8 @@ final GoRouter solaceRouter = GoRouter(
     ),
   ],
 );
+=======
+    ],
+  );
+}
+>>>>>>> 2f3b8ea464cb694b060fb7f0a67c68af2572727a
