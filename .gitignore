@@ -17,3 +17,6 @@ build/
 # OS Specific Files
 .DS_Store
 Thumbs.db
+
+.idea/
+*.iml
