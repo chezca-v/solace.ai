@@ -1,18 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'firebase_options.dart';
-import 'services/auth_service.dart';
 import 'ui/router.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
-  final auth = AuthService(FirebaseAuth.instance);
-  await auth.authChanges.first;
-  runApp(MyApp(router: buildRouter(auth)));
+  runApp(MyApp(router: buildRouter()));
 }
 
 class MyApp extends StatelessWidget {

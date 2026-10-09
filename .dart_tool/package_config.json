@@ -8,16 +8,16 @@
       "languageVersion": "3.11"
     },
     {
-      "name": "_flutterfire_internals",
-      "rootUri": "file:///C:/Users/jbene/AppData/Local/Pub/Cache/hosted/pub.dev/_flutterfire_internals-1.3.77",
-      "packageUri": "lib/",
-      "languageVersion": "3.6"
-    },
-    {
       "name": "analyzer",
       "rootUri": "file:///C:/Users/jbene/AppData/Local/Pub/Cache/hosted/pub.dev/analyzer-13.3.0",
       "packageUri": "lib/",
       "languageVersion": "3.11"
+    },
+    {
+      "name": "archive",
+      "rootUri": "file:///C:/Users/jbene/AppData/Local/Pub/Cache/hosted/pub.dev/archive-4.3.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
     },
     {
       "name": "args",
@@ -50,10 +50,22 @@
       "languageVersion": "3.4"
     },
     {
+      "name": "checked_yaml",
+      "rootUri": "file:///C:/Users/jbene/AppData/Local/Pub/Cache/hosted/pub.dev/checked_yaml-2.0.4",
+      "packageUri": "lib/",
+      "languageVersion": "3.8"
+    },
+    {
       "name": "cli_config",
       "rootUri": "file:///C:/Users/jbene/AppData/Local/Pub/Cache/hosted/pub.dev/cli_config-0.2.0",
       "packageUri": "lib/",
       "languageVersion": "3.0"
+    },
+    {
+      "name": "cli_util",
+      "rootUri": "file:///C:/Users/jbene/AppData/Local/Pub/Cache/hosted/pub.dev/cli_util-0.4.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
     },
     {
       "name": "clock",
@@ -164,42 +176,6 @@
       "languageVersion": "3.0"
     },
     {
-      "name": "firebase_auth",
-      "rootUri": "file:///C:/Users/jbene/AppData/Local/Pub/Cache/hosted/pub.dev/firebase_auth-6.7.0",
-      "packageUri": "lib/",
-      "languageVersion": "3.6"
-    },
-    {
-      "name": "firebase_auth_platform_interface",
-      "rootUri": "file:///C:/Users/jbene/AppData/Local/Pub/Cache/hosted/pub.dev/firebase_auth_platform_interface-9.1.0",
-      "packageUri": "lib/",
-      "languageVersion": "3.6"
-    },
-    {
-      "name": "firebase_auth_web",
-      "rootUri": "file:///C:/Users/jbene/AppData/Local/Pub/Cache/hosted/pub.dev/firebase_auth_web-6.3.0",
-      "packageUri": "lib/",
-      "languageVersion": "3.6"
-    },
-    {
-      "name": "firebase_core",
-      "rootUri": "file:///C:/Users/jbene/AppData/Local/Pub/Cache/hosted/pub.dev/firebase_core-4.15.0",
-      "packageUri": "lib/",
-      "languageVersion": "3.6"
-    },
-    {
-      "name": "firebase_core_platform_interface",
-      "rootUri": "file:///C:/Users/jbene/AppData/Local/Pub/Cache/hosted/pub.dev/firebase_core_platform_interface-8.1.1",
-      "packageUri": "lib/",
-      "languageVersion": "3.6"
-    },
-    {
-      "name": "firebase_core_web",
-      "rootUri": "file:///C:/Users/jbene/AppData/Local/Pub/Cache/hosted/pub.dev/firebase_core_web-3.12.0",
-      "packageUri": "lib/",
-      "languageVersion": "3.6"
-    },
-    {
       "name": "flutter",
       "rootUri": "file:///C:/Users/jbene/flutter/packages/flutter",
       "packageUri": "lib/",
@@ -216,6 +192,12 @@
       "rootUri": "file:///C:/Users/jbene/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_gemma_mediapipe-1.0.9",
       "packageUri": "lib/",
       "languageVersion": "3.12"
+    },
+    {
+      "name": "flutter_launcher_icons",
+      "rootUri": "file:///C:/Users/jbene/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_launcher_icons-0.14.4",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
     },
     {
       "name": "flutter_lints",
@@ -290,6 +272,12 @@
       "languageVersion": "3.4"
     },
     {
+      "name": "image",
+      "rootUri": "file:///C:/Users/jbene/AppData/Local/Pub/Cache/hosted/pub.dev/image-4.10.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
       "name": "intl",
       "rootUri": "file:///C:/Users/jbene/AppData/Local/Pub/Cache/hosted/pub.dev/intl-0.20.3",
       "packageUri": "lib/",
@@ -318,6 +306,18 @@
       "rootUri": "file:///C:/Users/jbene/AppData/Local/Pub/Cache/hosted/pub.dev/jni_util-1.0.0",
       "packageUri": "lib/",
       "languageVersion": "3.3"
+    },
+    {
+      "name": "js",
+      "rootUri": "file:///C:/Users/jbene/AppData/Local/Pub/Cache/hosted/pub.dev/js-0.7.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.7"
+    },
+    {
+      "name": "json_annotation",
+      "rootUri": "file:///C:/Users/jbene/AppData/Local/Pub/Cache/hosted/pub.dev/json_annotation-4.12.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.9"
     },
     {
       "name": "json_schema_builder",
@@ -464,6 +464,12 @@
       "languageVersion": "3.2"
     },
     {
+      "name": "pedantic",
+      "rootUri": "file:///C:/Users/jbene/AppData/Local/Pub/Cache/hosted/pub.dev/pedantic-1.11.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "petitparser",
       "rootUri": "file:///C:/Users/jbene/AppData/Local/Pub/Cache/hosted/pub.dev/petitparser-7.0.2",
       "packageUri": "lib/",
@@ -486,6 +492,12 @@
       "rootUri": "file:///C:/Users/jbene/AppData/Local/Pub/Cache/hosted/pub.dev/pool-1.5.3",
       "packageUri": "lib/",
       "languageVersion": "3.4"
+    },
+    {
+      "name": "posix",
+      "rootUri": "file:///C:/Users/jbene/AppData/Local/Pub/Cache/hosted/pub.dev/posix-6.5.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
     },
     {
       "name": "pub_semver",
@@ -594,6 +606,24 @@
       "rootUri": "file:///C:/Users/jbene/AppData/Local/Pub/Cache/hosted/pub.dev/source_span-1.10.2",
       "packageUri": "lib/",
       "languageVersion": "3.1"
+    },
+    {
+      "name": "speech_to_text",
+      "rootUri": "file:///C:/Users/jbene/AppData/Local/Pub/Cache/hosted/pub.dev/speech_to_text-6.6.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "speech_to_text_macos",
+      "rootUri": "file:///C:/Users/jbene/AppData/Local/Pub/Cache/hosted/pub.dev/speech_to_text_macos-1.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "speech_to_text_platform_interface",
+      "rootUri": "file:///C:/Users/jbene/AppData/Local/Pub/Cache/hosted/pub.dev/speech_to_text_platform_interface-2.5.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
     },
     {
       "name": "sqflite",
