@@ -1,4 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:sqflite/sqflite.dart';
+import '../core/database/database_helper.dart';
 import '../ai/local_ai.dart';
 
 /// Manages and retains the user's onboarding profile preferences
@@ -9,27 +12,13 @@ class OnboardingService extends ChangeNotifier {
 
   factory OnboardingService() => instance;
 
-  final Set<String> _selectedGoals = {
-    'Understand my thoughts and feelings',
-    'Make difficult decisions',
-    'Manage stress & overwhelm',
-  };
+  bool _isInitialized = false;
 
-  final Set<String> _selectedSupportStyles = {
-    'Listen and reflect',
-    'Help me compare choices',
-    'Ask thoughtful questions',
-  };
-
-  final Set<String> _selectedLifeAreas = {
-    'Career & Craft',
-    'Personal Growth',
-    'Creative Autonomy',
-  };
-
-  String _workingToward =
-      'Balancing a career transition without triggering burnout or sacrificing creative freedom.';
-  String _explicitBoundaries = 'Don\'t offer advice unless I specifically request it.';
+  Set<String> _selectedGoals = {};
+  Set<String> _selectedSupportStyles = {};
+  Set<String> _selectedLifeAreas = {};
+  String _workingToward = '';
+  String _explicitBoundaries = '';
 
   // Getters
   Set<String> get selectedGoals => Set.unmodifiable(_selectedGoals);
@@ -38,51 +27,69 @@ class OnboardingService extends ChangeNotifier {
   String get workingToward => _workingToward;
   String get explicitBoundaries => _explicitBoundaries;
 
-  // Mutators
-  void toggleGoal(String goal) {
-    if (_selectedGoals.contains(goal)) {
-      _selectedGoals.remove(goal);
-    } else {
-      _selectedGoals.add(goal);
+  Future<void> init() async {
+    if (_isInitialized) return;
+    if (kIsWeb) {
+      _isInitialized = true;
+      return;
     }
+
+    final db = await DatabaseHelper.instance.database;
+    if (db != null) {
+      final List<Map<String, dynamic>> maps = await db.query('user_preferences');
+      for (final map in maps) {
+        final key = map['key'] as String;
+        final value = map['value'] as String;
+        
+        try {
+          if (key == 'selectedGoals') _selectedGoals = Set<String>.from(jsonDecode(value));
+          if (key == 'selectedSupportStyles') _selectedSupportStyles = Set<String>.from(jsonDecode(value));
+          if (key == 'selectedLifeAreas') _selectedLifeAreas = Set<String>.from(jsonDecode(value));
+          if (key == 'workingToward') _workingToward = value;
+          if (key == 'explicitBoundaries') _explicitBoundaries = value;
+        } catch (_) {}
+      }
+    }
+    _isInitialized = true;
     notifyListeners();
   }
 
-  void toggleSupportStyle(String style) {
-    if (_selectedSupportStyles.contains(style)) {
-      _selectedSupportStyles.remove(style);
-    } else {
-      _selectedSupportStyles.add(style);
+  Future<void> _saveToDb(String key, String value) async {
+    if (kIsWeb) return;
+    final db = await DatabaseHelper.instance.database;
+    if (db != null) {
+      await db.insert('user_preferences', {'key': key, 'value': value}, conflictAlgorithm: ConflictAlgorithm.replace);
     }
-    notifyListeners();
   }
 
-  void toggleLifeArea(String area) {
-    if (_selectedLifeAreas.contains(area)) {
-      _selectedLifeAreas.remove(area);
-    } else {
-      _selectedLifeAreas.add(area);
-    }
+  Future<void> setGoals(Set<String> goals) async {
+    _selectedGoals = Set.from(goals);
     notifyListeners();
+    await _saveToDb('selectedGoals', jsonEncode(_selectedGoals.toList()));
   }
 
-  void setWorkingToward(String text) {
+  Future<void> setSupportStyles(Set<String> styles) async {
+    _selectedSupportStyles = Set.from(styles);
+    notifyListeners();
+    await _saveToDb('selectedSupportStyles', jsonEncode(_selectedSupportStyles.toList()));
+  }
+
+  Future<void> setLifeAreas(Set<String> areas) async {
+    _selectedLifeAreas = Set.from(areas);
+    notifyListeners();
+    await _saveToDb('selectedLifeAreas', jsonEncode(_selectedLifeAreas.toList()));
+  }
+
+  Future<void> setWorkingToward(String text) async {
     _workingToward = text;
     notifyListeners();
+    await _saveToDb('workingToward', text);
   }
 
-  void setExplicitBoundaries(String text) {
+  Future<void> setExplicitBoundaries(String text) async {
     _explicitBoundaries = text;
     notifyListeners();
-  }
-
-  void addBoundaryRule(String rule) {
-    if (_explicitBoundaries.trim().isEmpty) {
-      _explicitBoundaries = rule;
-    } else if (!_explicitBoundaries.contains(rule)) {
-      _explicitBoundaries = '$_explicitBoundaries. $rule';
-    }
-    notifyListeners();
+    await _saveToDb('explicitBoundaries', text);
   }
 
   /// Converts the captured onboarding preferences into a UserContext for the local AI engine

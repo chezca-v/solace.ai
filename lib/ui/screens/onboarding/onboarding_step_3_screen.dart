@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../theme/app_colors.dart';
+import '../../../services/onboarding_service.dart';
 import 'onboarding_step_4_screen.dart';
 
 class OnboardingStep3Screen extends StatefulWidget {
@@ -464,12 +465,19 @@ class _OnboardingStep3ScreenState extends State<OnboardingStep3Screen> {
                     height: 52,
                     child: ElevatedButton(
                       onPressed: () {
+                        final selectedAreaStrings = _selectedLifeAreas.map((i) => _lifeAreas[i]['label'] as String).toSet();
+                        final selectedBoundaryStrings = _selectedBoundaries.map((i) => _boundaries[i]['title'] as String).join('. ');
+                        
+                        OnboardingService.instance.setLifeAreas(selectedAreaStrings);
+                        OnboardingService.instance.setWorkingToward(_focusController.text);
+                        OnboardingService.instance.setExplicitBoundaries(selectedBoundaryStrings);
+
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => const OnboardingStep4Screen(),
                           ),
                         );
-                      }, // Handled directly via navigator when wired
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primaryContainer,
                         foregroundColor: AppColors.onPrimary,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../theme/app_colors.dart';
+import '../../../services/onboarding_service.dart';
 import 'onboarding_step_3_screen.dart';
 
 class OnboardingStep2Screen extends StatefulWidget {
@@ -364,6 +365,8 @@ class _OnboardingStep2ScreenState extends State<OnboardingStep2Screen> {
                 padding: const EdgeInsets.only(top: 8, bottom: 16),
                 child: ElevatedButton(
                   onPressed: _selectedIndices.isNotEmpty ? () {
+                    final selectedStyles = _selectedIndices.map((i) => _goals[i]['title'] as String).toSet();
+                    OnboardingService.instance.setSupportStyles(selectedStyles);
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => const OnboardingStep3Screen(),

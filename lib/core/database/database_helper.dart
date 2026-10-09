@@ -41,6 +41,12 @@ class DatabaseHelper {
             is_audio_draft INTEGER
           )
         ''');
+        await db.execute('''
+          CREATE TABLE user_preferences (
+            key TEXT PRIMARY KEY,
+            value TEXT
+          )
+        ''');
       },
     );
   }

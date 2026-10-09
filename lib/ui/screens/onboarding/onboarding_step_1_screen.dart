@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../theme/app_colors.dart';
+import '../../../services/onboarding_service.dart';
 import 'onboarding_step_2_screen.dart';
 
 class OnboardingStep1Screen extends StatefulWidget {
@@ -301,6 +302,8 @@ class _OnboardingStep1ScreenState extends State<OnboardingStep1Screen> {
                   children: [
                     ElevatedButton(
                       onPressed: _selectedIndices.isNotEmpty ? () {
+                         final selectedGoalStrings = _selectedIndices.map((i) => _goals[i]['title']!).toSet();
+                         OnboardingService.instance.setGoals(selectedGoalStrings);
                          Navigator.of(context).push(
                            MaterialPageRoute(
                              builder: (context) => const OnboardingStep2Screen(),
