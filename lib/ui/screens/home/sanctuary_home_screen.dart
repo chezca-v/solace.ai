@@ -1,19 +1,31 @@
 import 'package:flutter/material.dart';
 import '../../../services/journal_service.dart';
+import '../../../services/onboarding_service.dart';
 import '../../theme/solace_theme.dart';
 import '../../widgets/sun_illustration.dart';
+import '../journal/journal_editor_screen.dart';
+import '../journal/voice_journaling_screen.dart';
+import '../journal/entry_detail_screen.dart';
+import '../memories/memory_vault_screen.dart';
+import '../settings/settings_screen.dart';
 
 /// 06 — Sanctuary Home Dashboard
 class SanctuaryHomeScreen extends StatefulWidget {
   final VoidCallback? onNewEntry;
   final VoidCallback? onVoiceEntry;
   final Function(String)? onSelectEntry;
+  final VoidCallback? onMemoriesTab;
+  final VoidCallback? onJournalTab;
+  final VoidCallback? onSettingsTab;
 
   const SanctuaryHomeScreen({
     super.key,
     this.onNewEntry,
     this.onVoiceEntry,
     this.onSelectEntry,
+    this.onMemoriesTab,
+    this.onJournalTab,
+    this.onSettingsTab,
   });
 
   @override
@@ -240,27 +252,33 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
             ],
           ),
           const SizedBox(height: 8),
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Icon(Icons.circle, size: 6, color: Color(0xFF10B981)),
-                  SizedBox(width: 4),
-                  Icon(Icons.circle, size: 6, color: Color(0xFF10B981)),
-                  SizedBox(width: 5),
-                  Text(
-                    'Offline & Encrypted',
-                    style: TextStyle(
-                      fontFamily: SolaceTheme.fontFamily,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF1B7A52),
+              const Expanded(
+                child: Row(
+                  children: [
+                    Icon(Icons.circle, size: 6, color: Color(0xFF10B981)),
+                    SizedBox(width: 4),
+                    Icon(Icons.circle, size: 6, color: Color(0xFF10B981)),
+                    SizedBox(width: 5),
+                    Flexible(
+                      child: Text(
+                        'Offline & Encrypted',
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontFamily: SolaceTheme.fontFamily,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF1B7A52),
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-              Text(
+              const SizedBox(width: 8),
+              const Text(
                 'Wednesday, Oct 11',
                 style: TextStyle(
                   fontFamily: SolaceTheme.fontFamily,
@@ -280,43 +298,46 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'SANCTUARY SPACE',
-              style: TextStyle(
-                fontFamily: SolaceTheme.fontFamily,
-                fontSize: 10.5,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0.8,
-                color: SolaceTheme.primaryDark,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'SANCTUARY SPACE',
+                style: TextStyle(
+                  fontFamily: SolaceTheme.fontFamily,
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.8,
+                  color: SolaceTheme.primaryDark,
+                ),
               ),
-            ),
-            SizedBox(height: 2),
-            Text(
-              'Good morning,\nElena',
-              style: TextStyle(
-                fontFamily: SolaceTheme.fontFamily,
-                fontSize: 26,
-                fontWeight: FontWeight.w800,
-                color: SolaceTheme.textHeading,
-                letterSpacing: -0.5,
-                height: 1.15,
+              const SizedBox(height: 2),
+              Text(
+                'Good morning,\n${onboarding.userName.isNotEmpty ? onboarding.userName : 'Friend'}',
+                style: const TextStyle(
+                  fontFamily: SolaceTheme.fontFamily,
+                  fontSize: 26,
+                  fontWeight: FontWeight.w800,
+                  color: SolaceTheme.textHeading,
+                  letterSpacing: -0.5,
+                  height: 1.15,
+                ),
               ),
-            ),
-            SizedBox(height: 4),
-            Text(
-              'Here is a gentle space for your\nthoughts today.',
-              style: TextStyle(
-                fontFamily: SolaceTheme.fontFamily,
-                fontSize: 13,
-                color: SolaceTheme.textBody,
-                height: 1.35,
+              SizedBox(height: 4),
+              Text(
+                'Here is a gentle space for your\nthoughts today.',
+                style: TextStyle(
+                  fontFamily: SolaceTheme.fontFamily,
+                  fontSize: 13,
+                  color: SolaceTheme.textBody,
+                  height: 1.35,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
+        const SizedBox(width: 12),
         Container(
           width: 36,
           height: 36,
@@ -335,6 +356,17 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
   }
 
   Widget _buildGentlePromptCard() {
+    final onboarding = OnboardingService.instance;
+    final priorities = onboarding.workingToward;
+    final goals = onboarding.selectedGoals;
+    
+    String promptText = 'Take a breath. How does your mind feel right now?';
+    if (priorities.isNotEmpty) {
+      promptText = 'Take a breath. You mentioned wanting clarity on: $priorities. How does your mind feel right now?';
+    } else if (goals.isNotEmpty) {
+      promptText = 'Take a breath. You are focusing on ${goals.first}. How does your mind feel right now?';
+    }
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -362,9 +394,9 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
             ],
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Take a breath. You mentioned wanting clarity on your upcoming projects—how does your mind feel right now?',
-            style: TextStyle(
+          Text(
+            promptText,
+            style: const TextStyle(
               fontFamily: SolaceTheme.fontFamily,
               fontSize: 13,
               fontStyle: FontStyle.normal,
@@ -432,7 +464,15 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
           child: SizedBox(
             height: 50,
             child: ElevatedButton.icon(
-              onPressed: widget.onNewEntry,
+              onPressed: () {
+                if (widget.onNewEntry != null) {
+                  widget.onNewEntry!();
+                } else {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => const JournalEditorScreen()),
+                  );
+                }
+              },
               icon: const Icon(Icons.add_rounded, size: 20, color: Colors.white),
               label: const Text(
                 'New Entry',
@@ -465,7 +505,15 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
             border: Border.all(color: const Color(0xFFD4EBDD)),
           ),
           child: IconButton(
-            onPressed: widget.onVoiceEntry,
+            onPressed: () {
+              if (widget.onVoiceEntry != null) {
+                widget.onVoiceEntry!();
+              } else {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const VoiceJournalingScreen()),
+                );
+              }
+            },
             icon: const Icon(Icons.mic_rounded, color: SolaceTheme.primaryDark, size: 22),
           ),
         ),
@@ -601,20 +649,25 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Row(
-                  children: [
-                    Icon(Icons.auto_stories_outlined, size: 16, color: SolaceTheme.primary),
-                    SizedBox(width: 6),
-                    Text(
-                      'Your Recent Reflections',
-                      style: TextStyle(
-                        fontFamily: SolaceTheme.fontFamily,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: SolaceTheme.textHeading,
+                const Expanded(
+                  child: Row(
+                    children: [
+                      Icon(Icons.auto_stories_outlined, size: 16, color: SolaceTheme.primary),
+                      SizedBox(width: 6),
+                      Flexible(
+                        child: Text(
+                          'Your Recent Reflections',
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontFamily: SolaceTheme.fontFamily,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: SolaceTheme.textHeading,
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 TextButton(
                   onPressed: () {
@@ -645,7 +698,17 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
 
   Widget _buildReflectionCard(dynamic entry) {
     return InkWell(
-      onTap: () => widget.onSelectEntry?.call(entry.id),
+      onTap: () {
+        if (widget.onSelectEntry != null) {
+          widget.onSelectEntry!(entry.id);
+        } else {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => EntryDetailScreen(entryId: entry.id),
+            ),
+          );
+        }
+      },
       borderRadius: BorderRadius.circular(18),
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -726,29 +789,35 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFEBF6EF),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.auto_awesome, size: 11, color: SolaceTheme.primaryDark),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Sol Badge: ${entry.solBadge ?? "Reflection active"}',
-                        style: const TextStyle(
-                          fontFamily: SolaceTheme.fontFamily,
-                          fontSize: 10.5,
-                          fontWeight: FontWeight.w600,
-                          color: SolaceTheme.primaryDark,
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEBF6EF),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.auto_awesome, size: 11, color: SolaceTheme.primaryDark),
+                        const SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            'Sol Badge: ${entry.solBadge ?? "Reflection active"}',
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontFamily: SolaceTheme.fontFamily,
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.w600,
+                              color: SolaceTheme.primaryDark,
+                            ),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
+                const SizedBox(width: 8),
                 const Icon(
                   Icons.arrow_forward_rounded,
                   size: 16,
@@ -828,7 +897,36 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
   Widget _buildBottomNav() {
     return NavigationBar(
       selectedIndex: _currentNavIndex,
-      onDestinationSelected: (i) => setState(() => _currentNavIndex = i),
+      onDestinationSelected: (i) {
+        setState(() => _currentNavIndex = i);
+        if (i == 0) {
+          // Home
+        } else if (i == 1) {
+          if (widget.onJournalTab != null) {
+            widget.onJournalTab!();
+          } else {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const JournalEditorScreen()),
+            );
+          }
+        } else if (i == 2) {
+          if (widget.onMemoriesTab != null) {
+            widget.onMemoriesTab!();
+          } else {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const MemoryVaultScreen()),
+            );
+          }
+        } else if (i == 3) {
+          if (widget.onSettingsTab != null) {
+            widget.onSettingsTab!();
+          } else {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const SettingsScreen()),
+            );
+          }
+        }
+      },
       backgroundColor: SolaceTheme.surfaceWhite,
       indicatorColor: const Color(0xFFE5F6EC),
       destinations: const [

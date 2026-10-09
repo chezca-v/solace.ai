@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../theme/app_colors.dart';
+import '../../../services/onboarding_service.dart';
+import '../../widgets/onboarding_app_bar.dart';
+import '../../widgets/onboarding_progress_header.dart';
 import 'onboarding_step_4_screen.dart';
 
 class OnboardingStep3Screen extends StatefulWidget {
@@ -11,12 +14,12 @@ class OnboardingStep3Screen extends StatefulWidget {
 
 class _OnboardingStep3ScreenState extends State<OnboardingStep3Screen> {
   final List<Map<String, dynamic>> _lifeAreas = [
-    {'emoji': '💼', 'label': 'Work & Craft'},
-    {'emoji': '🌱', 'label': 'Personal Growth'},
-    {'emoji': '🎓', 'label': 'School & Studies'},
-    {'emoji': '❤️', 'label': 'Relationships'},
-    {'emoji': '⚡', 'label': 'Health & Energy'},
-    {'emoji': '🎨', 'label': 'Creative Autonomy'},
+    {'icon': Icons.work_outline, 'label': 'Work & Craft'},
+    {'icon': Icons.psychology_outlined, 'label': 'Personal Growth'},
+    {'icon': Icons.school_outlined, 'label': 'School & Studies'},
+    {'icon': Icons.favorite_outline, 'label': 'Relationships'},
+    {'icon': Icons.bolt_outlined, 'label': 'Health & Energy'},
+    {'icon': Icons.palette_outlined, 'label': 'Creative Autonomy'},
   ];
 
   final Set<int> _selectedLifeAreas = {};
@@ -41,107 +44,13 @@ class _OnboardingStep3ScreenState extends State<OnboardingStep3Screen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.canvasBackground,
-      appBar: AppBar(
-        backgroundColor: AppColors.canvasBackground.withOpacity(0.9),
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.bodyForest),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: const Text(
-          'Personal Context',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: AppColors.inverseSurface,
-          ),
-        ),
-        centerTitle: true,
-        actions: [
-          TextButton(
-            onPressed: () {},
-            child: const Text(
-              'Skip',
-              style: TextStyle(fontSize: 13, color: AppColors.secondary),
-            ),
-          ),
-          const SizedBox(width: 8),
-          const CircleAvatar(
-            radius: 16,
-            backgroundImage: NetworkImage('https://lh3.googleusercontent.com/aida/AEtjO1VTW28s9F5nAumb5HD_s_f6oKhP829n6u7izTeQXvnBc1xHEElSdKPl5yjjXLiYiGHXfxeMRALGF1imafC384vVcuTgtCaFnRJGkHSK34rT0f8Et6jFzBAkvO-EQT-GE2AAgSX4sSKV4nHXlxW9V8Z8mblgPgjU8LjavRZpQMjUJz1oUERs7kp_XBRyjfOX_gv9r1f6TlLvGoHLLPQK-4iG6-Mj2HoAixOVyMEfEIX5-80NjOwzXpAMHpA'),
-          ),
-          const SizedBox(width: 16),
-        ],
-      ),
+      appBar: const OnboardingAppBar(title: 'Personal Context'),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             children: [
-              // Progress Header
-              Padding(
-                padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: AppColors.surfaceContainer,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 4,
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: const BoxDecoration(
-                              color: AppColors.primaryContainer,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'STEP 3 OF 5',
-                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              color: const Color(0xFF193B2C),
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 1.2,
-                              fontSize: 11,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    // Multi-segment Progress Bar
-                    Row(
-                      children: List.generate(5, (index) {
-                        return Container(
-                          width: index == 2 ? 24 : 16,
-                          height: 6,
-                          margin: const EdgeInsets.only(left: 6),
-                          decoration: BoxDecoration(
-                            color: index < 3 
-                              ? AppColors.primaryContainer 
-                              : const Color(0xFFD4EEDF),
-                            borderRadius: BorderRadius.circular(3),
-                            boxShadow: index == 2 
-                              ? [BoxShadow(color: AppColors.primaryContainer.withOpacity(0.5), blurRadius: 4)]
-                              : null,
-                          ),
-                        );
-                      }),
-                    ),
-                  ],
-                ),
-              ),
+              const OnboardingProgressHeader(step: 3, label: 'Context'),
 
               Expanded(
                 child: SingleChildScrollView(
@@ -231,7 +140,7 @@ class _OnboardingStep3ScreenState extends State<OnboardingStep3Screen> {
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Text(area['emoji'], style: const TextStyle(fontSize: 16)),
+                                  Icon(area['icon'], size: 16, color: isSelected ? AppColors.onPrimary : AppColors.primary),
                                   const SizedBox(width: 8),
                                   Text(
                                     area['label'],
@@ -464,12 +373,19 @@ class _OnboardingStep3ScreenState extends State<OnboardingStep3Screen> {
                     height: 52,
                     child: ElevatedButton(
                       onPressed: () {
+                        final selectedAreaStrings = _selectedLifeAreas.map((i) => _lifeAreas[i]['label'] as String).toSet();
+                        final selectedBoundaryStrings = _selectedBoundaries.map((i) => _boundaries[i]['title'] as String).join('. ');
+                        
+                        OnboardingService.instance.setLifeAreas(selectedAreaStrings);
+                        OnboardingService.instance.setWorkingToward(_focusController.text);
+                        OnboardingService.instance.setExplicitBoundaries(selectedBoundaryStrings);
+
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => const OnboardingStep4Screen(),
                           ),
                         );
-                      }, // Handled directly via navigator when wired
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primaryContainer,
                         foregroundColor: AppColors.onPrimary,

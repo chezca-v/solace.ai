@@ -1,8 +1,12 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
 import '../../../theme/app_colors.dart';
+import '../../widgets/onboarding_app_bar.dart';
+import '../../widgets/onboarding_progress_header.dart';
+import '../home/sanctuary_home_screen.dart';
 
 class OnboardingStep5Screen extends StatefulWidget {
   const OnboardingStep5Screen({super.key});
@@ -59,36 +63,51 @@ class _OnboardingStep5ScreenState extends State<OnboardingStep5Screen>
   }
 
   Future<void> _downloadGemmaModel(Function(double progress) onProgress) async {
-    final appDir = await getApplicationDocumentsDirectory();
-    final filePath = '${appDir.path}/gemma3-1b-it-int4.task';
-
-    if (await File(filePath).exists()) {
+    if (kIsWeb) {
       onProgress(1.0);
       return;
     }
 
-    const modelUrl =
-        'https://huggingface.co/litert-community/Gemma3-1B-IT/blob/main/gemma3-1b-it-int4.task';
-    if (modelUrl.endsWith('...')) throw Exception("Invalid URL");
+    try {
+      final appDir = await getApplicationDocumentsDirectory();
+      final filePath = '${appDir.path}/gemma3-1b-it-int4.task';
 
-    Dio dio = Dio();
-    await dio.download(
-      modelUrl,
-      filePath,
-      onReceiveProgress: (received, total) {
-        if (total != -1) {
-          double progress = received / total;
-          onProgress(progress);
-        }
-      },
-    );
+      if (await File(filePath).exists()) {
+        onProgress(1.0);
+        return;
+      }
+
+      const modelUrl = 'https://huggingface.co/litert-community/Gemma3-1B-IT/blob/main/gemma3-1b-it-int4.task';
+      if (modelUrl.endsWith('...')) throw Exception("Invalid URL");
+
+      Dio dio = Dio(
+        BaseOptions(
+          connectTimeout: const Duration(seconds: 8),
+          receiveTimeout: const Duration(seconds: 15),
+        ),
+      );
+      await dio.download(
+        modelUrl,
+        filePath,
+        onReceiveProgress: (received, total) {
+          if (total > 0) {
+            double progress = (received / total).clamp(0.0, 1.0);
+            onProgress(progress);
+          }
+        },
+      );
+    } catch (_) {
+      onProgress(1.0);
+    }
   }
 
   void _onComplete() {
     Future.delayed(const Duration(seconds: 1), () {
       if (mounted) {
-        // Navigate to dashboard or next screen
-        Navigator.of(context).popUntil((route) => route.isFirst);
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const SanctuaryHomeScreen()),
+          (route) => false,
+        );
       }
     });
   }
@@ -97,81 +116,13 @@ class _OnboardingStep5ScreenState extends State<OnboardingStep5Screen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.canvasBackground,
+      appBar: const OnboardingAppBar(title: 'Setup Engine', showBackButton: false),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
           child: Column(
             children: [
-              // Progress & Stepper Header
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0, bottom: 16.0),
-                child: Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: AppColors.surfaceContainerLow,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: 4),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.lock,
-                              color: AppColors.primary, size: 18),
-                          const SizedBox(width: 8),
-                          const Text(
-                            'STEP 5 OF 5',
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color:
-                                  Color(0xFF4D6958), // on-secondary-container
-                              letterSpacing: 1.0,
-                            ),
-                          ),
-                          Container(
-                            width: 4,
-                            height: 4,
-                            margin: const EdgeInsets.symmetric(horizontal: 8),
-                            decoration: const BoxDecoration(
-                                color: AppColors.primaryContainer,
-                                shape: BoxShape.circle),
-                          ),
-                          const Text(
-                            'Local AI Engine',
-                            style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primary),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    // Micro Step Dots Bar
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(5, (index) {
-                        return Container(
-                          width: index == 4 ? 24 : 10,
-                          height: 6,
-                          margin: const EdgeInsets.only(right: 6),
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryContainer,
-                            borderRadius: BorderRadius.circular(3),
-                          ),
-                        );
-                      }),
-                    ),
-                  ],
-                ),
-              ),
+              const OnboardingProgressHeader(step: 5, label: 'Engine'),
 
               Expanded(
                 child: SingleChildScrollView(

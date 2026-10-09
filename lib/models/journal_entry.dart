@@ -28,6 +28,18 @@ class JournalEntry {
     this.isAudioDraft = false,
   });
 
+  String get formattedDate {
+    final months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+    final month = months[createdAt.month - 1];
+    final hour = createdAt.hour > 12 ? createdAt.hour - 12 : (createdAt.hour == 0 ? 12 : createdAt.hour);
+    final period = createdAt.hour >= 12 ? 'PM' : 'AM';
+    final min = createdAt.minute.toString().padLeft(2, '0');
+    return '$month ${createdAt.day}, ${createdAt.year} • $hour:$min $period';
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,

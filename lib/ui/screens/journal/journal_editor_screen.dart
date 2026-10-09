@@ -4,6 +4,7 @@ import '../../../models/journal_entry.dart';
 import '../../../services/journal_service.dart';
 import '../../../services/onboarding_service.dart';
 import '../../theme/solace_theme.dart';
+import 'voice_journaling_screen.dart';
 
 /// 07 — Journal Editor
 class JournalEditorScreen extends StatefulWidget {
@@ -29,19 +30,25 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
   late final TextEditingController _contentController;
   bool _showSeed = true;
   bool _isReflecting = false;
+  int _seedIndex = 0;
 
-  final String _currentSeed = 'Something I can\'t stop thinking about';
+  final List<String> _seeds = [
+    'Something I want to explore with honesty today',
+    'A quiet priority I want to hold space for',
+    'Where is my energy naturally drawn right now?',
+    'What felt grounding or clarifying today?',
+  ];
+
+  String get _currentSeed => _seeds[_seedIndex % _seeds.length];
 
   @override
   void initState() {
     super.initState();
     _titleController = TextEditingController(
-      text: widget.initialEntry?.title ??
-          'Two opportunities: Lead researcher vs Founding designer',
+      text: widget.initialEntry?.title ?? '',
     );
     _contentController = TextEditingController(
-      text: widget.initialEntry?.content ??
-          'I have two opportunities coming up, but I\'m afraid that if I choose one, I\'ll miss out on the other. The research lab gives me steady funding and deep focus, but the startup has incredible agency and immediate impact. My core priority this year is autonomy and sustainable pace, but my anxiety keeps pulling me toward perceived prestige...',
+      text: widget.initialEntry?.content ?? '',
     );
   }
 
@@ -66,9 +73,9 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
           : _titleController.text.trim(),
       content: _contentController.text.trim(),
       createdAt: widget.initialEntry?.createdAt ?? DateTime.now(),
-      type: 'Decision',
-      tags: ['Contemplative', 'Career Crossroads'],
-      solBadge: 'Decision comparison ready',
+      type: 'Reflection',
+      tags: ['Personal', 'Mindful'],
+      solBadge: 'Ready for reflection',
       wordCount: _wordCount,
     );
 
@@ -92,13 +99,28 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
       if (!mounted) return;
       setState(() => _isReflecting = false);
 
+      final entry = JournalEntry(
+        id: widget.initialEntry?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
+        title: _titleController.text.trim().isEmpty
+            ? 'Untitled Reflection'
+            : _titleController.text.trim(),
+        content: _contentController.text.trim(),
+        createdAt: widget.initialEntry?.createdAt ?? DateTime.now(),
+        type: 'Reflection',
+        tags: ['Personal', 'Mindful'],
+        solBadge: 'Reflection ready',
+        solWhisper: aiResult.reflection,
+        wordCount: _wordCount,
+      );
+      await JournalService.instance.addEntry(entry);
+
       _showReflectionDialog(aiResult.reflection, aiResult.followUpQuestion);
     } catch (e) {
       if (!mounted) return;
       setState(() => _isReflecting = false);
       _showReflectionDialog(
-        'It sounds like both opportunities matter to you, and choosing one feels like losing something valuable.',
-        'Would you like to compare them based on your priorities of autonomy and sustainable pace?',
+        'Sol has listened carefully to your thoughts. Your reflection and insights will be generated privately on your device.',
+        'Would you like to explore what you\'re feeling further or organize your thoughts into next steps?',
       );
     }
   }
@@ -227,7 +249,7 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
             ),
             child: const Center(
               child: Text(
-                'E',
+                'S',
                 style: TextStyle(
                   fontFamily: SolaceTheme.fontFamily,
                   fontSize: 13,
@@ -248,30 +270,37 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Row(
-            children: [
-              Icon(Icons.circle, size: 6, color: Color(0xFF10B981)),
-              SizedBox(width: 5),
-              Text(
-                'AUTO-SAVED LOCALLY',
-                style: TextStyle(
-                  fontFamily: SolaceTheme.fontFamily,
-                  fontSize: 10.5,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.3,
-                  color: SolaceTheme.primaryDark,
+          const Expanded(
+            child: Row(
+              children: [
+                Icon(Icons.circle, size: 6, color: Color(0xFF10B981)),
+                SizedBox(width: 5),
+                Flexible(
+                  child: Text(
+                    'AUTO-SAVED LOCALLY',
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontFamily: SolaceTheme.fontFamily,
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.3,
+                      color: SolaceTheme.primaryDark,
+                    ),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-          const Text(
-            'Oct 9, 10:14 PM',
-            style: TextStyle(
+          const SizedBox(width: 6),
+          Text(
+            widget.initialEntry?.formattedDate ?? 'Today • Offline',
+            style: const TextStyle(
               fontFamily: SolaceTheme.fontFamily,
               fontSize: 11.5,
               color: SolaceTheme.textMuted,
             ),
           ),
+          const SizedBox(width: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(
@@ -347,6 +376,7 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
           ),
           IconButton(
             onPressed: () {
+              setState(() => _seedIndex++);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('Seed refreshed!'),
@@ -371,7 +401,10 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
   }
 
   Widget _buildTuningTags() {
-    return Row(
+    return Wrap(
+      spacing: 6,
+      runSpacing: 6,
+      crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         const Text(
           'TUNING:',
@@ -383,7 +416,6 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
             color: SolaceTheme.textMuted,
           ),
         ),
-        const SizedBox(width: 8),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
           decoration: BoxDecoration(
@@ -407,7 +439,6 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
             ],
           ),
         ),
-        const SizedBox(width: 6),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
           decoration: BoxDecoration(
@@ -417,10 +448,10 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
           child: const Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.work_outline_rounded, size: 12, color: Colors.white),
+              Icon(Icons.self_improvement_rounded, size: 12, color: Colors.white),
               SizedBox(width: 4),
               Text(
-                'Career Crossroads',
+                'Mindful Reflection',
                 style: TextStyle(
                   fontFamily: SolaceTheme.fontFamily,
                   fontSize: 11,
@@ -446,21 +477,27 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
       child: const Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              Icon(Icons.spa_rounded, size: 14, color: SolaceTheme.primaryDark),
-              SizedBox(width: 6),
-              Text(
-                'Tension & Clarification Stream',
-                style: TextStyle(
-                  fontFamily: SolaceTheme.fontFamily,
-                  fontSize: 11.5,
-                  fontWeight: FontWeight.w700,
-                  color: SolaceTheme.textHeading,
+          Expanded(
+            child: Row(
+              children: [
+                Icon(Icons.spa_rounded, size: 14, color: SolaceTheme.primaryDark),
+                SizedBox(width: 6),
+                Flexible(
+                  child: Text(
+                    'Tension & Clarification Stream',
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontFamily: SolaceTheme.fontFamily,
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w700,
+                      color: SolaceTheme.textHeading,
+                    ),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
+          SizedBox(width: 8),
           Text(
             'Balanced Resonance',
             style: TextStyle(
@@ -511,40 +548,18 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
                       height: 20,
                       child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                     )
-                  : Row(
+                  : const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.auto_awesome, size: 18, color: Colors.white),
-                        const SizedBox(width: 8),
-                        const Text(
+                        Icon(Icons.auto_awesome, size: 18, color: Colors.white),
+                        SizedBox(width: 8),
+                        Text(
                           'Reflect with Solace',
                           style: TextStyle(
                             fontFamily: SolaceTheme.fontFamily,
                             fontSize: 15.5,
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: const Row(
-                            children: [
-                              Icon(Icons.lock_rounded, size: 10, color: Colors.white),
-                              SizedBox(width: 3),
-                              Text(
-                                'Private on-device AI',
-                                style: TextStyle(
-                                  fontFamily: SolaceTheme.fontFamily,
-                                  fontSize: 9.5,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
                           ),
                         ),
                       ],
@@ -585,7 +600,15 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
                   border: Border.all(color: const Color(0xFFD4EBDD)),
                 ),
                 child: IconButton(
-                  onPressed: widget.onOpenVoice,
+                  onPressed: () {
+                    if (widget.onOpenVoice != null) {
+                      widget.onOpenVoice!();
+                    } else {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context) => const VoiceJournalingScreen()),
+                      );
+                    }
+                  },
                   icon: const Icon(Icons.mic_rounded, color: SolaceTheme.primaryDark, size: 20),
                   padding: EdgeInsets.zero,
                 ),

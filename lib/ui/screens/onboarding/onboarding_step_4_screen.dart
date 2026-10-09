@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../theme/app_colors.dart';
+import '../../widgets/onboarding_app_bar.dart';
+import '../../widgets/onboarding_progress_header.dart';
 import 'onboarding_step_5_screen.dart';
 
 class OnboardingStep4Screen extends StatefulWidget {
@@ -48,106 +50,13 @@ class _OnboardingStep4ScreenState extends State<OnboardingStep4Screen> with Sing
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.canvasBackground,
-      appBar: AppBar(
-        backgroundColor: AppColors.canvasBackground.withOpacity(0.9),
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.bodyForest),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: const Text(
-          'Privacy Secured',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: AppColors.inverseSurface,
-          ),
-        ),
-        centerTitle: true,
-        actions: [
-          TextButton(
-            onPressed: () {},
-            child: const Text(
-              'Skip',
-              style: TextStyle(fontSize: 13, color: AppColors.secondary),
-            ),
-          ),
-          const SizedBox(width: 8),
-          const CircleAvatar(
-            radius: 16,
-            backgroundImage: NetworkImage('https://lh3.googleusercontent.com/aida/AEtjO1VTW28s9F5nAumb5HD_s_f6oKhP829n6u7izTeQXvnBc1xHEElSdKPl5yjjXLiYiGHXfxeMRALGF1imafC384vVcuTgtCaFnRJGkHSK34rT0f8Et6jFzBAkvO-EQT-GE2AAgSX4sSKV4nHXlxW9V8Z8mblgPgjU8LjavRZpQMjUJz1oUERs7kp_XBRyjfOX_gv9r1f6TlLvGoHLLPQK-4iG6-Mj2HoAixOVyMEfEIX5-80NjOwzXpAMHpA'),
-          ),
-          const SizedBox(width: 16),
-        ],
-      ),
+      appBar: const OnboardingAppBar(title: 'Privacy Secured'),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             children: [
-              // Top Progress Bar & Breadcrumb
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0, bottom: 16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: AppColors.aiBubble,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        children: [
-                          AnimatedBuilder(
-                            animation: _pulseController,
-                            builder: (context, child) {
-                              return Opacity(
-                                opacity: 0.5 + (_pulseController.value * 0.5),
-                                child: Container(
-                                  width: 8,
-                                  height: 8,
-                                  decoration: const BoxDecoration(
-                                    color: AppColors.primary,
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                              );
-                            }
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'STEP 4 OF 5',
-                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              color: AppColors.inverseSurface,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 1.2,
-                              fontSize: 11,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    // Multi-segment Progress Bar
-                    Row(
-                      children: List.generate(5, (index) {
-                        return Container(
-                          width: index == 3 ? 24 : 16,
-                          height: 6,
-                          margin: const EdgeInsets.only(left: 6),
-                          decoration: BoxDecoration(
-                            color: index < 4 
-                              ? AppColors.primaryContainer 
-                              : const Color(0xFFD4EEDF),
-                            borderRadius: BorderRadius.circular(3),
-                          ),
-                        );
-                      }),
-                    ),
-                  ],
-                ),
-              ),
+              const OnboardingProgressHeader(step: 4, label: 'Privacy'),
 
               Expanded(
                 child: SingleChildScrollView(

@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'theme/app_theme.dart';
 import 'dashboard_screen.dart';
+import 'services/journal_service.dart';
+import 'services/onboarding_service.dart';
+import 'services/memory_service.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await JournalService.instance.init();
+  await OnboardingService.instance.init();
+  await MemoryService.instance.init();
   runApp(const SolaceApp());
 }
 
