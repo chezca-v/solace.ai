@@ -18,5 +18,10 @@ build/
 .DS_Store
 Thumbs.db
 
+# Model Files (On-Device AI)
+*.task
+*.litertlm
+*.bin
+
 .idea/
 *.iml
