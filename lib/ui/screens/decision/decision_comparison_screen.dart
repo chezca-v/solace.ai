@@ -1,13 +1,43 @@
 import 'package:flutter/material.dart';
+import '../../models/journal_entry.dart';
+import '../../services/journal_service.dart';
 import '../../theme/solace_theme.dart';
 
 /// 10 — Decision Comparison & Support Screen
 class DecisionComparisonScreen extends StatefulWidget {
+  final String? dilemmaTitle;
+  final String? optionAName;
+  final String? optionBName;
+  final List<String>? optionAStrengths;
+  final List<String>? optionATradeOffs;
+  final List<String>? optionBStrengths;
+  final List<String>? optionBTradeOffs;
+  final int? optionAAutonomyScore;
+  final int? optionAPaceScore;
+  final int? optionBAutonomyScore;
+  final int? optionBPaceScore;
+  final List<Map<String, dynamic>>? priorities;
+  final String? tensionSummary;
+  final String? solSynthesis;
   final VoidCallback? onBack;
   final VoidCallback? onSaveToJournal;
 
   const DecisionComparisonScreen({
     super.key,
+    this.dilemmaTitle,
+    this.optionAName,
+    this.optionBName,
+    this.optionAStrengths,
+    this.optionATradeOffs,
+    this.optionBStrengths,
+    this.optionBTradeOffs,
+    this.optionAAutonomyScore,
+    this.optionAPaceScore,
+    this.optionBAutonomyScore,
+    this.optionBPaceScore,
+    this.priorities,
+    this.tensionSummary,
+    this.solSynthesis,
     this.onBack,
     this.onSaveToJournal,
   });
@@ -120,7 +150,7 @@ class _DecisionComparisonScreenState extends State<DecisionComparisonScreen> {
             ),
             child: const Center(
               child: Text(
-                'E',
+                'S',
                 style: TextStyle(
                   fontFamily: SolaceTheme.fontFamily,
                   fontSize: 13,
@@ -228,9 +258,9 @@ class _DecisionComparisonScreenState extends State<DecisionComparisonScreen> {
             ],
           ),
           const SizedBox(height: 4),
-          const Text(
-            'Research Fellowship\nvs.\nFounding Designer',
-            style: TextStyle(
+          Text(
+            widget.dilemmaTitle ?? 'Choice A\nvs.\nChoice B',
+            style: const TextStyle(
               fontFamily: SolaceTheme.fontFamily,
               fontSize: 18,
               fontWeight: FontWeight.w800,
@@ -259,23 +289,34 @@ class _DecisionComparisonScreenState extends State<DecisionComparisonScreen> {
           const SizedBox(height: 14),
 
           // Stated Priorities Weights
-          _buildPriorityWeightRow(
-            title: 'Autonomy & Schedule control',
-            weight: 'Weight: High',
-            isHigh: true,
-          ),
-          const SizedBox(height: 6),
-          _buildPriorityWeightRow(
-            title: 'Sustainable pace / Burnout prevention',
-            weight: 'Weight: High',
-            isHigh: true,
-          ),
-          const SizedBox(height: 6),
-          _buildPriorityWeightRow(
-            title: 'Long-term financial upside',
-            weight: 'Weight: Med',
-            isHigh: false,
-          ),
+          if (widget.priorities != null && widget.priorities!.isNotEmpty)
+            ...widget.priorities!.map((p) => Padding(
+                  padding: const EdgeInsets.only(bottom: 6.0),
+                  child: _buildPriorityWeightRow(
+                    title: p['title'] as String,
+                    weight: p['weight'] as String,
+                    isHigh: p['isHigh'] as bool? ?? false,
+                  ),
+                ))
+          else ...[
+            _buildPriorityWeightRow(
+              title: 'Autonomy & Schedule control',
+              weight: 'Weight: High',
+              isHigh: true,
+            ),
+            const SizedBox(height: 6),
+            _buildPriorityWeightRow(
+              title: 'Sustainable pace / Burnout prevention',
+              weight: 'Weight: High',
+              isHigh: true,
+            ),
+            const SizedBox(height: 6),
+            _buildPriorityWeightRow(
+              title: 'Long-term value alignment',
+              weight: 'Weight: Med',
+              isHigh: false,
+            ),
+          ],
         ],
       ),
     );
@@ -376,8 +417,8 @@ class _DecisionComparisonScreenState extends State<DecisionComparisonScreen> {
                     fontWeight:
                         _selectedTab == 0 ? FontWeight.w700 : FontWeight.w500,
                     color: _selectedTab == 0
-                        ? SolaceTheme.textHeading
-                        : SolaceTheme.textMuted,
+                      ? SolaceTheme.textHeading
+                      : SolaceTheme.textMuted,
                   ),
                 ),
               ),
@@ -424,20 +465,20 @@ class _DecisionComparisonScreenState extends State<DecisionComparisonScreen> {
         Expanded(
           child: _buildOptionColumn(
             optionTag: 'OPTION A',
-            optionName: 'Research Fellowship',
-            icon: Icons.school_outlined,
-            strengths: [
-              'Steady cadence',
-              'Deep scientific rigor',
-              'Guaranteed funding',
+            optionName: widget.optionAName ?? 'Option A',
+            icon: Icons.lightbulb_outline_rounded,
+            strengths: widget.optionAStrengths ?? [
+              'Predictable cadence',
+              'Established structure',
+              'Direct focus area',
             ],
-            tradeOffs: [
-              'Lower immediate ownership',
-              'Rigid bureaucracy',
+            tradeOffs: widget.optionATradeOffs ?? [
+              'Less initial autonomy',
+              'External dependencies',
             ],
-            autonomyScore: 7,
-            paceScore: 9,
-            bottomTag: '🌱 Low Burnout Risk',
+            autonomyScore: widget.optionAAutonomyScore ?? 7,
+            paceScore: widget.optionAPaceScore ?? 8,
+            bottomTag: '🌱 Sustainable Pace',
             isPaceWarning: false,
           ),
         ),
@@ -447,21 +488,21 @@ class _DecisionComparisonScreenState extends State<DecisionComparisonScreen> {
         Expanded(
           child: _buildOptionColumn(
             optionTag: 'OPTION B',
-            optionName: 'Founding Designer',
+            optionName: widget.optionBName ?? 'Option B',
             icon: Icons.rocket_launch_outlined,
-            strengths: [
-              'High creative autonomy',
-              'Direct equity stake',
-              'Rapid shipping velocity',
+            strengths: widget.optionBStrengths ?? [
+              'High creative agency',
+              'Direct ownership',
+              'Fast development cycles',
             ],
-            tradeOffs: [
-              'Unpredictable sprints',
-              'Elevated overwork risk',
+            tradeOffs: widget.optionBTradeOffs ?? [
+              'Variable pacing',
+              'Higher demands on energy',
             ],
-            autonomyScore: 10,
-            paceScore: 5,
-            bottomTag: '📈 Max Agency',
-            isPaceWarning: true,
+            autonomyScore: widget.optionBAutonomyScore ?? 9,
+            paceScore: widget.optionBPaceScore ?? 6,
+            bottomTag: '📈 Maximum Agency',
+            isPaceWarning: false,
           ),
         ),
       ],
@@ -730,11 +771,11 @@ class _DecisionComparisonScreenState extends State<DecisionComparisonScreen> {
             ),
           ),
           const SizedBox(width: 12),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   '• DYNAMIC TENSION ANALYSIS',
                   style: TextStyle(
                     fontFamily: SolaceTheme.fontFamily,
@@ -744,10 +785,11 @@ class _DecisionComparisonScreenState extends State<DecisionComparisonScreen> {
                     color: SolaceTheme.primaryDark,
                   ),
                 ),
-                SizedBox(height: 2),
+                const SizedBox(height: 2),
                 Text(
-                  'A trade-off between Somatic Rest (Fellowship) and Creative Velocity (Startup).',
-                  style: TextStyle(
+                  widget.tensionSummary ??
+                      'A trade-off between structured predictability (${widget.optionAName ?? "Option A"}) and agency velocity (${widget.optionBName ?? "Option B"}).',
+                  style: const TextStyle(
                     fontFamily: SolaceTheme.fontFamily,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
@@ -801,7 +843,7 @@ class _DecisionComparisonScreenState extends State<DecisionComparisonScreen> {
                       ),
                     ),
                     Text(
-                      'Reflected against your last 4 weeks of entries',
+                      'Reflected against your recorded priorities and memories',
                       style: TextStyle(
                         fontFamily: SolaceTheme.fontFamily,
                         fontSize: 10.5,
@@ -814,9 +856,10 @@ class _DecisionComparisonScreenState extends State<DecisionComparisonScreen> {
             ],
           ),
           const SizedBox(height: 10),
-          const Text(
-            'Notice how the Fellowship protects your boundary around pacing, while the Startup maximizes your need for agency. Would you like to define non-negotiable boundaries for the Startup role?',
-            style: TextStyle(
+          Text(
+            widget.solSynthesis ??
+                'Notice how ${widget.optionAName ?? "Option A"} aligns with your boundary for pacing, while ${widget.optionBName ?? "Option B"} maximizes your agency. Would you like to define non-negotiable boundaries for this choice?',
+            style: const TextStyle(
               fontFamily: SolaceTheme.fontFamily,
               fontSize: 13,
               fontStyle: FontStyle.italic,
@@ -910,11 +953,31 @@ class _DecisionComparisonScreenState extends State<DecisionComparisonScreen> {
             width: double.infinity,
             height: 48,
             child: ElevatedButton.icon(
-              onPressed: () {
+              onPressed: () async {
+                final summaryTitle = widget.dilemmaTitle ?? 'Decision Analysis & Synthesis';
+                final tension = widget.tensionSummary ?? 'Comparative analysis of choices';
+                final synthesis = widget.solSynthesis ?? 'Balanced alignment with stated priorities and boundaries.';
+                final fullContent = '$tension\n\nSolace Synthesis:\n$synthesis';
+
+                final entry = JournalEntry(
+                  id: 'decision-${DateTime.now().millisecondsSinceEpoch}',
+                  title: summaryTitle,
+                  content: fullContent,
+                  createdAt: DateTime.now(),
+                  type: 'Decision',
+                  tags: ['Decision', 'Tension Analysis'],
+                  solBadge: 'Decision Saved',
+                  solWhisper: synthesis,
+                  wordCount: fullContent.split(' ').where((w) => w.isNotEmpty).length,
+                );
+
+                await JournalService.instance.addEntry(entry);
                 widget.onSaveToJournal?.call();
+
+                if (!context.mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Decision summary saved to private journal.'),
+                    content: Text('Decision summary saved to private journal database.'),
                     backgroundColor: SolaceTheme.primary,
                   ),
                 );

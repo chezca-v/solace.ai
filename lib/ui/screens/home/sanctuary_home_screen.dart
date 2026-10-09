@@ -161,7 +161,7 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
               ),
               child: const Center(
                 child: Text(
-                  'E',
+                  'S',
                   style: TextStyle(
                     fontFamily: SolaceTheme.fontFamily,
                     fontSize: 14,
@@ -246,10 +246,10 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
             ],
           ),
           const SizedBox(height: 8),
-          Row(
+          const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Expanded(
+              Expanded(
                 child: Row(
                   children: [
                     Icon(Icons.circle, size: 6, color: Color(0xFF10B981)),
@@ -271,9 +271,9 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
-              const Text(
-                'Wednesday, Oct 11',
+              SizedBox(width: 8),
+              Text(
+                'Today • Offline Sanctuary',
                 style: TextStyle(
                   fontFamily: SolaceTheme.fontFamily,
                   fontSize: 11,
@@ -308,7 +308,7 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
               ),
               SizedBox(height: 2),
               Text(
-                'Good morning,\nElena',
+                'Good morning,\nFriend',
                 style: TextStyle(
                   fontFamily: SolaceTheme.fontFamily,
                   fontSize: 26,

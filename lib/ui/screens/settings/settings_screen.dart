@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../services/journal_service.dart';
+import '../../../services/memory_service.dart';
 import '../../theme/solace_theme.dart';
 import '../../widgets/sun_illustration.dart';
 
@@ -164,7 +166,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               child: const Center(
                 child: Text(
-                  'E',
+                  'S',
                   style: TextStyle(
                     fontFamily: SolaceTheme.fontFamily,
                     fontSize: 14,
@@ -837,11 +839,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               const SizedBox(width: 12),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       'Local Storage Allocated',
                       style: TextStyle(
                         fontFamily: SolaceTheme.fontFamily,
@@ -850,10 +852,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         color: SolaceTheme.textHeading,
                       ),
                     ),
-                    SizedBox(height: 2),
+                    const SizedBox(height: 2),
                     Text(
-                      '52 journal entries, 6 theme memories',
-                      style: TextStyle(
+                      '${JournalService.instance.entries.length} reflections, ${MemoryService.instance.memories.length} vault items',
+                      style: const TextStyle(
                         fontFamily: SolaceTheme.fontFamily,
                         fontSize: 11,
                         color: SolaceTheme.textMuted,
@@ -870,9 +872,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(color: const Color(0xFFDCFCE7)),
                 ),
-                child: const Text(
-                  '14.2 MB',
-                  style: TextStyle(
+                child: Text(
+                  '${((JournalService.instance.entries.length * 0.4) + (MemoryService.instance.memories.length * 0.1) + 8.4).toStringAsFixed(1)} MB',
+                  style: const TextStyle(
                     fontFamily: SolaceTheme.fontFamily,
                     fontSize: 11.5,
                     fontWeight: FontWeight.w700,

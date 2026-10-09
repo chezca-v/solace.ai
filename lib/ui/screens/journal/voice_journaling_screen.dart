@@ -26,7 +26,7 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
   bool _isRecording = true;
   bool _isTranscribed = false;
   bool _isPlayingAudio = false;
-  int _secondsRecorded = 192; // 03:12
+  int _secondsRecorded = 0;
   Timer? _timer;
   late AnimationController _pulseController;
 
@@ -36,8 +36,7 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
   void initState() {
     super.initState();
     _transcriptController = TextEditingController(
-      text:
-          'Kanina pa ako nagiisip tungkol sa dalawang offer. Sobrang torn ako between taking the Lead Researcher position sa lab or the Founding Designer role sa early-stage startup. Gusto ko ng autonomy at sustainable pace para hindi ma-burnout ulit, pero feeling ko may pressure to choose prestige over peace of mind...',
+      text: '',
     );
 
     _pulseController = AnimationController(
@@ -80,18 +79,26 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
   }
 
   void _saveTranscript() {
+    final text = _transcriptController.text.trim();
+    final wordCount = text.isEmpty ? 0 : text.split(RegExp(r'\s+')).length;
+    final title = text.isEmpty
+        ? 'Voice Reflection'
+        : (text.split('\n').first.length > 35
+            ? '${text.split('\n').first.substring(0, 35)}...'
+            : text.split('\n').first);
+
     final entry = JournalEntry(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
-      title: 'Lead researcher vs Founding Designer',
-      content: _transcriptController.text.trim(),
+      title: title,
+      content: text,
       createdAt: DateTime.now(),
       type: 'Voice',
-      tags: ['Contemplative', 'Career Crossroads'],
+      tags: ['Voice Note', 'Spoken Reflection'],
       solBadge: 'Empathetic Mode',
       solWhisper:
-          'I hear the fatigue in your voice when mentioning the sprint cycles. When you\'re ready, tap Reflect with Solace to weigh this against your non-negotiables.',
-      wordCount: 142,
-      audioDuration: '01:18',
+          'Your spoken thoughts have been captured in your private vault. Reflect anytime to uncover deeper patterns.',
+      wordCount: wordCount,
+      audioDuration: _formattedTime,
     );
 
     JournalService.instance.addEntry(entry);
@@ -179,7 +186,7 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
             ),
             child: const Center(
               child: Text(
-                'E',
+                'S',
                 style: TextStyle(
                   fontFamily: SolaceTheme.fontFamily,
                   fontSize: 13,
@@ -195,6 +202,9 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
   }
 
   Widget _buildMetaRow() {
+    final text = _transcriptController.text.trim();
+    final wordCount = text.isEmpty ? 0 : text.split(RegExp(r'\s+')).length;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 4.0),
       child: Row(
@@ -207,7 +217,7 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
                 const SizedBox(width: 5),
                 Flexible(
                   child: Text(
-                    _isTranscribed ? 'LOCAL TRANSCRIPT READY' : 'AUTO-SAVED LOCALLY · OCT 9, 10:14 PM',
+                    _isTranscribed ? 'LOCAL TRANSCRIPT READY' : 'AUTO-SAVED LOCALLY · OFFLINE',
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontFamily: SolaceTheme.fontFamily,
@@ -229,7 +239,7 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
               borderRadius: BorderRadius.circular(10),
             ),
             child: Text(
-              _isTranscribed ? '142 words (01:18)' : '100% Offline Edge',
+              _isTranscribed ? '$wordCount words ($_formattedTime)' : '100% Offline Edge',
               style: const TextStyle(
                 fontFamily: SolaceTheme.fontFamily,
                 fontSize: 10.5,
@@ -297,7 +307,7 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
                   const SizedBox(width: 6),
                   Flexible(
                     child: Text(
-                      _isTranscribed ? 'Note #04 (01:18) 🎧' : 'Speak •',
+                      _isTranscribed ? 'Voice Note ($_formattedTime) 🎧' : 'Speak •',
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         fontFamily: SolaceTheme.fontFamily,
@@ -722,7 +732,7 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
                   ),
                 ),
                 Text(
-                  'Overwhelm & Career Dilemma detected from gentle pitch cadence.',
+                  'Emotional tone and reflection cadence synthesized locally on-device.',
                   style: TextStyle(
                     fontFamily: SolaceTheme.fontFamily,
                     fontSize: 11.5,
@@ -776,9 +786,9 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
             ),
           ),
           const SizedBox(width: 10),
-          const Text(
-            '01:18 / 01:18',
-            style: TextStyle(
+          Text(
+            '$_formattedTime / $_formattedTime',
+            style: const TextStyle(
               fontFamily: SolaceTheme.fontFamily,
               fontSize: 11,
               fontWeight: FontWeight.w600,
@@ -811,7 +821,7 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
                     SizedBox(width: 4),
                     Flexible(
                       child: Text(
-                        'WHISPER.TFLITE • 99.4% CONFIDENCE',
+                        'WHISPER.TFLITE • ON-DEVICE TRANSLATION',
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontFamily: SolaceTheme.fontFamily,
@@ -842,9 +852,13 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
             ],
           ),
           const SizedBox(height: 10),
-          const Text(
-            'Lead researcher vs Founding Designer',
-            style: TextStyle(
+          Text(
+            _transcriptController.text.trim().isEmpty
+                ? 'Voice Reflection'
+                : (_transcriptController.text.trim().split('\n').first.length > 35
+                    ? '${_transcriptController.text.trim().split('\n').first.substring(0, 35)}...'
+                    : _transcriptController.text.trim().split('\n').first),
+            style: const TextStyle(
               fontFamily: SolaceTheme.fontFamily,
               fontSize: 16,
               fontWeight: FontWeight.w800,
@@ -862,10 +876,12 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
               height: 1.5,
             ),
             decoration: const InputDecoration(
+              hintText: 'Speak or edit your voice reflection here... Solace will transcribe in real time.',
               border: InputBorder.none,
               isDense: true,
               contentPadding: EdgeInsets.zero,
             ),
+            onChanged: (_) => setState(() {}),
           ),
           const SizedBox(height: 12),
           Row(
@@ -877,7 +893,7 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Text(
-                  '• Contemplative',
+                  '• Spoken Voice',
                   style: TextStyle(
                     fontFamily: SolaceTheme.fontFamily,
                     fontSize: 10.5,
@@ -894,7 +910,7 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Text(
-                  '💼 Career Crossroads',
+                  '🎙️ Audio Draft',
                   style: TextStyle(
                     fontFamily: SolaceTheme.fontFamily,
                     fontSize: 10.5,
@@ -952,7 +968,7 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
           ),
           SizedBox(height: 8),
           Text(
-            '"I hear the fatigue in your voice when mentioning the sprint cycles. When you\'re ready, tap Reflect with Solace to weigh this against your non-negotiables."',
+            '"I am listening to your thoughts and reflections. When you feel ready, tap Reflect with Solace to explore your priorities and insights."',
             style: TextStyle(
               fontFamily: SolaceTheme.fontFamily,
               fontSize: 13,
@@ -1093,9 +1109,11 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
               ],
             ),
             const SizedBox(height: 14),
-            const Text(
-              'Comparing your two opportunities against your approved priority ("Autonomy and sustainable pace"):',
-              style: TextStyle(
+            Text(
+              _transcriptController.text.trim().isNotEmpty
+                  ? 'Sol has analyzed your spoken reflection to surface core themes and actionable insights:'
+                  : 'Sol will analyze your spoken reflection locally to surface core themes and next steps:',
+              style: const TextStyle(
                 fontFamily: SolaceTheme.fontFamily,
                 fontSize: 13.5,
                 color: SolaceTheme.textBody,
@@ -1112,11 +1130,13 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
               child: const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Option A: Lead Researcher', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                  Text('• Steady funding & deep focus\n• High structure, lower autonomy', style: TextStyle(fontSize: 12)),
+                  Text('Core Themes & Reflections', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                  SizedBox(height: 4),
+                  Text('• Identifies underlying priorities and emotional signals\n• Synthesizes perspective against your local memory vault', style: TextStyle(fontSize: 12)),
                   SizedBox(height: 8),
-                  Text('Option B: Founding Designer', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                  Text('• High agency & impact\n• Fast sprint cycles, risk of burnout', style: TextStyle(fontSize: 12)),
+                  Text('Decision Architecture', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                  SizedBox(height: 4),
+                  Text('• Structures tradeoffs without unsolicited advice\n• Preserves total offline privacy and client-side encryption', style: TextStyle(fontSize: 12)),
                 ],
               ),
             ),
