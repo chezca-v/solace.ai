@@ -12,6 +12,7 @@ class JournalEntry {
   final String? solWhisper;
   final int wordCount;
   final String? audioDuration;
+  final String? audioFilePath;
   final bool isAudioDraft;
 
   const JournalEntry({
@@ -25,6 +26,7 @@ class JournalEntry {
     this.solWhisper,
     this.wordCount = 0,
     this.audioDuration,
+    this.audioFilePath,
     this.isAudioDraft = false,
   });
 
@@ -52,6 +54,7 @@ class JournalEntry {
       'sol_whisper': solWhisper,
       'word_count': wordCount,
       'audio_duration': audioDuration,
+      'audio_file_path': audioFilePath,
       'is_audio_draft': isAudioDraft ? 1 : 0,
     };
   }
@@ -77,6 +80,7 @@ class JournalEntry {
       solWhisper: map['sol_whisper'] as String?,
       wordCount: (map['word_count'] as int?) ?? 0,
       audioDuration: map['audio_duration'] as String?,
+      audioFilePath: map['audio_file_path'] as String?,
       isAudioDraft: (map['is_audio_draft'] as int?) == 1,
     );
   }

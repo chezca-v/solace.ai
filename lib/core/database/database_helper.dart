@@ -31,7 +31,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE IF NOT EXISTS entries (
@@ -45,6 +45,7 @@ class DatabaseHelper {
             sol_whisper TEXT,
             word_count INTEGER,
             audio_duration TEXT,
+            audio_file_path TEXT,
             is_audio_draft INTEGER
           )
         ''');
@@ -82,6 +83,13 @@ class DatabaseHelper {
             created_at TEXT
           )
         ''');
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          try {
+            await db.execute('ALTER TABLE entries ADD COLUMN audio_file_path TEXT');
+          } catch (_) {}
+        }
       },
     );
   }

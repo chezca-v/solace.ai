@@ -1248,11 +1248,5 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
     );
   }
 
-  void _showDecisionComparison(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const DecisionComparisonScreen(),
-      ),
-    );
-  }
+
 }

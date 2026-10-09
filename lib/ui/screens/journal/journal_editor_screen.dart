@@ -141,6 +141,10 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
                 // Meta Row: Auto-save status + Time + Word count
                 _buildMetaRow(),
 
+                // Mode Segmented Pill: Write vs Speak
+                _buildModeToggle(),
+                const SizedBox(height: 8),
+
                 // Scrollable Editor Body
                 Expanded(
                   child: SingleChildScrollView(
@@ -322,6 +326,87 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
                   ),
                 ),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildModeToggle() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: const Color(0xFFEDF5F0), // surface-container-highest
+        borderRadius: BorderRadius.circular(25),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: SolaceTheme.surfaceWhite, // surface-card
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: const [
+                  BoxShadow(color: Color(0x0A000000), blurRadius: 4, offset: Offset(0, 2)),
+                ],
+              ),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.edit_note_rounded, size: 16, color: SolaceTheme.primary),
+                  SizedBox(width: 6),
+                  Text(
+                    'Write',
+                    style: TextStyle(
+                      fontFamily: SolaceTheme.fontFamily,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: SolaceTheme.primaryDark, // text-body-forest
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            child: InkWell(
+              onTap: () {
+                if (widget.onOpenVoice != null) {
+                  widget.onOpenVoice!();
+                } else {
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (context) => const VoiceJournalingScreen()),
+                  );
+                }
+              },
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.mic_none_rounded, size: 16, color: SolaceTheme.textMuted),
+                    SizedBox(width: 6),
+                    Text(
+                      'Speak',
+                      style: TextStyle(
+                        fontFamily: SolaceTheme.fontFamily,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: SolaceTheme.textMuted,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ],

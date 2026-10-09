@@ -2,8 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../ai/ai_service.dart';
 import '../../../models/journal_entry.dart';
+import '../../../services/audio_service.dart';
 import '../../../services/journal_service.dart';
 import '../../../services/onboarding_service.dart';
+import '../../../services/stt_service.dart';
 import '../../theme/solace_theme.dart';
 import 'journal_editor_screen.dart';
 
@@ -30,6 +32,9 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
   int _secondsRecorded = 0;
   Timer? _timer;
   late AnimationController _pulseController;
+  final STTService _sttService = STTService();
+  final AudioService _audioService = AudioService();
+  String? _recordedAudioPath;
 
   late final TextEditingController _transcriptController;
 
@@ -45,7 +50,32 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
       duration: const Duration(milliseconds: 1400),
     )..repeat(reverse: true);
 
+    _initSTT();
     _startTimer();
+  }
+
+  Future<void> _initSTT() async {
+    final success = await _sttService.initialize();
+    if (success && mounted) {
+      _startListening();
+    }
+  }
+
+  void _startListening() {
+    _audioService.startRecording();
+    _sttService.startListening(
+      onResult: (text) {
+        if (mounted) {
+          setState(() {
+            _transcriptController.text = text;
+          });
+        }
+      },
+    );
+  }
+
+  void _stopListening() {
+    _sttService.stopListening();
   }
 
   void _startTimer() {
@@ -60,6 +90,8 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
 
   @override
   void dispose() {
+    _stopListening();
+    _audioService.dispose();
     _timer?.cancel();
     _pulseController.dispose();
     _transcriptController.dispose();
@@ -72,8 +104,11 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
     return '$minutes:$seconds';
   }
 
-  void _transcribeVoice() {
+  Future<void> _transcribeVoice() async {
+    _stopListening();
+    final audioPath = await _audioService.stopRecording();
     setState(() {
+      _recordedAudioPath = audioPath;
       _isRecording = false;
       _isTranscribed = true;
     });
@@ -100,6 +135,7 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
           'Your spoken thoughts have been captured in your private vault. Reflect anytime to uncover deeper patterns.',
       wordCount: wordCount,
       audioDuration: _formattedTime,
+      audioFilePath: _recordedAudioPath,
     );
 
     JournalService.instance.addEntry(entry);
@@ -392,17 +428,32 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
               ],
             ),
             child: Center(
-              child: Container(
-                width: 72,
-                height: 72,
-                decoration: const BoxDecoration(
-                  color: SolaceTheme.primary,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.mic_rounded,
-                  size: 34,
-                  color: Colors.white,
+              child: InkWell(
+                onTap: () async {
+                  setState(() {
+                    _isRecording = !_isRecording;
+                  });
+                  if (_isRecording) {
+                    await _audioService.resumeRecording();
+                    _startListening();
+                  } else {
+                    await _audioService.pauseRecording();
+                    _stopListening();
+                  }
+                },
+                borderRadius: BorderRadius.circular(36),
+                child: Container(
+                  width: 72,
+                  height: 72,
+                  decoration: BoxDecoration(
+                    color: _isRecording ? SolaceTheme.primary : SolaceTheme.textMuted,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    _isRecording ? Icons.mic_rounded : Icons.mic_off_rounded,
+                    size: 34,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
@@ -471,8 +522,17 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
               ),
             ),
             OutlinedButton.icon(
-              onPressed: () {
-                setState(() => _isRecording = !_isRecording);
+              onPressed: () async {
+                setState(() {
+                  _isRecording = !_isRecording;
+                });
+                if (_isRecording) {
+                  await _audioService.resumeRecording();
+                  _startListening();
+                } else {
+                  await _audioService.pauseRecording();
+                  _stopListening();
+                }
               },
               icon: Icon(_isRecording ? Icons.pause_rounded : Icons.play_arrow_rounded, size: 16),
               label: Text(_isRecording ? 'Pause' : 'Resume'),
@@ -768,7 +828,14 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
       child: Row(
         children: [
           IconButton(
-            onPressed: () => setState(() => _isPlayingAudio = !_isPlayingAudio),
+            onPressed: () {
+              setState(() => _isPlayingAudio = !_isPlayingAudio);
+              if (_isPlayingAudio && _recordedAudioPath != null) {
+                _audioService.playAudio(_recordedAudioPath!);
+              } else {
+                _audioService.pausePlayback();
+              }
+            },
             icon: Icon(
               _isPlayingAudio ? Icons.pause_circle_filled_rounded : Icons.play_circle_fill_rounded,
               size: 32,

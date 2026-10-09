@@ -27,6 +27,8 @@ dependencies:
   go_router: ^18.0.2
   sqflite_common_ffi: ^2.4.3
   sqlite3_flutter_libs: ^0.6.0+eol
+  record: ^7.1.2
+  audioplayers: ^6.8.1
 
 dev_dependencies:
   flutter_test:
