@@ -1,34 +1,30 @@
-name: CI Pipeline
+name: Flutter CI
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
 
 jobs:
-  build-and-test:
+  analyze-and-test:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x]
-
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Set up Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
 
-    - name: Install Dependencies
-      run: npm ci
+      - name: Install dependencies
+        run: flutter pub get
 
-    - name: Run Linter
-      run: npm run lint --if-present
+      - name: Analyze
+        run: flutter analyze
 
-    - name: Run Tests
-      run: npm test
+      - name: Run tests
+        run: flutter test
