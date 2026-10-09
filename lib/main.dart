@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'firebase_options.dart';
 import 'services/auth_service.dart';
 import 'ui/router.dart';
+import 'ui/theme/solace_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,8 +23,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'Solace',
-      theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal)),
+      title: 'Solace AI',
+      debugShowCheckedModeBanner: false,
+      theme: SolaceTheme.themeData,
       routerConfig: router,
     );
   }
