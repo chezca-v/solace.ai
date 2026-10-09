@@ -193,7 +193,7 @@ class _PersonalContextScreenState extends State<PersonalContextScreen> {
               shape: BoxShape.circle,
             ),
             child: const Icon(
-              Icons.eco_rounded,
+              Icons.eco,
               size: 22,
               color: Color(0xFF1B7A52),
             ),
