@@ -1,80 +1,89 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-<<<<<<< HEAD
-import '../services/auth_service.dart';
-import 'login_screen.dart';
+import 'screens/home/sanctuary_home_screen.dart';
+import 'screens/journal/journal_editor_screen.dart';
+import 'screens/journal/voice_journaling_screen.dart';
 import 'screens/model_download_screen.dart';
 import 'screens/onboarding/journaling_goals_screen.dart';
 import 'screens/onboarding/personal_context_screen.dart';
 import 'screens/onboarding/support_preferences_screen.dart';
-=======
->>>>>>> b75fe5860338f5db816c5f982ef257e790856875
-import 'screens/sanctuary_dashboard_screen.dart';
 import 'screens/welcome_screen.dart';
 
-GoRouter buildRouter() {
-  return GoRouter(
-<<<<<<< HEAD
-    initialLocation: '/welcome',
-    refreshListenable: _AuthRefresh(auth.authChanges),
-    redirect: (context, state) {
-      final loggedIn = auth.currentUser != null;
-      final loc = state.matchedLocation;
-      final isOnboardingOrAuth =
-          loc.startsWith('/onboarding') || loc == '/welcome' || loc == '/login';
+/// Global router defining navigation across Solace AI
+final GoRouter solaceRouter = GoRouter(
+  initialLocation: '/welcome',
+  routes: [
+    // 01 — Welcome Screen (Landing)
+    GoRoute(
+      path: '/welcome',
+      builder: (context, state) => WelcomeScreen(
+        onGetStarted: () => context.go('/onboarding/goals'),
+      ),
+    ),
 
-      if (!loggedIn && !isOnboardingOrAuth) return '/welcome';
-      if (loggedIn && (loc == '/welcome' || loc == '/login')) return '/';
-      return null;
-    },
-    routes: [
-      GoRoute(
-        path: '/welcome',
-        builder: (context, state) => WelcomeScreen(
-          onGetStarted: () => context.go('/onboarding/goals'),
-        ),
+    // 02 — Journaling Goals (Step 1 of 4)
+    GoRoute(
+      path: '/onboarding/goals',
+      builder: (context, state) => JournalingGoalsScreen(
+        onContinue: () => context.go('/onboarding/preferences'),
+        onBack: () => context.go('/welcome'),
+        onSkip: () => context.go('/onboarding/preferences'),
       ),
-      GoRoute(
-        path: '/onboarding/goals',
-        builder: (context, state) => JournalingGoalsScreen(
-          onContinue: () => context.go('/onboarding/preferences'),
-          onBack: () => context.go('/welcome'),
-          onSkip: () => context.go('/onboarding/preferences'),
-        ),
+    ),
+
+    // 03 — Support Preferences (Step 2 of 4)
+    GoRoute(
+      path: '/onboarding/preferences',
+      builder: (context, state) => SupportPreferencesScreen(
+        onContinue: () => context.go('/onboarding/context'),
+        onBack: () => context.go('/onboarding/goals'),
+        onSkip: () => context.go('/onboarding/context'),
       ),
-      GoRoute(
-        path: '/onboarding/preferences',
-        builder: (context, state) => SupportPreferencesScreen(
-          onContinue: () => context.go('/onboarding/context'),
-          onBack: () => context.go('/onboarding/goals'),
-          onSkip: () => context.go('/onboarding/context'),
-        ),
+    ),
+
+    // 04 — Personal Context (Step 3 of 4)
+    GoRoute(
+      path: '/onboarding/context',
+      builder: (context, state) => PersonalContextScreen(
+        onContinue: () => context.go('/onboarding/download'),
+        onBack: () => context.go('/onboarding/preferences'),
+        onSkip: () => context.go('/onboarding/download'),
       ),
-      GoRoute(
-        path: '/onboarding/context',
-        builder: (context, state) => PersonalContextScreen(
-          onContinue: () => context.go('/onboarding/download'),
-          onBack: () => context.go('/onboarding/preferences'),
-          onSkip: () => context.go('/onboarding/download'),
-        ),
+    ),
+
+    // 05 — Model Setup & SLM Download
+    GoRoute(
+      path: '/onboarding/download',
+      builder: (context, state) => const ModelDownloadScreen(
+        destinationScreen: SanctuaryHomeScreen(),
       ),
-      GoRoute(
-        path: '/onboarding/download',
-        builder: (context, state) => const ModelDownloadScreen(
-          destinationScreen: SanctuaryDashboardScreen(),
-        ),
+    ),
+
+    // 06 — Sanctuary Home Dashboard
+    GoRoute(
+      path: '/',
+      builder: (context, state) => SanctuaryHomeScreen(
+        onNewEntry: () => context.go('/journal/new'),
+        onVoiceEntry: () => context.go('/journal/voice'),
       ),
-      GoRoute(
-        path: '/',
-        builder: (_, __) => const SanctuaryDashboardScreen(),
+    ),
+
+    // 07 — Journal Editor (Text)
+    GoRoute(
+      path: '/journal/new',
+      builder: (context, state) => JournalEditorScreen(
+        onBack: () => context.go('/'),
+        onOpenVoice: () => context.go('/journal/voice'),
       ),
-      GoRoute(
-        path: '/login',
-        builder: (_, __) => LoginScreen(auth: auth),
+    ),
+
+    // 07A & 07B — Voice Journaling (Recording & Transcribed Reflection)
+    GoRoute(
+      path: '/journal/voice',
+      builder: (context, state) => VoiceJournalingScreen(
+        onBack: () => context.go('/'),
+        onSwitchToWrite: () => context.go('/journal/new'),
       ),
-=======
-    routes: [
-      GoRoute(path: '/', builder: (_, __) => const SanctuaryDashboardScreen()),
->>>>>>> b75fe5860338f5db816c5f982ef257e790856875
-    ],
-  );
-}
+    ),
+  ],
+);
