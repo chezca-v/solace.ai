@@ -5,14 +5,8 @@ import 'json_parser.dart';
 import 'local_ai.dart';
 import 'prompts.dart';
 
-// TODO: needs flutter_gemma dependency in pubspec.yaml
-// dependencies:
-//   flutter_gemma: ^1.11.2
-//   flutter_gemma_mediapipe: ^1.0.6
-//
-// When flutter_gemma is present in pubspec.yaml, uncomment:
-// import 'package:flutter_gemma/flutter_gemma.dart';
-// import 'package:flutter_gemma_mediapipe/flutter_gemma_mediapipe.dart';
+import 'package:flutter_gemma/flutter_gemma.dart';
+import 'package:flutter_gemma_mediapipe/flutter_gemma_mediapipe.dart';
 
 /// On-device AI engine utilizing Google Gemma 3 1B IT via MediaPipe.
 class GemmaAi implements LocalAi {
@@ -50,12 +44,10 @@ class GemmaAi implements LocalAi {
 
       _resolvedModelPath = targetPath;
 
-      // TODO: needs flutter_gemma dependency
-      // Once dependencies are added, initialize MediaPipe and register model:
-      // await FlutterGemma.initialize(inferenceEngines: const [MediaPipeEngine()]);
-      // await FlutterGemma.installModel(modelType: ModelType.gemmaIt)
-      //     .fromFile(targetPath)
-      //     .install();
+      await FlutterGemma.initialize(inferenceEngines: const [MediaPipeEngine()]);
+      await FlutterGemma.installModel(modelType: ModelType.gemmaIt)
+          .fromFile(targetPath)
+          .install();
 
       _isReady = true;
       return true;
@@ -172,12 +164,10 @@ class GemmaAi implements LocalAi {
   }
 
   Future<String?> _runInference(String prompt) async {
-    // TODO: needs flutter_gemma dependency
-    // Example flutter_gemma execution:
-    // final model = await FlutterGemma.getActiveModel(maxTokens: 512);
-    // final session = await model.createSession();
-    // return await session.getResponse(prompt: prompt);
-    return null;
+    final model = await FlutterGemma.getActiveModel(maxTokens: 512);
+    final session = await model.createSession();
+    await session.addQueryChunk(Message(text: prompt, isUser: true));
+    return await session.getResponse();
   }
 
   String _cleanReflectionResponse(String raw) {

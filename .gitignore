@@ -23,5 +23,18 @@ Thumbs.db
 *.litertlm
 *.bin
 
+# Flutter / Dart Build & Tools
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+
 .idea/
 *.iml
+
+#Flutter
+.flutter-plugins
+.flutter-plugins-dependencies

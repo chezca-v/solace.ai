@@ -332,7 +332,7 @@ class RuleBasedAi implements LocalAi {
     // Pattern 1: between X and Y
     final betweenRegex = RegExp(
       r'between\s+(.+?)\s+(?:and|o|or)\s+(.+)',
-      caseInsensitive: true,
+      caseSensitive: false,
     );
     final betweenMatch = betweenRegex.firstMatch(clean);
     if (betweenMatch != null) {
@@ -344,7 +344,7 @@ class RuleBasedAi implements LocalAi {
     // Pattern 2: X vs/versus/kaysa/or/o Y
     final splitRegex = RegExp(
       r'\s+(?:vs\.?|versus|kaysa\s+sa|kaysa|\bor\b|\bo\b)\s+',
-      caseInsensitive: true,
+      caseSensitive: false,
     );
     final parts = clean.split(splitRegex);
     if (parts.length >= 2) {

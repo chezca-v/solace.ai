@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+    }
+  </style>
+</head>
+<body>
+<!-- STITCH_SVG_START:ANIMATION_36 class="fixed inset-0 w-full h-full" --><div class="fixed inset-0 w-full h-full" id="animated-svg-ANIMATION_36" style="display:block;"><svg height="120" viewbox="0 0 120 120" width="120" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<radialgradient cx="50%" cy="50%" id="sunGlowAlertAnim" r="50%">
+<stop offset="0%" stop-color="#FFF275"></stop>
+<stop offset="65%" stop-color="#FFAA00"></stop>
+<stop offset="100%" stop-color="#E65100" stop-opacity="0.9"></stop>
+</radialgradient>
+<filter height="180%" id="amberHaloAnim" width="180%" x="-40%" y="-40%">
+<fegaussianblur result="blur" stddeviation="6"></fegaussianblur>
+<fecomposite in="SourceGraphic" in2="blur" operator="over"></fecomposite>
+</filter>
+<style>
+      @keyframes alertPulseHalo {
+        0%, 100% { transform: scale(1); opacity: 0.45; }
+        50% { transform: scale(1.12); opacity: 0.8; }
+      }
+      @keyframes alertRaysBlink {
+        0%, 100% { opacity: 0.7; transform: scale(1); }
+        50% { opacity: 1; transform: scale(1.06); }
+      }
+      @keyframes alertHoverSway {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        25% { transform: translateY(-2.5px) rotate(-1deg); }
+        75% { transform: translateY(-2px) rotate(1deg); }
+      }
+      @keyframes shieldGlow {
+        0%, 100% { filter: drop-shadow(0 0 2px rgba(76,175,130,0.4)); }
+        50% { filter: drop-shadow(0 0 7px rgba(76,175,130,0.9)); }
+      }
+      .anim-alert-halo {
+        transform-origin: 60px 58px;
+        animation: alertPulseHalo 1.8s ease-in-out infinite;
+      }
+      .anim-alert-rays {
+        transform-origin: 60px 58px;
+        animation: alertRaysBlink 1.2s ease-in-out infinite;
+      }
+      .anim-alert-sol {
+        transform-origin: 60px 58px;
+        animation: alertHoverSway 2.5s ease-in-out infinite;
+      }
+      .anim-shield {
+        animation: shieldGlow 2s ease-in-out infinite;
+      }
+    </style>
+</defs>
+<!-- High-visibility Alert Amber Halo with Active Pulsing -->
+<circle class="anim-alert-halo" cx="60" cy="58" fill="#FFE082" filter="url(#amberHaloAnim)" r="48"></circle>
+<!-- Dynamic Alert Rays -->
+<g class="anim-alert-rays" stroke="#FFA000" stroke-linecap="round" stroke-width="4">
+<line x1="60" x2="60" y1="10" y2="4"></line>
+<line x1="60" x2="60" y1="106" y2="112"></line>
+<line x1="12" x2="6" y1="58" y2="58"></line>
+<line x1="108" x2="114" y1="58" y2="58"></line>
+<line x1="26" x2="21" y1="24" y2="19"></line>
+<line x1="94" x2="99" y1="92" y2="97"></line>
+<line x1="26" x2="21" y1="92" y2="97"></line>
+<line x1="94" x2="99" y1="24" y2="19"></line>
+</g>
+<!-- Main Sol Character with Attentive Hover Movement -->
+<g class="anim-alert-sol">
+<!-- Sun Body -->
+<circle cx="60" cy="58" fill="url(#sunGlowAlertAnim)" r="37"></circle>
+<!-- Alert Attentive Wide Eyes with white reflections -->
+<circle cx="48" cy="54" fill="#2D3142" r="5"></circle>
+<circle cx="46.5" cy="52.5" fill="#FFFFFF" r="1.8"></circle>
+<circle cx="72" cy="54" fill="#2D3142" r="5"></circle>
+<circle cx="70.5" cy="52.5" fill="#FFFFFF" r="1.8"></circle>
+<!-- Serious but cute "O" mouth -->
+<ellipse cx="60" cy="66" fill="#2D3142" rx="3.5" ry="4"></ellipse>
+<!-- Rosy Alert Cheeks -->
+<circle cx="42" cy="62" fill="#FF8FAB" opacity="0.8" r="5.5"></circle>
+<circle cx="78" cy="62" fill="#FF8FAB" opacity="0.8" r="5.5"></circle>
+<!-- Tiny Cute Rescue Helmet on top of Sol -->
+<path d="M 44 32 C 44 20 76 20 76 32 C 78 32 80 34 80 36 C 80 37 77 38 74 38 L 46 38 C 43 38 40 37 40 36 C 40 34 42 32 44 32 Z" fill="#4CAF82" stroke="#2D3142" stroke-width="1.8"></path>
+<circle cx="60" cy="28" fill="#FFFFFF" r="3"></circle>
+<!-- Glowing Offline Shield on chest -->
+<g class="anim-shield">
+<path d="M 54 75 L 60 72 L 66 75 L 66 82 C 66 86 60 89 60 89 C 60 89 54 86 54 82 Z" fill="#2D3142" stroke="#FFD166" stroke-width="1.5"></path>
+<path d="M 58 78 L 60 76 L 62 78 L 62 82 C 62 84 60 85 60 85 C 60 85 58 84 58 82 Z" fill="#4CAF82"></path>
+</g>
+</g>
+</svg></div><!-- STITCH_SVG_END:ANIMATION_36 -->
+</body>
+</html>

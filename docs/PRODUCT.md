@@ -156,7 +156,7 @@ An optional thirteenth Offline Safety Guide should be added only after core jour
 
 ## 🎨 7. Visual Design Direction
 
-Solace should feel calm and personal without looking clinical or like a generic AI chatbot.
+**Core vibe:** Calm, organic, deeply personal, safe, and modern—a wellness sanctuary combined with smart edge technology. The interface should feel warm and grounded while presenting local AI as quiet, dependable assistance rather than the center of attention.
 
 | Color direction | Role |
 | --- | --- |
@@ -165,7 +165,9 @@ Solace should feel calm and personal without looking clinical or like a generic 
 | **Deep forest** | Headings and emphasis |
 | **Soft sand** | Warm secondary surfaces |
 
-Give writing generous space. Use legible typography, rounded cards sparingly, and a clear visual distinction between user writing and AI responses. Avoid fake analytics and invented personal insights.
+Use **Plus Jakarta Sans** as the bundled interface typeface across Flutter targets. Give writing generous space, use rounded cards sparingly, and clearly distinguish user writing from AI responses. Avoid fake analytics and invented personal insights.
+
+Use organic shapes and subtle natural motifs sparingly; avoid clinical imagery, cold sci-fi effects, or overly decorative screens. Communicate privacy and on-device processing with clear, reassuring status cues rather than alarmist security graphics. App icons, logos, and animations should follow the same quiet, welcoming visual language and never distract from writing.
 
 ---
 

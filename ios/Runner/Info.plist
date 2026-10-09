@@ -66,5 +66,9 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Solace needs speech recognition for journaling through voice.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Solace needs microphone access for voice journaling.</string>
 </dict>
 </plist>

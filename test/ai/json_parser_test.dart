@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import '../../lib/ai/json_parser.dart';
+import 'package:solace_ai/ai/json_parser.dart';
 
 void main() {
   group('JsonParser', () {
@@ -69,7 +69,8 @@ void main() {
         usedModel: true,
       );
       expect(result, isNotNull);
-      expect(result!.reflection, equals('You are balancing two clear possibilities.'));
+      expect(result!.reflection,
+          equals('You are balancing two clear possibilities.'));
       expect(result.options.length, equals(1));
       expect(result.options.first.name, equals('Option A'));
       expect(result.followUpQuestion, equals('What is your next intuition?'));
@@ -97,8 +98,12 @@ void main() {
     });
 
     test('returns null gracefully on garbage text without throwing', () {
-      expect(JsonParser.parseJsonObject('This is random text with no JSON at all.'), isNull);
-      expect(JsonParser.parseJsonObject('{ incomplete json: "broken" ...'), isNull);
+      expect(
+          JsonParser.parseJsonObject(
+              'This is random text with no JSON at all.'),
+          isNull);
+      expect(JsonParser.parseJsonObject('{ incomplete json: "broken" ...'),
+          isNull);
       expect(JsonParser.parseJsonObject(''), isNull);
       expect(JsonParser.parseJsonObject('   '), isNull);
       expect(JsonParser.parseJsonObject(null), isNull);

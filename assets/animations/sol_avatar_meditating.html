@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+    }
+  </style>
+</head>
+<body>
+<!-- STITCH_SVG_START:ANIMATION_35 class="fixed inset-0 w-full h-full" --><div class="fixed inset-0 w-full h-full" id="animated-svg-ANIMATION_35" style="display:block;"><svg height="120" viewbox="0 0 120 120" width="120" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<radialgradient cx="50%" cy="50%" id="sunGlowMeditateAnim" r="50%">
+<stop offset="0%" stop-color="#FFF5A5"></stop>
+<stop offset="70%" stop-color="#FFD166"></stop>
+<stop offset="100%" stop-color="#F4A261" stop-opacity="0.85"></stop>
+</radialgradient>
+<filter height="180%" id="softGlowMeditateAnim" width="180%" x="-40%" y="-40%">
+<fegaussianblur result="blur" stddeviation="6"></fegaussianblur>
+<fecomposite in="SourceGraphic" in2="blur" operator="over"></fecomposite>
+</filter>
+<style>
+      @keyframes sereneFloat {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-4px) rotate(0.8deg); }
+      }
+      @keyframes auraPulseZen {
+        0%, 100% { transform: scale(1); opacity: 0.32; }
+        50% { transform: scale(1.08); opacity: 0.55; }
+      }
+      @keyframes raysGlowZen {
+        0%, 100% { opacity: 0.55; transform: rotate(0deg); }
+        50% { opacity: 0.9; transform: rotate(4deg); }
+      }
+      @keyframes breatheCloud {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.03) translateY(-1px); }
+      }
+      .anim-sol-zen-group {
+        transform-origin: 60px 56px;
+        animation: sereneFloat 4s ease-in-out infinite;
+      }
+      .anim-zen-aura {
+        transform-origin: 60px 56px;
+        animation: auraPulseZen 4s ease-in-out infinite;
+      }
+      .anim-zen-rays {
+        transform-origin: 60px 56px;
+        animation: raysGlowZen 6s ease-in-out infinite;
+      }
+      .anim-cloud-pillow {
+        transform-origin: 60px 72px;
+        animation: breatheCloud 4s ease-in-out infinite;
+      }
+    </style>
+</defs>
+<!-- Ambient Serene Aura with Breathing Glow -->
+<circle class="anim-zen-aura" cx="60" cy="56" fill="#A3E4D7" filter="url(#softGlowMeditateAnim)" r="46"></circle>
+<!-- Living Sol Container -->
+<g class="anim-sol-zen-group">
+<!-- Calming Zen Rays -->
+<g class="anim-zen-rays" stroke="#FFD166" stroke-linecap="round" stroke-width="3.5">
+<line x1="60" x2="60" y1="12" y2="6"></line>
+<line x1="60" x2="60" y1="100" y2="106"></line>
+<line x1="16" x2="10" y1="56" y2="56"></line>
+<line x1="104" x2="110" y1="56" y2="56"></line>
+<line x1="29" x2="24" y1="25" y2="20"></line>
+<line x1="91" x2="96" y1="87" y2="92"></line>
+<line x1="29" x2="24" y1="87" y2="92"></line>
+<line x1="91" x2="96" y1="25" y2="20"></line>
+</g>
+<!-- Sun Body -->
+<circle cx="60" cy="56" fill="url(#sunGlowMeditateAnim)" r="36"></circle>
+<!-- Peaceful Closed Eyes (calm curved sleeping lines) -->
+<path d="M 46 54 Q 51 59 56 54" fill="none" stroke="#2D3142" stroke-linecap="round" stroke-width="3"></path>
+<path d="M 64 54 Q 69 59 74 54" fill="none" stroke="#2D3142" stroke-linecap="round" stroke-width="3"></path>
+<!-- Rosy Pink Cheeks -->
+<circle cx="44" cy="60" fill="#FF8FAB" opacity="0.75" r="5"></circle>
+<circle cx="76" cy="60" fill="#FF8FAB" opacity="0.75" r="5"></circle>
+<!-- Gentle Content Smile -->
+<path d="M 56 61 Q 60 64 64 61" fill="none" stroke="#2D3142" stroke-linecap="round" stroke-width="2.5"></path>
+<!-- Meditating Fluffy Cloud Pillow being hugged -->
+<g class="anim-cloud-pillow" filter="drop-shadow(0 4px 6px rgba(45,49,66,0.12))">
+<path d="M 42 78 C 36 78 32 73 35 67 C 37 63 42 63 45 65 C 48 60 55 59 59 63 C 62 58 70 58 74 62 C 78 61 84 64 84 69 C 87 74 83 78 78 78 Z" fill="#FFFFFF"></path>
+<!-- Tiny arms resting on cloud -->
+<ellipse cx="44" cy="71" fill="#FFD166" rx="4" ry="3" stroke="#2D3142" stroke-width="1.5"></ellipse>
+<ellipse cx="76" cy="71" fill="#FFD166" rx="4" ry="3" stroke="#2D3142" stroke-width="1.5"></ellipse>
+</g>
+</g>
+</svg></div><!-- STITCH_SVG_END:ANIMATION_35 -->
+</body>
+</html>
