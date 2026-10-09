@@ -15,6 +15,7 @@ import 'screens/welcome_screen.dart';
 /// Global router defining navigation across Solace AI
 final GoRouter solaceRouter = GoRouter(
   initialLocation: '/welcome',
+  errorBuilder: (context, state) => const SanctuaryHomeScreen(),
   routes: [
     // 01 — Welcome Screen (Landing)
     GoRoute(
@@ -63,7 +64,7 @@ final GoRouter solaceRouter = GoRouter(
       ),
     ),
 
-    // 06 — Sanctuary Home Dashboard
+    // 06 — Sanctuary Home Dashboard (Root)
     GoRoute(
       path: '/',
       builder: (context, state) => SanctuaryHomeScreen(
@@ -74,6 +75,24 @@ final GoRouter solaceRouter = GoRouter(
         onJournalTab: () => context.go('/journal/new'),
         onSettingsTab: () => context.go('/settings'),
       ),
+    ),
+
+    // Common navigation aliases
+    GoRoute(
+      path: '/home',
+      redirect: (context, state) => '/',
+    ),
+    GoRoute(
+      path: '/dashboard',
+      redirect: (context, state) => '/',
+    ),
+    GoRoute(
+      path: '/sanctuary',
+      redirect: (context, state) => '/',
+    ),
+    GoRoute(
+      path: '/journal',
+      redirect: (context, state) => '/journal/new',
     ),
 
     // 07 — Journal Editor
