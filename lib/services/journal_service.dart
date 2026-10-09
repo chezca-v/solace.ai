@@ -63,6 +63,14 @@ class JournalService extends ChangeNotifier {
     notifyListeners();
   }
 
+  JournalEntry? getEntryById(String id) {
+    try {
+      return _entries.firstWhere((e) => e.id == id);
+    } catch (_) {
+      return null;
+    }
+  }
+
   List<JournalEntry> search(String query) {
     if (query.trim().isEmpty) return _entries;
     final lower = query.toLowerCase();

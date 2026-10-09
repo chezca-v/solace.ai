@@ -453,18 +453,21 @@ class _SupportPreferencesScreenState extends State<SupportPreferencesScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.lock_outline_rounded, size: 12, color: SolaceTheme.textMuted),
-              SizedBox(width: 5),
-              Text(
-                'Encrypted & stored strictly on this device',
-                style: TextStyle(
-                  fontFamily: SolaceTheme.fontFamily,
-                  fontSize: 11.5,
-                  fontWeight: FontWeight.w400,
-                  color: SolaceTheme.textMuted,
+              const Icon(Icons.lock_outline_rounded, size: 12, color: SolaceTheme.textMuted),
+              const SizedBox(width: 5),
+              Flexible(
+                child: Text(
+                  'Encrypted & stored strictly on this device',
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontFamily: SolaceTheme.fontFamily,
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w400,
+                    color: SolaceTheme.textMuted,
+                  ),
                 ),
               ),
             ],

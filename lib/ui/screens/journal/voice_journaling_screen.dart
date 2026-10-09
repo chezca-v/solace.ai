@@ -200,22 +200,28 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              const Icon(Icons.circle, size: 6, color: Color(0xFF10B981)),
-              const SizedBox(width: 5),
-              Text(
-                _isTranscribed ? 'LOCAL TRANSCRIPT READY' : 'AUTO-SAVED LOCALLY · OCT 9, 10:14 PM',
-                style: const TextStyle(
-                  fontFamily: SolaceTheme.fontFamily,
-                  fontSize: 10.5,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.3,
-                  color: SolaceTheme.primaryDark,
+          Expanded(
+            child: Row(
+              children: [
+                const Icon(Icons.circle, size: 6, color: Color(0xFF10B981)),
+                const SizedBox(width: 5),
+                Flexible(
+                  child: Text(
+                    _isTranscribed ? 'LOCAL TRANSCRIPT READY' : 'AUTO-SAVED LOCALLY · OCT 9, 10:14 PM',
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontFamily: SolaceTheme.fontFamily,
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.3,
+                      color: SolaceTheme.primaryDark,
+                    ),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
+          const SizedBox(width: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(
@@ -289,13 +295,16 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
                 children: [
                   const Icon(Icons.mic_rounded, size: 14, color: Colors.white),
                   const SizedBox(width: 6),
-                  Text(
-                    _isTranscribed ? 'Note #04 (01:18) 🎧' : 'Speak •',
-                    style: const TextStyle(
-                      fontFamily: SolaceTheme.fontFamily,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                  Flexible(
+                    child: Text(
+                      _isTranscribed ? 'Note #04 (01:18) 🎧' : 'Speak •',
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontFamily: SolaceTheme.fontFamily,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ],
@@ -329,13 +338,16 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
             children: [
               Icon(Icons.circle, size: 6, color: Color(0xFF10B981)),
               SizedBox(width: 6),
-              Text(
-                'Listening to your thoughts with whisper-edge AI...',
-                style: TextStyle(
-                  fontFamily: SolaceTheme.fontFamily,
-                  fontSize: 11.5,
-                  fontWeight: FontWeight.w600,
-                  color: SolaceTheme.primaryDark,
+              Flexible(
+                child: Text(
+                  'Listening to your thoughts with whisper-edge AI...',
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontFamily: SolaceTheme.fontFamily,
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w600,
+                    color: SolaceTheme.primaryDark,
+                  ),
                 ),
               ),
             ],
@@ -422,8 +434,10 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
         const SizedBox(height: 24),
 
         // Recording Control Buttons: Cancel | Pause | Transcribe
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        Wrap(
+          alignment: WrapAlignment.center,
+          spacing: 10,
+          runSpacing: 10,
           children: [
             OutlinedButton.icon(
               onPressed: () {
@@ -437,7 +451,6 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
               ),
             ),
-            const SizedBox(width: 10),
             OutlinedButton.icon(
               onPressed: () {
                 setState(() => _isRecording = !_isRecording);
@@ -450,7 +463,6 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
               ),
             ),
-            const SizedBox(width: 10),
             ElevatedButton.icon(
               onPressed: _transcribeVoice,
               icon: const Icon(Icons.check_rounded, size: 16, color: Colors.white),
@@ -789,25 +801,31 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Icon(Icons.lock_rounded, size: 12, color: SolaceTheme.primaryDark),
-                  SizedBox(width: 4),
-                  Text(
-                    'WHISPER.TFLITE • 99.4% CONFIDENCE',
-                    style: TextStyle(
-                      fontFamily: SolaceTheme.fontFamily,
-                      fontSize: 10.5,
-                      fontWeight: FontWeight.w700,
-                      color: SolaceTheme.primaryDark,
+              const Expanded(
+                child: Row(
+                  children: [
+                    Icon(Icons.lock_rounded, size: 12, color: SolaceTheme.primaryDark),
+                    SizedBox(width: 4),
+                    Flexible(
+                      child: Text(
+                        'WHISPER.TFLITE • 99.4% CONFIDENCE',
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontFamily: SolaceTheme.fontFamily,
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w700,
+                          color: SolaceTheme.primaryDark,
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-              Row(
+              const SizedBox(width: 8),
+              const Row(
                 children: [
                   Icon(Icons.edit_outlined, size: 12, color: SolaceTheme.textMuted),
                   SizedBox(width: 4),

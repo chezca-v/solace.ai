@@ -377,18 +377,21 @@ class _JournalingGoalsScreenState extends State<JournalingGoalsScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.lock_outline_rounded, size: 12, color: SolaceTheme.textMuted),
-              SizedBox(width: 5),
-              Text(
-                'End-to-end encrypted · Stored only on your device',
-                style: TextStyle(
-                  fontFamily: SolaceTheme.fontFamily,
-                  fontSize: 11.5,
-                  fontWeight: FontWeight.w400,
-                  color: SolaceTheme.textMuted,
+              const Icon(Icons.lock_outline_rounded, size: 12, color: SolaceTheme.textMuted),
+              const SizedBox(width: 5),
+              Flexible(
+                child: Text(
+                  'End-to-end encrypted · Stored only on your device',
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontFamily: SolaceTheme.fontFamily,
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w400,
+                    color: SolaceTheme.textMuted,
+                  ),
                 ),
               ),
             ],

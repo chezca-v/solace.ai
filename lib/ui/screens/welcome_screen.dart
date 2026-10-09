@@ -203,13 +203,16 @@ class WelcomeScreen extends StatelessWidget {
             color: SolaceTheme.badgeText,
           ),
           SizedBox(width: 6),
-          Text(
-            'Private by design. Useful offline.',
-            style: TextStyle(
-              fontFamily: SolaceTheme.fontFamily,
-              fontSize: 12.5,
-              fontWeight: FontWeight.w600,
-              color: SolaceTheme.badgeText,
+          Flexible(
+            child: Text(
+              'Private by design. Useful offline.',
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontFamily: SolaceTheme.fontFamily,
+                fontSize: 12.5,
+                fontWeight: FontWeight.w600,
+                color: SolaceTheme.badgeText,
+              ),
             ),
           ),
         ],

@@ -250,22 +250,27 @@ class _PersonalContextScreenState extends State<PersonalContextScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Row(
-                children: [
-                  Icon(Icons.spa_rounded, size: 16, color: SolaceTheme.primary),
-                  SizedBox(width: 6),
-                  Text(
-                    'Life areas that matter\nmost right now',
-                    style: TextStyle(
-                      fontFamily: SolaceTheme.fontFamily,
-                      fontSize: 14.5,
-                      fontWeight: FontWeight.w700,
-                      color: SolaceTheme.textHeading,
-                      height: 1.2,
+              const Expanded(
+                child: Row(
+                  children: [
+                    Icon(Icons.spa_rounded, size: 16, color: SolaceTheme.primary),
+                    SizedBox(width: 6),
+                    Flexible(
+                      child: Text(
+                        'Life areas that matter\nmost right now',
+                        style: TextStyle(
+                          fontFamily: SolaceTheme.fontFamily,
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w700,
+                          color: SolaceTheme.textHeading,
+                          height: 1.2,
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
+              const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
@@ -454,22 +459,27 @@ class _PersonalContextScreenState extends State<PersonalContextScreen> {
           const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Icon(Icons.tune_rounded, size: 16, color: SolaceTheme.primary),
-                  SizedBox(width: 6),
-                  Text(
-                    'Any explicit boundaries for\nSol?',
-                    style: TextStyle(
-                      fontFamily: SolaceTheme.fontFamily,
-                      fontSize: 14.5,
-                      fontWeight: FontWeight.w700,
-                      color: SolaceTheme.textHeading,
-                      height: 1.2,
+              Expanded(
+                child: Row(
+                  children: [
+                    Icon(Icons.tune_rounded, size: 16, color: SolaceTheme.primary),
+                    SizedBox(width: 6),
+                    Flexible(
+                      child: Text(
+                        'Any explicit boundaries for\nSol?',
+                        style: TextStyle(
+                          fontFamily: SolaceTheme.fontFamily,
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w700,
+                          color: SolaceTheme.textHeading,
+                          height: 1.2,
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
+              SizedBox(width: 8),
               Text(
                 'Your\nRules',
                 textAlign: TextAlign.center,

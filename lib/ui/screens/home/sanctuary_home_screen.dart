@@ -246,27 +246,33 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
             ],
           ),
           const SizedBox(height: 8),
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Icon(Icons.circle, size: 6, color: Color(0xFF10B981)),
-                  SizedBox(width: 4),
-                  Icon(Icons.circle, size: 6, color: Color(0xFF10B981)),
-                  SizedBox(width: 5),
-                  Text(
-                    'Offline & Encrypted',
-                    style: TextStyle(
-                      fontFamily: SolaceTheme.fontFamily,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF1B7A52),
+              const Expanded(
+                child: Row(
+                  children: [
+                    Icon(Icons.circle, size: 6, color: Color(0xFF10B981)),
+                    SizedBox(width: 4),
+                    Icon(Icons.circle, size: 6, color: Color(0xFF10B981)),
+                    SizedBox(width: 5),
+                    Flexible(
+                      child: Text(
+                        'Offline & Encrypted',
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontFamily: SolaceTheme.fontFamily,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF1B7A52),
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-              Text(
+              const SizedBox(width: 8),
+              const Text(
                 'Wednesday, Oct 11',
                 style: TextStyle(
                   fontFamily: SolaceTheme.fontFamily,
@@ -286,43 +292,46 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'SANCTUARY SPACE',
-              style: TextStyle(
-                fontFamily: SolaceTheme.fontFamily,
-                fontSize: 10.5,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0.8,
-                color: SolaceTheme.primaryDark,
+        const Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'SANCTUARY SPACE',
+                style: TextStyle(
+                  fontFamily: SolaceTheme.fontFamily,
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.8,
+                  color: SolaceTheme.primaryDark,
+                ),
               ),
-            ),
-            SizedBox(height: 2),
-            Text(
-              'Good morning,\nElena',
-              style: TextStyle(
-                fontFamily: SolaceTheme.fontFamily,
-                fontSize: 26,
-                fontWeight: FontWeight.w800,
-                color: SolaceTheme.textHeading,
-                letterSpacing: -0.5,
-                height: 1.15,
+              SizedBox(height: 2),
+              Text(
+                'Good morning,\nElena',
+                style: TextStyle(
+                  fontFamily: SolaceTheme.fontFamily,
+                  fontSize: 26,
+                  fontWeight: FontWeight.w800,
+                  color: SolaceTheme.textHeading,
+                  letterSpacing: -0.5,
+                  height: 1.15,
+                ),
               ),
-            ),
-            SizedBox(height: 4),
-            Text(
-              'Here is a gentle space for your\nthoughts today.',
-              style: TextStyle(
-                fontFamily: SolaceTheme.fontFamily,
-                fontSize: 13,
-                color: SolaceTheme.textBody,
-                height: 1.35,
+              SizedBox(height: 4),
+              Text(
+                'Here is a gentle space for your\nthoughts today.',
+                style: TextStyle(
+                  fontFamily: SolaceTheme.fontFamily,
+                  fontSize: 13,
+                  color: SolaceTheme.textBody,
+                  height: 1.35,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
+        const SizedBox(width: 12),
         Container(
           width: 36,
           height: 36,
@@ -607,20 +616,25 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Row(
-                  children: [
-                    Icon(Icons.auto_stories_outlined, size: 16, color: SolaceTheme.primary),
-                    SizedBox(width: 6),
-                    Text(
-                      'Your Recent Reflections',
-                      style: TextStyle(
-                        fontFamily: SolaceTheme.fontFamily,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: SolaceTheme.textHeading,
+                const Expanded(
+                  child: Row(
+                    children: [
+                      Icon(Icons.auto_stories_outlined, size: 16, color: SolaceTheme.primary),
+                      SizedBox(width: 6),
+                      Flexible(
+                        child: Text(
+                          'Your Recent Reflections',
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontFamily: SolaceTheme.fontFamily,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: SolaceTheme.textHeading,
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 TextButton(
                   onPressed: () {
@@ -732,29 +746,35 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFEBF6EF),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.auto_awesome, size: 11, color: SolaceTheme.primaryDark),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Sol Badge: ${entry.solBadge ?? "Reflection active"}',
-                        style: const TextStyle(
-                          fontFamily: SolaceTheme.fontFamily,
-                          fontSize: 10.5,
-                          fontWeight: FontWeight.w600,
-                          color: SolaceTheme.primaryDark,
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEBF6EF),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.auto_awesome, size: 11, color: SolaceTheme.primaryDark),
+                        const SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            'Sol Badge: ${entry.solBadge ?? "Reflection active"}',
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontFamily: SolaceTheme.fontFamily,
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.w600,
+                              color: SolaceTheme.primaryDark,
+                            ),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
+                const SizedBox(width: 8),
                 const Icon(
                   Icons.arrow_forward_rounded,
                   size: 16,

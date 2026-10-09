@@ -243,12 +243,15 @@ class _DecisionComparisonScreenState extends State<DecisionComparisonScreen> {
             children: [
               Icon(Icons.lock_rounded, size: 12, color: SolaceTheme.primaryDark),
               SizedBox(width: 4),
-              Text(
-                'Retrieved from your private on-device journal vault',
-                style: TextStyle(
-                  fontFamily: SolaceTheme.fontFamily,
-                  fontSize: 11,
-                  color: SolaceTheme.textBody,
+              Expanded(
+                child: Text(
+                  'Retrieved from your private on-device journal vault',
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontFamily: SolaceTheme.fontFamily,
+                    fontSize: 11,
+                    color: SolaceTheme.textBody,
+                  ),
                 ),
               ),
             ],
@@ -292,22 +295,28 @@ class _DecisionComparisonScreenState extends State<DecisionComparisonScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              const Icon(Icons.check_circle_rounded,
-                  size: 16, color: Color(0xFF10B981)),
-              const SizedBox(width: 8),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontFamily: SolaceTheme.fontFamily,
-                  fontSize: 12.5,
-                  fontWeight: FontWeight.w600,
-                  color: SolaceTheme.textHeading,
+          Expanded(
+            child: Row(
+              children: [
+                const Icon(Icons.check_circle_rounded,
+                    size: 16, color: Color(0xFF10B981)),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    title,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontFamily: SolaceTheme.fontFamily,
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w600,
+                      color: SolaceTheme.textHeading,
+                    ),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
+          const SizedBox(width: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(
@@ -611,11 +620,16 @@ class _DecisionComparisonScreenState extends State<DecisionComparisonScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Autonomy',
-                  style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600)),
+              const Expanded(
+                child: Text(
+                  'Autonomy',
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
+                ),
+              ),
               Text('$autonomyScore/10',
                   style: const TextStyle(
-                      fontSize: 10.5, fontWeight: FontWeight.w700)),
+                      fontSize: 10, fontWeight: FontWeight.w700)),
             ],
           ),
           const SizedBox(height: 3),
@@ -635,11 +649,16 @@ class _DecisionComparisonScreenState extends State<DecisionComparisonScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Sustainable Pace',
-                  style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600)),
+              const Expanded(
+                child: Text(
+                  'Sustainable Pace',
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
+                ),
+              ),
               Text('$paceScore/10',
                   style: TextStyle(
-                    fontSize: 10.5,
+                    fontSize: 10,
                     fontWeight: FontWeight.w700,
                     color: isPaceWarning
                         ? const Color(0xFFEF4444)

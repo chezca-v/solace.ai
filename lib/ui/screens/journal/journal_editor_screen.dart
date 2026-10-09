@@ -248,22 +248,28 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Row(
-            children: [
-              Icon(Icons.circle, size: 6, color: Color(0xFF10B981)),
-              SizedBox(width: 5),
-              Text(
-                'AUTO-SAVED LOCALLY',
-                style: TextStyle(
-                  fontFamily: SolaceTheme.fontFamily,
-                  fontSize: 10.5,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.3,
-                  color: SolaceTheme.primaryDark,
+          const Expanded(
+            child: Row(
+              children: [
+                Icon(Icons.circle, size: 6, color: Color(0xFF10B981)),
+                SizedBox(width: 5),
+                Flexible(
+                  child: Text(
+                    'AUTO-SAVED LOCALLY',
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontFamily: SolaceTheme.fontFamily,
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.3,
+                      color: SolaceTheme.primaryDark,
+                    ),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
+          const SizedBox(width: 6),
           const Text(
             'Oct 9, 10:14 PM',
             style: TextStyle(
@@ -272,6 +278,7 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
               color: SolaceTheme.textMuted,
             ),
           ),
+          const SizedBox(width: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(
@@ -371,7 +378,10 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
   }
 
   Widget _buildTuningTags() {
-    return Row(
+    return Wrap(
+      spacing: 6,
+      runSpacing: 6,
+      crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         const Text(
           'TUNING:',
@@ -383,7 +393,6 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
             color: SolaceTheme.textMuted,
           ),
         ),
-        const SizedBox(width: 8),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
           decoration: BoxDecoration(
@@ -407,7 +416,6 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
             ],
           ),
         ),
-        const SizedBox(width: 6),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
           decoration: BoxDecoration(
@@ -446,21 +454,27 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
       child: const Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              Icon(Icons.spa_rounded, size: 14, color: SolaceTheme.primaryDark),
-              SizedBox(width: 6),
-              Text(
-                'Tension & Clarification Stream',
-                style: TextStyle(
-                  fontFamily: SolaceTheme.fontFamily,
-                  fontSize: 11.5,
-                  fontWeight: FontWeight.w700,
-                  color: SolaceTheme.textHeading,
+          Expanded(
+            child: Row(
+              children: [
+                Icon(Icons.spa_rounded, size: 14, color: SolaceTheme.primaryDark),
+                SizedBox(width: 6),
+                Flexible(
+                  child: Text(
+                    'Tension & Clarification Stream',
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontFamily: SolaceTheme.fontFamily,
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w700,
+                      color: SolaceTheme.textHeading,
+                    ),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
+          SizedBox(width: 8),
           Text(
             'Balanced Resonance',
             style: TextStyle(
@@ -511,40 +525,18 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
                       height: 20,
                       child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                     )
-                  : Row(
+                  : const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.auto_awesome, size: 18, color: Colors.white),
-                        const SizedBox(width: 8),
-                        const Text(
+                        Icon(Icons.auto_awesome, size: 18, color: Colors.white),
+                        SizedBox(width: 8),
+                        Text(
                           'Reflect with Solace',
                           style: TextStyle(
                             fontFamily: SolaceTheme.fontFamily,
                             fontSize: 15.5,
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: const Row(
-                            children: [
-                              Icon(Icons.lock_rounded, size: 10, color: Colors.white),
-                              SizedBox(width: 3),
-                              Text(
-                                'Private on-device AI',
-                                style: TextStyle(
-                                  fontFamily: SolaceTheme.fontFamily,
-                                  fontSize: 9.5,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
                           ),
                         ),
                       ],

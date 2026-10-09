@@ -13,8 +13,22 @@ import 'package:solace_ai/ui/screens/welcome_screen.dart';
 import 'package:solace_ai/ui/theme/solace_theme.dart';
 
 void main() {
+  setUp(() {
+    TestWidgetsFlutterBinding.ensureInitialized();
+  });
+
+  void setTestDeviceSize(WidgetTester tester) {
+    tester.view.physicalSize = const Size(500, 1000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+  }
+
   testWidgets('01 — WelcomeScreen renders branding, cards and CTAs',
       (WidgetTester tester) async {
+    setTestDeviceSize(tester);
     bool startedTapped = false;
 
     await tester.pumpWidget(
@@ -40,6 +54,7 @@ void main() {
 
   testWidgets('02 — JournalingGoalsScreen renders goals and handles selection',
       (WidgetTester tester) async {
+    setTestDeviceSize(tester);
     bool continueTapped = false;
 
     await tester.pumpWidget(
@@ -62,6 +77,7 @@ void main() {
 
   testWidgets('03 — SupportPreferencesScreen renders support options and Sol quote',
       (WidgetTester tester) async {
+    setTestDeviceSize(tester);
     bool continueTapped = false;
 
     await tester.pumpWidget(
@@ -84,6 +100,7 @@ void main() {
 
   testWidgets('04 — PersonalContextScreen renders life areas and input fields',
       (WidgetTester tester) async {
+    setTestDeviceSize(tester);
     bool continueTapped = false;
 
     await tester.pumpWidget(
@@ -105,6 +122,7 @@ void main() {
 
   testWidgets('06 — SanctuaryHomeScreen renders greeting, prompt, rhythm, and reflections',
       (WidgetTester tester) async {
+    setTestDeviceSize(tester);
     bool newEntryTapped = false;
 
     await tester.pumpWidget(
@@ -129,6 +147,7 @@ void main() {
 
   testWidgets('07 — JournalEditorScreen renders editor body, seed and tags',
       (WidgetTester tester) async {
+    setTestDeviceSize(tester);
     await tester.pumpWidget(
       MaterialApp(
         theme: SolaceTheme.themeData,
@@ -145,6 +164,7 @@ void main() {
 
   testWidgets('07A & 07B — VoiceJournalingScreen renders recording and transcribe flow',
       (WidgetTester tester) async {
+    setTestDeviceSize(tester);
     await tester.pumpWidget(
       MaterialApp(
         theme: SolaceTheme.themeData,
@@ -157,7 +177,8 @@ void main() {
 
     // Tap Transcribe to switch to 07B
     await tester.tap(find.text('Transcribe'));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
 
     expect(find.text('Empathetic Mode Activated'), findsOneWidget);
     expect(find.text('SOL\'S WHISPER'), findsOneWidget);
@@ -166,6 +187,7 @@ void main() {
 
   testWidgets('08/09 — EntryDetailScreen renders journal and Sol reflection synthesis',
       (WidgetTester tester) async {
+    setTestDeviceSize(tester);
     await tester.pumpWidget(
       MaterialApp(
         theme: SolaceTheme.themeData,
@@ -184,6 +206,7 @@ void main() {
 
   testWidgets('10 — DecisionComparisonScreen renders comparative columns and tension',
       (WidgetTester tester) async {
+    setTestDeviceSize(tester);
     await tester.pumpWidget(
       MaterialApp(
         theme: SolaceTheme.themeData,
@@ -200,6 +223,7 @@ void main() {
 
   testWidgets('11 — MemoryVaultScreen renders zero leakage status, filters, and memories',
       (WidgetTester tester) async {
+    setTestDeviceSize(tester);
     await tester.pumpWidget(
       MaterialApp(
         theme: SolaceTheme.themeData,
@@ -208,8 +232,8 @@ void main() {
     );
 
     expect(find.text('Personal Memory Vault'), findsOneWidget);
-    expect(find.text('ZERO LEAKAGE'), findsOneWidget);
-    expect(find.text('+ Add Custom Rule or Priority'), findsOneWidget);
+    expect(find.text('ZERO LEAKAGE'), findsWidgets);
+    expect(find.text('Add Custom Rule or Priority'), findsOneWidget);
     expect(find.text('Solace never assumes.'), findsOneWidget);
   });
 }

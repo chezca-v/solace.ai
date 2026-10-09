@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../services/journal_service.dart';
-import '../../services/memory_service.dart';
+import '../../../models/memory_item.dart';
+import '../../../services/journal_service.dart';
+import '../../../services/memory_service.dart';
 import '../../theme/solace_theme.dart';
 import '../../widgets/sun_illustration.dart';
 
@@ -165,34 +166,40 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
                 color: SolaceTheme.textHeading),
             splashRadius: 22,
           ),
-          Row(
-            children: [
-              Container(
-                width: 28,
-                height: 28,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFE8F7EE),
-                  shape: BoxShape.circle,
-                ),
-                child: const Center(
-                  child: Icon(
-                    Icons.wb_sunny_rounded,
-                    size: 17,
-                    color: Color(0xFF2E8B62),
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 28,
+                  height: 28,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFE8F7EE),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.wb_sunny_rounded,
+                      size: 17,
+                      color: Color(0xFF2E8B62),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              const Text(
-                'Memory Insight Detail',
-                style: TextStyle(
-                  fontFamily: SolaceTheme.fontFamily,
-                  fontSize: 16.5,
-                  fontWeight: FontWeight.w700,
-                  color: SolaceTheme.textHeading,
+                const SizedBox(width: 8),
+                const Flexible(
+                  child: Text(
+                    'Memory Insight Detail',
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontFamily: SolaceTheme.fontFamily,
+                      fontSize: 16.5,
+                      fontWeight: FontWeight.w700,
+                      color: SolaceTheme.textHeading,
+                    ),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           Stack(
             children: [
@@ -265,21 +272,28 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
             ],
           ),
         ),
-        Row(
-          children: [
-            const Icon(Icons.access_time_rounded,
-                size: 13, color: SolaceTheme.textMuted),
-            const SizedBox(width: 4),
-            Text(
-              dateStr,
-              style: const TextStyle(
-                fontFamily: SolaceTheme.fontFamily,
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: SolaceTheme.textMuted,
+        const SizedBox(width: 8),
+        Expanded(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              const Icon(Icons.access_time_rounded,
+                  size: 13, color: SolaceTheme.textMuted),
+              const SizedBox(width: 4),
+              Flexible(
+                child: Text(
+                  dateStr,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontFamily: SolaceTheme.fontFamily,
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w500,
+                    color: SolaceTheme.textMuted,
+                  ),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ],
     );
@@ -474,7 +488,6 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
                   child: const Center(
                     child: SunIllustration(
                       size: 64,
-                      animate: true,
                     ),
                   ),
                 ),
@@ -487,43 +500,49 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Container(
-                    width: 24,
-                    height: 24,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFD3F2DF),
-                      shape: BoxShape.circle,
+              Expanded(
+                child: Row(
+                  children: [
+                    Container(
+                      width: 24,
+                      height: 24,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFD3F2DF),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.wb_sunny_rounded,
+                          size: 15, color: Color(0xFF166E49)),
                     ),
-                    child: const Icon(Icons.wb_sunny_rounded,
-                        size: 15, color: Color(0xFF166E49)),
-                  ),
-                  const SizedBox(width: 8),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Sol Reflection',
-                        style: TextStyle(
-                          fontFamily: SolaceTheme.fontFamily,
-                          fontSize: 15.5,
-                          fontWeight: FontWeight.w800,
-                          color: SolaceTheme.textHeading,
-                        ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Sol Reflection',
+                            style: TextStyle(
+                              fontFamily: SolaceTheme.fontFamily,
+                              fontSize: 15.5,
+                              fontWeight: FontWeight.w800,
+                              color: SolaceTheme.textHeading,
+                            ),
+                          ),
+                          Text(
+                            'On-device neural core • ${_moods[_selectedMoodIndex]['activeText']}',
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontFamily: SolaceTheme.fontFamily,
+                              fontSize: 11,
+                              color: SolaceTheme.textMuted,
+                            ),
+                          ),
+                        ],
                       ),
-                      Text(
-                        'On-device neural core • ${_moods[_selectedMoodIndex]['activeText']}',
-                        style: const TextStyle(
-                          fontFamily: SolaceTheme.fontFamily,
-                          fontSize: 11,
-                          color: SolaceTheme.textMuted,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
+              const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
                 decoration: BoxDecoration(
@@ -656,12 +675,15 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
                 children: [
                   Icon(Icons.balance_rounded, size: 18),
                   SizedBox(width: 8),
-                  Text(
-                    'Compare Choices based on Priorities',
-                    style: TextStyle(
-                      fontFamily: SolaceTheme.fontFamily,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
+                  Flexible(
+                    child: Text(
+                      'Compare Choices based on Priorities',
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontFamily: SolaceTheme.fontFamily,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                   SizedBox(width: 6),
@@ -697,45 +719,57 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Row(
-                  children: [
-                    Icon(Icons.folder_special_outlined,
-                        size: 16, color: SolaceTheme.primaryDark),
-                    SizedBox(width: 8),
-                    Text(
-                      'Save insight to memories',
-                      style: TextStyle(
-                        fontFamily: SolaceTheme.fontFamily,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: SolaceTheme.textHeading,
-                      ),
-                    ),
-                  ],
-                ),
-                Switch(
-                  value: _isSavedToMemories,
-                  onChanged: (val) {
-                    setState(() => _isSavedToMemories = val);
-                    if (val) {
-                      MemoryService.instance.addMemory(
-                        title: 'Career Dilemma: Research vs Founding Designer',
-                        quote:
-                            'Prioritizes autonomy & sustainable pacing over institutional prestige.',
-                        category: 'Priorities',
-                        tag: 'Career',
-                        statedIn: 'Entry on Oct 9: Two opportunities',
-                      );
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Insight saved to Personal Memory Vault!'),
-                          backgroundColor: SolaceTheme.primaryDark,
-                          duration: Duration(seconds: 2),
+                const Expanded(
+                  child: Row(
+                    children: [
+                      Icon(Icons.folder_special_outlined,
+                          size: 16, color: SolaceTheme.primaryDark),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Save insight to memories',
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontFamily: SolaceTheme.fontFamily,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: SolaceTheme.textHeading,
+                          ),
                         ),
-                      );
-                    }
-                  },
-                  activeColor: SolaceTheme.primary,
+                      ),
+                    ],
+                  ),
+                ),
+                Transform.scale(
+                  scale: 0.8,
+                  child: Switch(
+                    value: _isSavedToMemories,
+                    onChanged: (val) {
+                      setState(() => _isSavedToMemories = val);
+                      if (val) {
+                        MemoryService.instance.addMemory(
+                          MemoryItem(
+                            id: DateTime.now().millisecondsSinceEpoch.toString(),
+                            title: 'Career Dilemma: Research vs Founding Designer',
+                            quoteOrDescription:
+                                'Prioritizes autonomy & sustainable pacing over institutional prestige.',
+                            source: 'Entry on Oct 9: Two opportunities',
+                            category: 'HIGH PRIORITY',
+                            subcategory: 'Career',
+                            createdAt: DateTime.now(),
+                          ),
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Insight saved to Personal Memory Vault!'),
+                            backgroundColor: SolaceTheme.primaryDark,
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      }
+                    },
+                    activeColor: SolaceTheme.primary,
+                  ),
                 ),
               ],
             ),

@@ -189,16 +189,19 @@ class _MemoryVaultScreenState extends State<MemoryVaultScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'Personal Memory Vault',
-              style: TextStyle(
-                fontFamily: SolaceTheme.fontFamily,
-                fontSize: 22,
-                fontWeight: FontWeight.w800,
-                color: SolaceTheme.textHeading,
-                letterSpacing: -0.4,
+            const Expanded(
+              child: Text(
+                'Personal Memory Vault',
+                style: TextStyle(
+                  fontFamily: SolaceTheme.fontFamily,
+                  fontSize: 21,
+                  fontWeight: FontWeight.w800,
+                  color: SolaceTheme.textHeading,
+                  letterSpacing: -0.4,
+                ),
               ),
             ),
+            const SizedBox(width: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
@@ -252,38 +255,44 @@ class _MemoryVaultScreenState extends State<MemoryVaultScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
+              Expanded(
+                child: Row(
+                  children: [
+                    const Icon(Icons.shield_outlined,
+                        size: 16, color: SolaceTheme.primaryDark),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        '${_memoryService.activeCount} Active Memories • 0 Cloud Sync',
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontFamily: SolaceTheme.fontFamily,
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w700,
+                          color: SolaceTheme.primaryDark,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.shield_outlined,
-                      size: 16, color: SolaceTheme.primaryDark),
-                  const SizedBox(width: 8),
+                  Icon(Icons.circle, size: 6, color: Color(0xFF10B981)),
+                  SizedBox(width: 4),
                   Text(
-                    '${_memoryService.activeCount} Active Memories • 0 Cloud Sync',
-                    style: const TextStyle(
+                    'ZERO LEAKAGE',
+                    style: TextStyle(
                       fontFamily: SolaceTheme.fontFamily,
-                      fontSize: 11.5,
-                      fontWeight: FontWeight.w700,
-                      color: SolaceTheme.primaryDark,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.4,
+                      color: Color(0xFF166E49),
                     ),
                   ),
                 ],
-              ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFD1FAE5),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: const Text(
-                  '• ZERO LEAKAGE',
-                  style: TextStyle(
-                    fontFamily: SolaceTheme.fontFamily,
-                    fontSize: 9.5,
-                    fontWeight: FontWeight.w800,
-                    color: Color(0xFF047857),
-                  ),
-                ),
               ),
             ],
           ),
@@ -402,36 +411,41 @@ class _MemoryVaultScreenState extends State<MemoryVaultScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFE8F6EE),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      item.category,
-                      style: const TextStyle(
-                        fontFamily: SolaceTheme.fontFamily,
-                        fontSize: 9.5,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0.4,
-                        color: SolaceTheme.primaryDark,
+              Expanded(
+                child: Row(
+                  children: [
+                    Container(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE8F6EE),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        item.category,
+                        style: const TextStyle(
+                          fontFamily: SolaceTheme.fontFamily,
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.4,
+                          color: SolaceTheme.primaryDark,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    item.subcategory,
-                    style: const TextStyle(
-                      fontFamily: SolaceTheme.fontFamily,
-                      fontSize: 11,
-                      color: SolaceTheme.textMuted,
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        item.subcategory,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontFamily: SolaceTheme.fontFamily,
+                          fontSize: 11,
+                          color: SolaceTheme.textMuted,
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               Transform.scale(
                 scale: 0.75,
@@ -519,23 +533,28 @@ class _MemoryVaultScreenState extends State<MemoryVaultScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  const Icon(Icons.circle,
-                      size: 6, color: Color(0xFF10B981)),
-                  const SizedBox(width: 5),
-                  Text(
-                    item.category == 'HIGH PRIORITY'
-                        ? 'Active for AI Decision Support'
-                        : 'Active',
-                    style: const TextStyle(
-                      fontFamily: SolaceTheme.fontFamily,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: SolaceTheme.primaryDark,
+              Expanded(
+                child: Row(
+                  children: [
+                    const Icon(Icons.circle,
+                        size: 6, color: Color(0xFF10B981)),
+                    const SizedBox(width: 5),
+                    Expanded(
+                      child: Text(
+                        item.category == 'HIGH PRIORITY'
+                            ? 'Active for AI Decision Support'
+                            : 'Active',
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontFamily: SolaceTheme.fontFamily,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: SolaceTheme.primaryDark,
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               Row(
                 children: [
