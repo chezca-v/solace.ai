@@ -3,6 +3,8 @@ import '../../../services/journal_service.dart';
 import '../../../services/memory_service.dart';
 import '../../theme/solace_theme.dart';
 import '../../widgets/sun_illustration.dart';
+import '../journal/journal_editor_screen.dart';
+import '../memories/memory_vault_screen.dart';
 
 /// 12 — Settings & Privacy Screen
 ///
@@ -1285,6 +1287,64 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildBottomNav() {
+    return NavigationBar(
+      selectedIndex: _currentNavIndex,
+      onDestinationSelected: (i) {
+        setState(() => _currentNavIndex = i);
+        if (i == 0) {
+          if (widget.onHomeTab != null) {
+            widget.onHomeTab!();
+          } else {
+            Navigator.of(context).maybePop();
+          }
+        } else if (i == 1) {
+          if (widget.onJournalTab != null) {
+            widget.onJournalTab!();
+          } else {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const JournalEditorScreen()),
+            );
+          }
+        } else if (i == 2) {
+          if (widget.onMemoriesTab != null) {
+            widget.onMemoriesTab!();
+          } else {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const MemoryVaultScreen()),
+            );
+          }
+        } else if (i == 3) {
+          // Already on Settings
+        }
+      },
+      backgroundColor: SolaceTheme.surfaceWhite,
+      indicatorColor: const Color(0xFFE5F6EC),
+      destinations: const [
+        NavigationDestination(
+          icon: Icon(Icons.home_outlined),
+          selectedIcon: Icon(Icons.home_rounded, color: SolaceTheme.primaryDark),
+          label: 'Home',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.book_outlined),
+          selectedIcon: Icon(Icons.book_rounded, color: SolaceTheme.primaryDark),
+          label: 'Journal',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.psychology_outlined),
+          selectedIcon: Icon(Icons.psychology_rounded, color: SolaceTheme.primaryDark),
+          label: 'Memories',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.settings_outlined),
+          selectedIcon: Icon(Icons.settings_rounded, color: SolaceTheme.primaryDark),
+          label: 'Settings',
+        ),
+      ],
     );
   }
 }

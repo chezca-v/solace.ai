@@ -5,6 +5,7 @@ import '../../../models/journal_entry.dart';
 import '../../../services/journal_service.dart';
 import '../../../services/onboarding_service.dart';
 import '../../theme/solace_theme.dart';
+import 'journal_editor_screen.dart';
 
 /// 07A & 07B — Voice Journaling (Recording & Transcribed Reflection Mode)
 class VoiceJournalingScreen extends StatefulWidget {
@@ -265,7 +266,15 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
         children: [
           Expanded(
             child: InkWell(
-              onTap: widget.onSwitchToWrite,
+              onTap: () {
+                if (widget.onSwitchToWrite != null) {
+                  widget.onSwitchToWrite!();
+                } else {
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (context) => const JournalEditorScreen()),
+                  );
+                }
+              },
               borderRadius: BorderRadius.circular(20),
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 8),
