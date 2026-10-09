@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../../models/journal_entry.dart';
 import '../../../models/memory_item.dart';
 import '../../../services/journal_service.dart';
 import '../../../services/memory_service.dart';
+import '../../../services/onboarding_service.dart';
 import '../../theme/solace_theme.dart';
 import '../../widgets/sun_illustration.dart';
 import '../decision/decision_comparison_screen.dart';
@@ -31,7 +33,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _pulseController;
   int _selectedMoodIndex = 1; // 0: Meditating, 1: Empathetic, 2: Joyful, 3: Alert
-  bool _isSavedToMemories = true;
+  bool _isSavedToMemories = false;
   bool _isDismissed = false;
 
   final List<Map<String, dynamic>> _moods = [
@@ -72,21 +74,44 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
   }
 
   @override
-  void dispose() {
+  void dispose) {
     _pulseController.dispose();
     super.dispose();
+  }
+
+  String _formatDate(DateTime dt) {
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
+    final hour = dt.hour > 12 ? dt.hour - 12 : (dt.hour == 0 ? 12 : dt.hour);
+    final minute = dt.minute.toString().padLeft(2, '0');
+    final period = dt.hour >= 12 ? 'PM' : 'AM';
+    return '${months[dt.month - 1]} ${dt.day}, $hour:$minute $period • Stored on device';
   }
 
   @override
   Widget build(BuildContext context) {
     final journalService = JournalService.instance;
-    final entry = journalService.getEntryById(widget.entryId ?? 'entry-1');
+    final entry = widget.entryId != null
+        ? journalService.getEntryById(widget.entryId!)
+        : (journalService.entries.isNotEmpty ? journalService.entries.first : null);
 
-    final title = entry?.title ?? 'Untitled Reflection';
+    final title = entry?.title ?? 'Personal Reflection';
     final content = entry?.content ??
-        'No reflection content recorded yet. Write or speak freely to begin your sanctuary journey.';
-    final dateStr = entry?.formattedDate ?? 'Today • Stored on device';
-    final wordCount = entry?.wordCount ?? 0;
+        'Write or speak freely to begin your sanctuary reflection. All thoughts stay encrypted on your device.';
+    final dateStr = entry != null ? _formatDate(entry.createdAt) : 'Today • Stored on device';
+    final wordCount = entry?.wordCount ?? (content.split(' ').where((w) => w.isNotEmpty).length);
 
     return Scaffold(
       backgroundColor: SolaceTheme.background,
@@ -155,6 +180,8 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
   }
 
   Widget _buildHeader(BuildContext context) {
+    final userInitial = OnboardingService.instance.userInitial;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Row(
@@ -211,10 +238,10 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
                   border: Border.all(color: SolaceTheme.primary, width: 1.5),
                   color: const Color(0xFFD4EBDD),
                 ),
-                child: const Center(
+                child: Center(
                   child: Text(
-                    'S',
-                    style: TextStyle(
+                    userInitial,
+                    style: const TextStyle(
                       fontFamily: SolaceTheme.fontFamily,
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
@@ -317,7 +344,6 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header of card
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -446,14 +472,12 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
     );
   }
 
-  Widget _buildSolReflectionCard(BuildContext context, [dynamic entry]) {
+  Widget _buildSolReflectionCard(BuildContext context, [JournalEntry? entry]) {
     final solReflectionText = entry?.solWhisper ??
-        (entry?.reflection != null && (entry?.reflection as String).isNotEmpty
-            ? entry!.reflection as String
-            : '“Sol is observing your thoughts. Your reflection, synthesized themes, and empathetic support will appear here once processed locally.”');
+        '“Sol has listened carefully to your reflections. When you review your priorities, pause and notice which path preserves your energy and boundaries.”';
 
-    final connectedMemoryText = entry?.tags != null && (entry?.tags as List).isNotEmpty
-        ? '“Stated priority: ${(entry!.tags as List).join(', ')}”'
+    final connectedMemoryText = entry?.tags != null && entry!.tags.isNotEmpty
+        ? '“Stated priority: ${entry.tags.join(', ')}”'
         : '“Synthesizing recurring patterns from your local sanctuary...”';
 
     return Container(
@@ -671,8 +695,19 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: widget.onCompareChoices ??
-                  () => _showDecisionComparison(context),
+              onPressed: () {
+                if (widget.onCompareChoices != null) {
+                  widget.onCompareChoices!();
+                } else {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => DecisionComparisonScreen(
+                        dilemmaTitle: entry?.title,
+                      ),
+                    ),
+                  );
+                }
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: SolaceTheme.primary,
                 foregroundColor: Colors.white,
@@ -763,10 +798,10 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
                           MemoryItem(
                             id: DateTime.now().millisecondsSinceEpoch.toString(),
                             title: entry?.title ?? 'Personal Insight',
-                            quoteOrDescription:
-                                entry?.content != null && (entry!.content as String).length > 80
-                                    ? '${(entry.content as String).substring(0, 80)}...'
-                                    : (entry?.content ?? 'Approved personal priority from reflection.'),
+                            quoteOrDescription: entry?.content != null &&
+                                    entry!.content.length > 80
+                                ? '${entry.content.substring(0, 80)}...'
+                                : (entry?.content ?? 'Approved personal priority from reflection.'),
                             source: 'Entry: ${entry?.title ?? "Reflection"}',
                             category: 'HIGH PRIORITY',
                             subcategory: 'Insight',
@@ -795,7 +830,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
             children: [
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: () => _showEditInterpretationDialog(context, solReflectionText),
+                  onPressed: () => _showEditInterpretationDialog(context, entry, solReflectionText),
                   style: OutlinedButton.styleFrom(
                     backgroundColor: SolaceTheme.surfaceWhite,
                     side: const BorderSide(color: Color(0xFFCEECD9)),
@@ -1015,14 +1050,6 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
     );
   }
 
-  void _showDecisionComparison(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => const DecisionComparisonScreen(),
-      ),
-    );
-  }
-
   void _showExploreAnxietyDialog(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -1193,7 +1220,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
     );
   }
 
-  void _showEditInterpretationDialog(BuildContext context, [String? initialText]) {
+  void _showEditInterpretationDialog(BuildContext context, JournalEntry? entry, [String? initialText]) {
     final controller = TextEditingController(
       text: initialText ??
           'Your reflection and empathetic synthesis will appear here once Sol processes this entry locally on your device.',
@@ -1229,10 +1256,27 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
           ),
           ElevatedButton(
             onPressed: () {
+              if (entry != null) {
+                final updated = JournalEntry(
+                  id: entry.id,
+                  title: entry.title,
+                  content: entry.content,
+                  createdAt: entry.createdAt,
+                  type: entry.type,
+                  tags: entry.tags,
+                  solBadge: entry.solBadge,
+                  solWhisper: controller.text.trim(),
+                  wordCount: entry.wordCount,
+                  audioDuration: entry.audioDuration,
+                  isAudioDraft: entry.isAudioDraft,
+                );
+                JournalService.instance.updateEntry(updated);
+              }
               Navigator.pop(ctx);
+              setState(() {});
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Interpretation refined locally.'),
+                  content: Text('Interpretation updated locally.'),
                   backgroundColor: SolaceTheme.primaryDark,
                 ),
               );
@@ -1244,14 +1288,6 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
             child: const Text('Save'),
           ),
         ],
-      ),
-    );
-  }
-
-  void _showDecisionComparison(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const DecisionComparisonScreen(),
       ),
     );
   }

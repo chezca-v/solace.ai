@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../models/journal_entry.dart';
 import '../../services/journal_service.dart';
+import '../../services/onboarding_service.dart';
+import '../../services/memory_service.dart';
 import '../../theme/solace_theme.dart';
 
 /// 10 — Decision Comparison & Support Screen
@@ -49,6 +51,81 @@ class DecisionComparisonScreen extends StatefulWidget {
 
 class _DecisionComparisonScreenState extends State<DecisionComparisonScreen> {
   int _selectedTab = 0; // 0: Comparative Grid, 1: Detailed Breakdown
+  late List<Map<String, dynamic>> _customPriorities;
+
+  @override
+  void initState() {
+    super.initState();
+    _customPriorities = _buildDynamicPriorities();
+  }
+
+  List<Map<String, dynamic>> _buildDynamicPriorities() {
+    if (widget.priorities != null && widget.priorities!.isNotEmpty) {
+      return List.from(widget.priorities!);
+    }
+
+    final onboarding = OnboardingService.instance;
+    final memories = MemoryService.instance.memories.where((m) => m.isActive).toList();
+    final list = <Map<String, dynamic>>[];
+
+    if (onboarding.workingToward.trim().isNotEmpty) {
+      list.add({
+        'title': onboarding.workingToward.trim(),
+        'weight': 'Weight: High',
+        'isHigh': true,
+      });
+    }
+
+    if (onboarding.explicitBoundaries.trim().isNotEmpty) {
+      list.add({
+        'title': 'Boundary: ${onboarding.explicitBoundaries.trim()}',
+        'weight': 'Weight: High',
+        'isHigh': true,
+      });
+    }
+
+    for (final goal in onboarding.selectedGoals) {
+      if (list.length < 3) {
+        list.add({
+          'title': goal,
+          'weight': 'Weight: Med',
+          'isHigh': false,
+        });
+      }
+    }
+
+    for (final mem in memories) {
+      if (list.length < 3) {
+        list.add({
+          'title': mem.title,
+          'weight': mem.category == 'HIGH PRIORITY' ? 'Weight: High' : 'Weight: Med',
+          'isHigh': mem.category == 'HIGH PRIORITY',
+        });
+      }
+    }
+
+    if (list.isEmpty) {
+      list.addAll([
+        {
+          'title': 'Autonomy & Schedule Control',
+          'weight': 'Weight: High',
+          'isHigh': true,
+        },
+        {
+          'title': 'Sustainable Pace / Burnout Prevention',
+          'weight': 'Weight: High',
+          'isHigh': true,
+        },
+        {
+          'title': 'Long-term Value Alignment',
+          'weight': 'Weight: Med',
+          'isHigh': false,
+        },
+      ]);
+    }
+
+    return list;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -114,6 +191,8 @@ class _DecisionComparisonScreenState extends State<DecisionComparisonScreen> {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final userInitial = OnboardingService.instance.userInitial;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Row(
@@ -130,7 +209,7 @@ class _DecisionComparisonScreenState extends State<DecisionComparisonScreen> {
               Icon(Icons.wb_sunny_rounded, size: 18, color: Color(0xFF10B981)),
               SizedBox(width: 8),
               Text(
-                'New Reflection',
+                'Decision Support',
                 style: TextStyle(
                   fontFamily: SolaceTheme.fontFamily,
                   fontSize: 16.5,
@@ -148,10 +227,10 @@ class _DecisionComparisonScreenState extends State<DecisionComparisonScreen> {
               border: Border.all(color: SolaceTheme.primary, width: 1.5),
               color: const Color(0xFFD4EBDD),
             ),
-            child: const Center(
+            child: Center(
               child: Text(
-                'S',
-                style: TextStyle(
+                userInitial,
+                style: const TextStyle(
                   fontFamily: SolaceTheme.fontFamily,
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
@@ -222,6 +301,11 @@ class _DecisionComparisonScreenState extends State<DecisionComparisonScreen> {
   }
 
   Widget _buildActiveDilemmaCard() {
+    final effectiveDilemma = widget.dilemmaTitle ??
+        (OnboardingService.instance.workingToward.trim().isNotEmpty
+            ? OnboardingService.instance.workingToward.trim()
+            : 'Balancing Immediate Demands vs. Sustainable Focus');
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -259,7 +343,7 @@ class _DecisionComparisonScreenState extends State<DecisionComparisonScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            widget.dilemmaTitle ?? 'Choice A\nvs.\nChoice B',
+            effectiveDilemma,
             style: const TextStyle(
               fontFamily: SolaceTheme.fontFamily,
               fontSize: 18,
@@ -289,34 +373,14 @@ class _DecisionComparisonScreenState extends State<DecisionComparisonScreen> {
           const SizedBox(height: 14),
 
           // Stated Priorities Weights
-          if (widget.priorities != null && widget.priorities!.isNotEmpty)
-            ...widget.priorities!.map((p) => Padding(
-                  padding: const EdgeInsets.only(bottom: 6.0),
-                  child: _buildPriorityWeightRow(
-                    title: p['title'] as String,
-                    weight: p['weight'] as String,
-                    isHigh: p['isHigh'] as bool? ?? false,
-                  ),
-                ))
-          else ...[
-            _buildPriorityWeightRow(
-              title: 'Autonomy & Schedule control',
-              weight: 'Weight: High',
-              isHigh: true,
-            ),
-            const SizedBox(height: 6),
-            _buildPriorityWeightRow(
-              title: 'Sustainable pace / Burnout prevention',
-              weight: 'Weight: High',
-              isHigh: true,
-            ),
-            const SizedBox(height: 6),
-            _buildPriorityWeightRow(
-              title: 'Long-term value alignment',
-              weight: 'Weight: Med',
-              isHigh: false,
-            ),
-          ],
+          ..._customPriorities.map((p) => Padding(
+                padding: const EdgeInsets.only(bottom: 6.0),
+                child: _buildPriorityWeightRow(
+                  title: p['title'] as String,
+                  weight: p['weight'] as String,
+                  isHigh: p['isHigh'] as bool? ?? false,
+                ),
+              )),
         ],
       ),
     );
@@ -417,8 +481,8 @@ class _DecisionComparisonScreenState extends State<DecisionComparisonScreen> {
                     fontWeight:
                         _selectedTab == 0 ? FontWeight.w700 : FontWeight.w500,
                     color: _selectedTab == 0
-                      ? SolaceTheme.textHeading
-                      : SolaceTheme.textMuted,
+                        ? SolaceTheme.textHeading
+                        : SolaceTheme.textMuted,
                   ),
                 ),
               ),
@@ -465,19 +529,19 @@ class _DecisionComparisonScreenState extends State<DecisionComparisonScreen> {
         Expanded(
           child: _buildOptionColumn(
             optionTag: 'OPTION A',
-            optionName: widget.optionAName ?? 'Option A',
+            optionName: widget.optionAName ?? 'Protected Pacing',
             icon: Icons.lightbulb_outline_rounded,
             strengths: widget.optionAStrengths ?? [
               'Predictable cadence',
-              'Established structure',
-              'Direct focus area',
+              'Preserves emotional energy',
+              'Protected boundaries',
             ],
             tradeOffs: widget.optionATradeOffs ?? [
-              'Less initial autonomy',
-              'External dependencies',
+              'Slower initial rollout',
+              'Requires turning down requests',
             ],
-            autonomyScore: widget.optionAAutonomyScore ?? 7,
-            paceScore: widget.optionAPaceScore ?? 8,
+            autonomyScore: widget.optionAAutonomyScore ?? 8,
+            paceScore: widget.optionAPaceScore ?? 9,
             bottomTag: '🌱 Sustainable Pace',
             isPaceWarning: false,
           ),
@@ -488,19 +552,19 @@ class _DecisionComparisonScreenState extends State<DecisionComparisonScreen> {
         Expanded(
           child: _buildOptionColumn(
             optionTag: 'OPTION B',
-            optionName: widget.optionBName ?? 'Option B',
+            optionName: widget.optionBName ?? 'Rapid Expansion',
             icon: Icons.rocket_launch_outlined,
             strengths: widget.optionBStrengths ?? [
-              'High creative agency',
-              'Direct ownership',
+              'High velocity output',
+              'Immediate agency',
               'Fast development cycles',
             ],
             tradeOffs: widget.optionBTradeOffs ?? [
-              'Variable pacing',
-              'Higher demands on energy',
+              'High cognitive load',
+              'Risk of burnout',
             ],
             autonomyScore: widget.optionBAutonomyScore ?? 9,
-            paceScore: widget.optionBPaceScore ?? 6,
+            paceScore: widget.optionBPaceScore ?? 5,
             bottomTag: '📈 Maximum Agency',
             isPaceWarning: false,
           ),
@@ -748,6 +812,9 @@ class _DecisionComparisonScreenState extends State<DecisionComparisonScreen> {
   }
 
   Widget _buildDynamicTensionCard() {
+    final optA = widget.optionAName ?? 'Protected Pacing';
+    final optB = widget.optionBName ?? 'Rapid Expansion';
+
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -757,7 +824,6 @@ class _DecisionComparisonScreenState extends State<DecisionComparisonScreen> {
       ),
       child: Row(
         children: [
-          // Donut Ring
           Container(
             width: 44,
             height: 44,
@@ -788,7 +854,7 @@ class _DecisionComparisonScreenState extends State<DecisionComparisonScreen> {
                 const SizedBox(height: 2),
                 Text(
                   widget.tensionSummary ??
-                      'A trade-off between structured predictability (${widget.optionAName ?? "Option A"}) and agency velocity (${widget.optionBName ?? "Option B"}).',
+                      'A natural tension exists between structured predictability ($optA) and fast momentum ($optB).',
                   style: const TextStyle(
                     fontFamily: SolaceTheme.fontFamily,
                     fontSize: 12,
@@ -806,6 +872,9 @@ class _DecisionComparisonScreenState extends State<DecisionComparisonScreen> {
   }
 
   Widget _buildSolSynthesisCard(BuildContext context) {
+    final optA = widget.optionAName ?? 'Protected Pacing';
+    final optB = widget.optionBName ?? 'Rapid Expansion';
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -858,7 +927,7 @@ class _DecisionComparisonScreenState extends State<DecisionComparisonScreen> {
           const SizedBox(height: 10),
           Text(
             widget.solSynthesis ??
-                'Notice how ${widget.optionAName ?? "Option A"} aligns with your boundary for pacing, while ${widget.optionBName ?? "Option B"} maximizes your agency. Would you like to define non-negotiable boundaries for this choice?',
+                'Notice how $optA protects your long-term mental clarity and boundary for sustainable pacing, while $optB accelerates direct agency. Consider if a hybrid approach can capture key upsides while honoring your baseline boundaries.',
             style: const TextStyle(
               fontFamily: SolaceTheme.fontFamily,
               fontSize: 13,
@@ -879,10 +948,7 @@ class _DecisionComparisonScreenState extends State<DecisionComparisonScreen> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16)),
                 onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text('Opening Boundary Definition tool...')),
-                  );
+                  _showAdjustWeightsSheet(context);
                 },
               ),
               ActionChip(
@@ -894,7 +960,7 @@ class _DecisionComparisonScreenState extends State<DecisionComparisonScreen> {
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                        content: Text('Running 6-month offline simulation...')),
+                        content: Text('Simulating long-term projection locally...')),
                   );
                 },
               ),
@@ -956,7 +1022,8 @@ class _DecisionComparisonScreenState extends State<DecisionComparisonScreen> {
               onPressed: () async {
                 final summaryTitle = widget.dilemmaTitle ?? 'Decision Analysis & Synthesis';
                 final tension = widget.tensionSummary ?? 'Comparative analysis of choices';
-                final synthesis = widget.solSynthesis ?? 'Balanced alignment with stated priorities and boundaries.';
+                final synthesis = widget.solSynthesis ??
+                    'Balanced alignment with stated priorities and boundaries.';
                 final fullContent = '$tension\n\nSolace Synthesis:\n$synthesis';
 
                 final entry = JournalEntry(
@@ -1006,11 +1073,7 @@ class _DecisionComparisonScreenState extends State<DecisionComparisonScreen> {
             width: double.infinity,
             height: 44,
             child: OutlinedButton.icon(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Adjust weights dialog...')),
-                );
-              },
+              onPressed: () => _showAdjustWeightsSheet(context),
               icon: const Icon(Icons.tune_rounded, size: 16),
               label: const Text(
                 'Ask Solace to adjust weights',
@@ -1029,6 +1092,110 @@ class _DecisionComparisonScreenState extends State<DecisionComparisonScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  void _showAdjustWeightsSheet(BuildContext context) {
+    final titleCtrl = TextEditingController();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: SolaceTheme.surfaceWhite,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setModalState) {
+          return Padding(
+            padding: EdgeInsets.fromLTRB(
+                20, 20, 20, MediaQuery.of(ctx).viewInsets.bottom + 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Adjust Decision Weights & Priorities',
+                  style: TextStyle(
+                    fontFamily: SolaceTheme.fontFamily,
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                    color: SolaceTheme.textHeading,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ...List.generate(_customPriorities.length, (i) {
+                  final item = _customPriorities[i];
+                  final isHigh = item['isHigh'] as bool? ?? false;
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            item['title'] as String,
+                            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            setModalState(() {
+                              _customPriorities[i]['isHigh'] = !isHigh;
+                              _customPriorities[i]['weight'] =
+                                  !isHigh ? 'Weight: High' : 'Weight: Med';
+                            });
+                            setState(() {});
+                          },
+                          child: Text(isHigh ? 'Set to Medium' : 'Set to High'),
+                        ),
+                      ],
+                    ),
+                  );
+                }),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: titleCtrl,
+                  decoration: InputDecoration(
+                    labelText: 'Add Custom Decision Factor',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (titleCtrl.text.trim().isNotEmpty) {
+                        setState(() {
+                          _customPriorities.add({
+                            'title': titleCtrl.text.trim(),
+                            'weight': 'Weight: High',
+                            'isHigh': true,
+                          });
+                        });
+                      }
+                      Navigator.pop(ctx);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Decision weights updated.')),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: SolaceTheme.primary,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                    ),
+                    child: const Text('Apply Weights'),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }

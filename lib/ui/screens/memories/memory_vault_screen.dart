@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../models/memory_item.dart';
 import '../../../services/memory_service.dart';
+import '../../../services/onboarding_service.dart';
 import '../../theme/solace_theme.dart';
 import '../journal/journal_editor_screen.dart';
 import '../settings/settings_screen.dart';
@@ -26,13 +27,15 @@ class MemoryVaultScreen extends StatefulWidget {
 
 class _MemoryVaultScreenState extends State<MemoryVaultScreen> {
   final _memoryService = MemoryService.instance;
-  int _selectedFilter = 0; // 0: All, 1: Priorities (3), 2: Life Context (2), 3: Recurring Themes
+  final _onboardingService = OnboardingService.instance;
+  int _selectedFilter = 0; // 0: All, 1: Priorities, 2: Life Context, 3: Themes
   final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _memoryService.addListener(_onServiceChanged);
+    _onboardingService.addListener(_onServiceChanged);
   }
 
   void _onServiceChanged() {
@@ -42,6 +45,7 @@ class _MemoryVaultScreenState extends State<MemoryVaultScreen> {
   @override
   void dispose() {
     _memoryService.removeListener(_onServiceChanged);
+    _onboardingService.removeListener(_onServiceChanged);
     _searchController.dispose();
     super.dispose();
   }
@@ -108,6 +112,8 @@ class _MemoryVaultScreenState extends State<MemoryVaultScreen> {
   }
 
   Widget _buildTopBar() {
+    final userInitial = _onboardingService.userInitial;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Row(
@@ -176,10 +182,10 @@ class _MemoryVaultScreenState extends State<MemoryVaultScreen> {
                   border: Border.all(color: SolaceTheme.primary, width: 1.5),
                   color: const Color(0xFFD4EBDD),
                 ),
-                child: const Center(
+                child: Center(
                   child: Text(
-                    'S',
-                    style: TextStyle(
+                    userInitial,
+                    style: const TextStyle(
                       fontFamily: SolaceTheme.fontFamily,
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
@@ -351,15 +357,19 @@ class _MemoryVaultScreenState extends State<MemoryVaultScreen> {
       listenable: _memoryService,
       builder: (context, _) {
         final all = _memoryService.memories;
-        final priorities = all.where((m) => m.category.contains('PRIORITY')).length;
-        final contextCount = all.where((m) => m.category.contains('CONTEXT') || m.category.contains('VALUE')).length;
-        final themes = all.where((m) => m.category.contains('THEME') || m.category.contains('RULE')).length;
+        final priorities = all.where((m) => m.category.toUpperCase().contains('PRIORITY')).length;
+        final contextCount = all.where((m) => m.category.toUpperCase().contains('CONTEXT') || m.category.toUpperCase().contains('VALUE')).length;
+        final themes = all.where((m) =>
+            m.category.toUpperCase().contains('THEME') ||
+            m.category.toUpperCase().contains('RULE') ||
+            m.category.toUpperCase().contains('CUSTOM') ||
+            m.category.toUpperCase().contains('INSIGHT')).length;
 
         final filters = [
           'All (${all.length})',
           'Priorities ($priorities)',
           'Life Context ($contextCount)',
-          'Themes ($themes)',
+          'Themes & Rules ($themes)',
         ];
 
         return SingleChildScrollView(
@@ -414,11 +424,15 @@ class _MemoryVaultScreenState extends State<MemoryVaultScreen> {
         var memories = _memoryService.memories;
 
         if (_selectedFilter == 1) {
-          memories = memories.where((m) => m.category.contains('PRIORITY')).toList();
+          memories = memories.where((m) => m.category.toUpperCase().contains('PRIORITY')).toList();
         } else if (_selectedFilter == 2) {
-          memories = memories.where((m) => m.category.contains('CONTEXT') || m.category.contains('VALUE')).toList();
+          memories = memories.where((m) => m.category.toUpperCase().contains('CONTEXT') || m.category.toUpperCase().contains('VALUE')).toList();
         } else if (_selectedFilter == 3) {
-          memories = memories.where((m) => m.category.contains('THEME') || m.category.contains('RULE')).toList();
+          memories = memories.where((m) =>
+              m.category.toUpperCase().contains('THEME') ||
+              m.category.toUpperCase().contains('RULE') ||
+              m.category.toUpperCase().contains('CUSTOM') ||
+              m.category.toUpperCase().contains('INSIGHT')).toList();
         }
 
         if (query.isNotEmpty) {
@@ -629,20 +643,27 @@ class _MemoryVaultScreenState extends State<MemoryVaultScreen> {
               Expanded(
                 child: Row(
                   children: [
-                    const Icon(Icons.circle,
-                        size: 6, color: Color(0xFF10B981)),
+                    Icon(Icons.circle,
+                        size: 6,
+                        color: item.isActive
+                            ? const Color(0xFF10B981)
+                            : const Color(0xFF9CA3AF)),
                     const SizedBox(width: 5),
                     Expanded(
                       child: Text(
-                        item.category == 'HIGH PRIORITY'
-                            ? 'Active for AI Decision Support'
-                            : 'Active',
+                        item.isActive
+                            ? (item.category == 'HIGH PRIORITY'
+                                ? 'Active for AI Decision Support'
+                                : 'Active in Sanctuary')
+                            : 'Paused (Not retrieved by Sol)',
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: SolaceTheme.fontFamily,
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
-                          color: SolaceTheme.primaryDark,
+                          color: item.isActive
+                              ? SolaceTheme.primaryDark
+                              : SolaceTheme.textMuted,
                         ),
                       ),
                     ),
@@ -652,11 +673,7 @@ class _MemoryVaultScreenState extends State<MemoryVaultScreen> {
               Row(
                 children: [
                   IconButton(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Edit memory...')),
-                      );
-                    },
+                    onPressed: () => _showEditMemoryDialog(context, item),
                     icon: const Icon(Icons.edit_outlined,
                         size: 16, color: SolaceTheme.textMuted),
                     padding: EdgeInsets.zero,
@@ -667,17 +684,31 @@ class _MemoryVaultScreenState extends State<MemoryVaultScreen> {
                     onPressed: () {
                       _memoryService.toggleMemory(item.id);
                     },
-                    icon: const Icon(Icons.visibility_off_outlined,
-                        size: 16, color: SolaceTheme.textMuted),
+                    icon: Icon(
+                        item.isActive
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined,
+                        size: 16,
+                        color: SolaceTheme.textMuted),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
                   ),
                   const SizedBox(width: 14),
                   IconButton(
                     onPressed: () {
+                      final deleted = item;
                       _memoryService.deleteMemory(item.id);
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Memory deleted.')),
+                        SnackBar(
+                          content: const Text('Memory deleted.'),
+                          action: SnackBarAction(
+                            label: 'Undo',
+                            textColor: Colors.white,
+                            onPressed: () {
+                              _memoryService.addMemory(deleted);
+                            },
+                          ),
+                        ),
                       );
                     },
                     icon: const Icon(Icons.delete_outline_rounded,
@@ -773,6 +804,80 @@ class _MemoryVaultScreenState extends State<MemoryVaultScreen> {
     );
   }
 
+  void _showEditMemoryDialog(BuildContext context, MemoryItem item) {
+    final titleCtrl = TextEditingController(text: item.title);
+    final contentCtrl = TextEditingController(text: item.quoteOrDescription);
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: SolaceTheme.surfaceWhite,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text(
+          'Edit Vault Memory',
+          style: TextStyle(
+            fontFamily: SolaceTheme.fontFamily,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: titleCtrl,
+              decoration: InputDecoration(
+                labelText: 'Title',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: contentCtrl,
+              maxLines: 3,
+              decoration: InputDecoration(
+                labelText: 'Description / Quote',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (titleCtrl.text.trim().isNotEmpty) {
+                final updated = MemoryItem(
+                  id: item.id,
+                  title: titleCtrl.text.trim(),
+                  quoteOrDescription: contentCtrl.text.trim(),
+                  source: item.source,
+                  category: item.category,
+                  subcategory: item.subcategory,
+                  isQuote: item.isQuote,
+                  isActive: item.isActive,
+                  createdAt: item.createdAt,
+                );
+                _memoryService.updateMemory(updated);
+                Navigator.pop(ctx);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Memory updated in local SQLite.')),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: SolaceTheme.primary,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showAddCustomRuleSheet(BuildContext context) {
     final titleCtrl = TextEditingController();
     final contentCtrl = TextEditingController();
@@ -838,6 +943,12 @@ class _MemoryVaultScreenState extends State<MemoryVaultScreen> {
                       ),
                     );
                     Navigator.of(ctx).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Custom rule saved to Memory Vault database.'),
+                        backgroundColor: SolaceTheme.primary,
+                      ),
+                    );
                   }
                 },
                 style: ElevatedButton.styleFrom(

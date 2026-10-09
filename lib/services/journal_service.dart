@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 import '../core/database/database_helper.dart';
 import '../models/journal_entry.dart';
+import 'onboarding_service.dart';
 
 /// Manages private local journal entries and reflections
 class JournalService extends ChangeNotifier {
@@ -20,16 +21,16 @@ class JournalService extends ChangeNotifier {
     
     // SQLite does not support web. If running on web, fallback to in-memory list
     if (kIsWeb) {
-      _loadInitialSampleEntries();
+      _loadInitialDynamicEntries();
       _isInitialized = true;
       return;
     }
 
     await _loadFromDb();
     
-    // If DB is empty, populate with samples
+    // If DB is empty, populate with dynamic entries
     if (_entries.isEmpty) {
-      _loadInitialSampleEntries();
+      _loadInitialDynamicEntries();
       final db = await DatabaseHelper.instance.database;
       if (db != null) {
         for (final e in _entries) {
@@ -48,20 +49,31 @@ class JournalService extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _loadInitialSampleEntries() {
+  void _loadInitialDynamicEntries() {
+    final onboarding = OnboardingService.instance;
+    final focus = onboarding.workingToward.trim();
+    final goals = onboarding.selectedGoals;
+
+    final initialTitle = focus.isNotEmpty
+        ? 'Reflecting on: $focus'
+        : (goals.isNotEmpty ? 'Focus: ${goals.first}' : 'Reflecting on upcoming choices');
+
+    final initialContent = focus.isNotEmpty
+        ? 'Taking a moment to pause and write down my thoughts on $focus, focusing on sustainable energy and clear boundaries.'
+        : 'Taking a moment to pause and write down my thoughts on balancing focus, creative energy, and sustainable pacing.';
+
     _entries.addAll([
       JournalEntry(
         id: 'entry-1',
-        title: 'Reflecting on upcoming choices',
-        content:
-            'Taking a moment to pause and write down my thoughts on balancing focus, creative energy, and sustainable pacing.',
+        title: initialTitle,
+        content: initialContent,
         createdAt: DateTime.now().subtract(const Duration(days: 1)),
         type: 'Decision',
-        tags: ['Mindful', 'Reflection'],
+        tags: ['Mindful', 'Reflection', if (focus.isNotEmpty) 'Focus'],
         solBadge: 'Reflection ready',
         solWhisper:
             'Sol is ready to help you weigh your thoughts against your core priorities and boundaries.',
-        wordCount: 22,
+        wordCount: initialContent.split(' ').length,
       ),
       JournalEntry(
         id: 'entry-2',
@@ -135,4 +147,15 @@ class JournalService extends ChangeNotifier {
             e.tags.any((t) => t.toLowerCase().contains(lower)))
         .toList(growable: false);
   }
+
+  Future<void> clearAllEntries() async {
+    _entries.clear();
+    notifyListeners();
+    final db = await DatabaseHelper.instance.database;
+    if (db != null) {
+      await db.delete('entries');
+    }
+  }
 }
+
+
