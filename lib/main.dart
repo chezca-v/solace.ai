@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'theme/app_theme.dart';
 import 'dashboard_screen.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
