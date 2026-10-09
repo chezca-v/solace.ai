@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 
-/// Landing dashboard after onboarding and model setup are complete.
 class SanctuaryDashboardScreen extends StatelessWidget {
   const SanctuaryDashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A), // Slate 900
+      backgroundColor: const Color(0xFF0F172A),
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: const Color(0xFF0F172A),
         elevation: 0,
         title: const Text(
           'Sanctuary',
@@ -32,18 +31,11 @@ class SanctuaryDashboardScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: const Color(0xFF1E293B),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: const Color(0xFF334155),
-                    width: 1,
-                  ),
+                  border: Border.all(color: const Color(0xFF334155), width: 1),
                 ),
                 child: const Column(
                   children: [
-                    Icon(
-                      Icons.shield_outlined,
-                      size: 56,
-                      color: Color(0xFF818CF8),
-                    ),
+                    Icon(Icons.shield_outlined, size: 56, color: Color(0xFF818CF8)),
                     SizedBox(height: 16),
                     Text(
                       'Welcome to Solace',

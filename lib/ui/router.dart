@@ -1,30 +1,19 @@
-import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
+<<<<<<< HEAD
 import '../services/auth_service.dart';
 import 'login_screen.dart';
 import 'screens/model_download_screen.dart';
 import 'screens/onboarding/journaling_goals_screen.dart';
 import 'screens/onboarding/personal_context_screen.dart';
 import 'screens/onboarding/support_preferences_screen.dart';
+=======
+>>>>>>> b75fe5860338f5db816c5f982ef257e790856875
 import 'screens/sanctuary_dashboard_screen.dart';
 import 'screens/welcome_screen.dart';
 
-class _AuthRefresh extends ChangeNotifier {
-  _AuthRefresh(Stream<dynamic> stream) {
-    _sub = stream.listen((_) => notifyListeners());
-  }
-  late final StreamSubscription _sub;
-
-  @override
-  void dispose() {
-    _sub.cancel();
-    super.dispose();
-  }
-}
-
-GoRouter buildRouter(AuthService auth) {
+GoRouter buildRouter() {
   return GoRouter(
+<<<<<<< HEAD
     initialLocation: '/welcome',
     refreshListenable: _AuthRefresh(auth.authChanges),
     redirect: (context, state) {
@@ -82,6 +71,10 @@ GoRouter buildRouter(AuthService auth) {
         path: '/login',
         builder: (_, __) => LoginScreen(auth: auth),
       ),
+=======
+    routes: [
+      GoRoute(path: '/', builder: (_, __) => const SanctuaryDashboardScreen()),
+>>>>>>> b75fe5860338f5db816c5f982ef257e790856875
     ],
   );
 }

@@ -12,8 +12,8 @@ dependencies:
     sdk: flutter
 
   # Networking & File Management
-  dio: ^5.7.0
-  path_provider: ^2.1.5
+  dio: ^5.11.1
+  path_provider: ^2.1.6
   path: ^1.9.1
 
   # On-Device AI
@@ -23,8 +23,7 @@ dependencies:
 
   # Local Persistence
   sqflite: ^2.4.1
-  firebase_core: ^4.15.0
-  firebase_auth: ^6.7.0
+  flutter_svg: ^2.3.0
   go_router: ^18.0.2
 
 dev_dependencies:
@@ -41,6 +40,7 @@ flutter:
     - assets/brand/
     - assets/images/
     - assets/animations/
+    - assets/dashboard.html
 
   fonts:
     - family: PlusJakartaSans
