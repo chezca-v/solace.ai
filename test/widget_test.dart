@@ -9,6 +9,7 @@ import 'package:solace_ai/ui/screens/memories/memory_vault_screen.dart';
 import 'package:solace_ai/ui/screens/onboarding/journaling_goals_screen.dart';
 import 'package:solace_ai/ui/screens/onboarding/personal_context_screen.dart';
 import 'package:solace_ai/ui/screens/onboarding/support_preferences_screen.dart';
+import 'package:solace_ai/ui/screens/settings/settings_screen.dart';
 import 'package:solace_ai/ui/screens/welcome_screen.dart';
 import 'package:solace_ai/ui/theme/solace_theme.dart';
 
@@ -235,5 +236,33 @@ void main() {
     expect(find.text('ZERO LEAKAGE'), findsWidgets);
     expect(find.text('Add Custom Rule or Priority'), findsOneWidget);
     expect(find.text('Solace never assumes.'), findsOneWidget);
+  });
+
+  testWidgets('12 — SettingsScreen renders Edge AI engine, toggles, emergency hub, and deletion',
+      (WidgetTester tester) async {
+    setTestDeviceSize(tester);
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: SolaceTheme.themeData,
+        home: const SettingsScreen(),
+      ),
+    );
+
+    expect(find.text('Settings & Privacy'), findsOneWidget);
+    expect(find.text('Privacy Sanctuary'), findsOneWidget);
+    expect(find.text('Edge AI Engine'), findsOneWidget);
+    expect(find.text('ONNX Runtime Mobile v1.2 — Ready Offline'), findsOneWidget);
+    expect(find.text('Memory & Context Boundaries'), findsOneWidget);
+    expect(find.text('Allow local memory retrieval'), findsOneWidget);
+    expect(find.text('Prompt before saving recurring themes'), findsOneWidget);
+    expect(find.text('Biometric App Lock'), findsOneWidget);
+    expect(find.text('Data Vault & Offline Care'), findsOneWidget);
+    expect(find.text('Offline Crisis\n& Emergency Hub'), findsOneWidget);
+    expect(find.text('Export Encrypted SQLite Database'), findsOneWidget);
+    expect(find.text('Local Storage Allocated'), findsOneWidget);
+    expect(find.text('Complete Sovereignty'), findsOneWidget);
+    expect(find.text('Zero-Trace Data Deletion'), findsOneWidget);
+    expect(find.text('Erase All Local Data & Reset Model'), findsOneWidget);
+    expect(find.text('SOLACE OPERATES STRICTLY CLIENT-SIDE'), findsOneWidget);
   });
 }
