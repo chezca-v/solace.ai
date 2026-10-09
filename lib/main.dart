@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
-import 'ui/router.dart';
-import 'ui/theme/solace_theme.dart';
+import 'theme/app_theme.dart';
+import 'dashboard_screen.dart';
 
-Future<void> main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
+  runApp(const SolaceApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class SolaceApp extends StatelessWidget {
+  const SolaceApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Solace AI',
+    return MaterialApp(
+      title: 'Solace.ai',
       debugShowCheckedModeBanner: false,
-      theme: SolaceTheme.themeData,
-      routerConfig: buildRouter(),
+      theme: AppTheme.lightTheme,
+      home: const DashboardScreen(),
     );
   }
 }
