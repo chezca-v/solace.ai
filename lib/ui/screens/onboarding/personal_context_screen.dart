@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../services/onboarding_service.dart';
 import '../../theme/solace_theme.dart';
 
@@ -59,7 +60,11 @@ class _PersonalContextScreenState extends State<PersonalContextScreen> {
   void _onSaveAndContinue() {
     _service.setWorkingToward(_workingTowardController.text.trim());
     _service.setExplicitBoundaries(_boundariesController.text.trim());
-    widget.onContinue?.call();
+    if (widget.onContinue != null) {
+      widget.onContinue!();
+    } else {
+      context.go('/');
+    }
   }
 
   @override

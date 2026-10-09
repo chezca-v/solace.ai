@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:solace_ai/ui/screens/decision/decision_comparison_screen.dart';
 import 'package:solace_ai/ui/screens/home/sanctuary_home_screen.dart';
+import 'package:solace_ai/ui/screens/journal/entry_detail_screen.dart';
 import 'package:solace_ai/ui/screens/journal/journal_editor_screen.dart';
 import 'package:solace_ai/ui/screens/journal/voice_journaling_screen.dart';
+import 'package:solace_ai/ui/screens/memories/memory_vault_screen.dart';
 import 'package:solace_ai/ui/screens/onboarding/journaling_goals_screen.dart';
 import 'package:solace_ai/ui/screens/onboarding/personal_context_screen.dart';
 import 'package:solace_ai/ui/screens/onboarding/support_preferences_screen.dart';
@@ -159,5 +162,54 @@ void main() {
     expect(find.text('Empathetic Mode Activated'), findsOneWidget);
     expect(find.text('SOL\'S WHISPER'), findsOneWidget);
     expect(find.text('Reflect with Solace →'), findsOneWidget);
+  });
+
+  testWidgets('08/09 — EntryDetailScreen renders journal and Sol reflection synthesis',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: SolaceTheme.themeData,
+        home: const EntryDetailScreen(
+          entryId: 'entry-1',
+        ),
+      ),
+    );
+
+    expect(find.text('Memory Insight Detail'), findsOneWidget);
+    expect(find.text('ORIGINAL JOURNAL ENTRY'), findsOneWidget);
+    expect(find.text('Sol Reflection'), findsOneWidget);
+    expect(find.text('Compare Choices based on Priorities'), findsOneWidget);
+    expect(find.text('Save insight to memories'), findsOneWidget);
+  });
+
+  testWidgets('10 — DecisionComparisonScreen renders comparative columns and tension',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: SolaceTheme.themeData,
+        home: const DecisionComparisonScreen(),
+      ),
+    );
+
+    expect(find.text('Decision Comparison'), findsOneWidget);
+    expect(find.text('• ACTIVE DILEMMA'), findsOneWidget);
+    expect(find.text('Comparative Grid'), findsOneWidget);
+    expect(find.text('• DYNAMIC TENSION ANALYSIS'), findsOneWidget);
+    expect(find.text('Save Decision Summary to Journal'), findsOneWidget);
+  });
+
+  testWidgets('11 — MemoryVaultScreen renders zero leakage status, filters, and memories',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: SolaceTheme.themeData,
+        home: const MemoryVaultScreen(),
+      ),
+    );
+
+    expect(find.text('Personal Memory Vault'), findsOneWidget);
+    expect(find.text('ZERO LEAKAGE'), findsOneWidget);
+    expect(find.text('+ Add Custom Rule or Priority'), findsOneWidget);
+    expect(find.text('Solace never assumes.'), findsOneWidget);
   });
 }

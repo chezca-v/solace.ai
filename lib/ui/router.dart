@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-<<<<<<< HEAD
+import 'screens/decision/decision_comparison_screen.dart';
 import 'screens/home/sanctuary_home_screen.dart';
+import 'screens/journal/entry_detail_screen.dart';
 import 'screens/journal/journal_editor_screen.dart';
 import 'screens/journal/voice_journaling_screen.dart';
-=======
->>>>>>> d522cf191db37f3c5de497b8c25103064042fb9f
+import 'screens/memories/memory_vault_screen.dart';
 import 'screens/model_download_screen.dart';
 import 'screens/onboarding/journaling_goals_screen.dart';
 import 'screens/onboarding/personal_context_screen.dart';
 import 'screens/onboarding/support_preferences_screen.dart';
-<<<<<<< HEAD
 import 'screens/welcome_screen.dart';
 
 /// Global router defining navigation across Solace AI
@@ -32,20 +31,6 @@ final GoRouter solaceRouter = GoRouter(
         onContinue: () => context.go('/onboarding/preferences'),
         onBack: () => context.go('/welcome'),
         onSkip: () => context.go('/onboarding/preferences'),
-=======
-import 'screens/sanctuary_dashboard_screen.dart';
-import 'screens/welcome_screen.dart';
-
-GoRouter buildRouter() {
-  return GoRouter(
-    initialLocation: '/welcome',
-    routes: [
-      GoRoute(
-        path: '/welcome',
-        builder: (context, state) => WelcomeScreen(
-          onGetStarted: () => context.go('/onboarding/goals'),
-        ),
->>>>>>> d522cf191db37f3c5de497b8c25103064042fb9f
       ),
     ),
 
@@ -63,17 +48,18 @@ GoRouter buildRouter() {
     GoRoute(
       path: '/onboarding/context',
       builder: (context, state) => PersonalContextScreen(
-        onContinue: () => context.go('/onboarding/download'),
+        onContinue: () => context.go('/'),
         onBack: () => context.go('/onboarding/preferences'),
-        onSkip: () => context.go('/onboarding/download'),
+        onSkip: () => context.go('/'),
       ),
     ),
 
-    // 05 — Model Setup & SLM Download
+    // Optional SLM Download / Setup
     GoRoute(
       path: '/onboarding/download',
-      builder: (context, state) => const ModelDownloadScreen(
-        destinationScreen: SanctuaryHomeScreen(),
+      builder: (context, state) => ModelDownloadScreen(
+        onComplete: () => context.go('/'),
+        destinationScreen: const SanctuaryHomeScreen(),
       ),
     ),
 
@@ -83,6 +69,9 @@ GoRouter buildRouter() {
       builder: (context, state) => SanctuaryHomeScreen(
         onNewEntry: () => context.go('/journal/new'),
         onVoiceEntry: () => context.go('/journal/voice'),
+        onSelectEntry: (id) => context.go('/entry/$id'),
+        onMemoriesTab: () => context.go('/memories'),
+        onJournalTab: () => context.go('/journal/new'),
       ),
     ),
 
@@ -93,7 +82,6 @@ GoRouter buildRouter() {
         onBack: () => context.go('/'),
         onOpenVoice: () => context.go('/journal/voice'),
       ),
-<<<<<<< HEAD
     ),
 
     // 07A & 07B — Voice Journaling (Recording & Transcribed Reflection)
@@ -104,10 +92,37 @@ GoRouter buildRouter() {
         onSwitchToWrite: () => context.go('/journal/new'),
       ),
     ),
+
+    // 08/09 — Memory Insight Detail & Sol Reflection
+    GoRoute(
+      path: '/entry/:id',
+      builder: (context, state) {
+        final entryId = state.pathParameters['id'] ?? 'entry-1';
+        return EntryDetailScreen(
+          entryId: entryId,
+          onBack: () => context.go('/'),
+          onCompareChoices: () => context.go('/decision'),
+        );
+      },
+    ),
+
+    // 10 — Decision Comparison & Dynamic Tension Analysis
+    GoRoute(
+      path: '/decision',
+      builder: (context, state) => DecisionComparisonScreen(
+        onBack: () => context.go('/entry/entry-1'),
+        onSaveToJournal: () => context.go('/'),
+      ),
+    ),
+
+    // 11 — Personal Memory Vault
+    GoRoute(
+      path: '/memories',
+      builder: (context, state) => MemoryVaultScreen(
+        onBack: () => context.go('/'),
+        onHomeTab: () => context.go('/'),
+        onJournalTab: () => context.go('/journal/new'),
+      ),
+    ),
   ],
 );
-=======
-    ],
-  );
-}
->>>>>>> d522cf191db37f3c5de497b8c25103064042fb9f

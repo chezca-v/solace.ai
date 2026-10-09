@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../theme/solace_theme.dart';
 import '../widgets/sun_illustration.dart';
 
@@ -293,8 +294,8 @@ class WelcomeScreen extends StatelessWidget {
   }
 
   void _defaultOnGetStarted(BuildContext context) {
-    // Navigation to the next step in onboarding or auth
-    Navigator.of(context).pushNamed('/login');
+    // Navigation to the next step in onboarding
+    context.go('/onboarding/goals');
   }
 
   void _showRestoreBackupSheet(BuildContext context) {

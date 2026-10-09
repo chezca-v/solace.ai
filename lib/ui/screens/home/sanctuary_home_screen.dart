@@ -8,12 +8,18 @@ class SanctuaryHomeScreen extends StatefulWidget {
   final VoidCallback? onNewEntry;
   final VoidCallback? onVoiceEntry;
   final Function(String)? onSelectEntry;
+  final VoidCallback? onMemoriesTab;
+  final VoidCallback? onJournalTab;
+  final VoidCallback? onSettingsTab;
 
   const SanctuaryHomeScreen({
     super.key,
     this.onNewEntry,
     this.onVoiceEntry,
     this.onSelectEntry,
+    this.onMemoriesTab,
+    this.onJournalTab,
+    this.onSettingsTab,
   });
 
   @override
@@ -828,7 +834,18 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
   Widget _buildBottomNav() {
     return NavigationBar(
       selectedIndex: _currentNavIndex,
-      onDestinationSelected: (i) => setState(() => _currentNavIndex = i),
+      onDestinationSelected: (i) {
+        setState(() => _currentNavIndex = i);
+        if (i == 0) {
+          // Home
+        } else if (i == 1) {
+          widget.onJournalTab?.call();
+        } else if (i == 2) {
+          widget.onMemoriesTab?.call();
+        } else if (i == 3) {
+          widget.onSettingsTab?.call();
+        }
+      },
       backgroundColor: SolaceTheme.surfaceWhite,
       indicatorColor: const Color(0xFFE5F6EC),
       destinations: const [
