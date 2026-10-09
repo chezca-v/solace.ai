@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 import '../core/database/database_helper.dart';
 import '../models/memory_item.dart';
+import 'onboarding_service.dart';
 
 /// Service managing user-approved personal memories and decision weights in SQLite
 class MemoryService extends ChangeNotifier {
@@ -21,7 +22,7 @@ class MemoryService extends ChangeNotifier {
     if (_isInitialized) return;
 
     if (kIsWeb) {
-      _loadSampleMemories();
+      _loadDynamicMemories();
       _isInitialized = true;
       return;
     }

@@ -135,18 +135,6 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
       bottomNavigationBar: _buildBottomNav(),
     );
   }
-      body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 480),
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Top App Bar: Brand + On-Device Badge + Dynamic Avatar
-                  _buildTopBar(),
-                  const SizedBox(height: 12),
 
   Widget _buildBody() {
     switch (_currentNavIndex) {
@@ -180,13 +168,9 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
                 // Sol Active On-Device Status Banner
                 _buildSolStatusBanner(),
                 const SizedBox(height: 16),
-
                 // Sanctuary Greeting Section
                 _buildGreetingSection(),
                 const SizedBox(height: 16),
-                  // Action Bar: + New Entry Button, Voice, & Search
-                  _buildActionBar(),
-                  const SizedBox(height: 20),
 
                 // Sol's Gentle Prompt Card
                 _buildGentlePromptCard(),

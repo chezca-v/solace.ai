@@ -30,7 +30,7 @@ class JournalService extends ChangeNotifier {
     
     // If DB is empty, populate with samples
     if (_entries.isEmpty) {
-      _loadInitialSampleEntries();
+      _loadInitialDynamicEntries();
       final db = await DatabaseHelper.instance.database;
       if (db != null) {
         for (final e in _entries) {

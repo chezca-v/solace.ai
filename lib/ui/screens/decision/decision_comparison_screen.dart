@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../models/journal_entry.dart';
-import '../../services/journal_service.dart';
-import '../../services/onboarding_service.dart';
-import '../../services/memory_service.dart';
+import '../../../models/journal_entry.dart';
+import '../../../services/journal_service.dart';
+import '../../../services/onboarding_service.dart';
+import '../../../services/memory_service.dart';
 import '../../theme/solace_theme.dart';
 
 /// 10 — Decision Comparison & Support Screen

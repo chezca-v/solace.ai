@@ -74,7 +74,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
   }
 
   @override
-  void dispose) {
+  void dispose() {
     _pulseController.dispose();
     super.dispose();
   }
