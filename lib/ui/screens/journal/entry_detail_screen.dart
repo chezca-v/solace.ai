@@ -4,6 +4,7 @@ import '../../../services/journal_service.dart';
 import '../../../services/memory_service.dart';
 import '../../theme/solace_theme.dart';
 import '../../widgets/sun_illustration.dart';
+import '../decision/decision_comparison_screen.dart';
 
 /// 08/09 — Memory Insight Detail & Sol Reflection Screen
 class EntryDetailScreen extends StatefulWidget {
@@ -81,12 +82,11 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
     final journalService = JournalService.instance;
     final entry = journalService.getEntryById(widget.entryId ?? 'entry-1');
 
-    final title = entry?.title ??
-        'Two opportunities: Lead researcher vs Founding designer';
+    final title = entry?.title ?? 'Untitled Reflection';
     final content = entry?.content ??
-        'I spent the afternoon staring at both offer letters. On one side, taking the Lead Researcher position at the lab offers immense institutional prestige, established funding pipelines, and instant validation from peers. Everyone I know expects me to take it.\n\nOn the other hand, the Founding Designer role at the early-stage wellness collective excites something intuitive in me. The freedom to craft design language from zero, set my own rhythms, and protect my personal calm. Yet, there is this persistent undercurrent of guilt—am I playing it too small? Why do I worry about how my resume looks more than how my everyday mornings will feel?';
-    final dateStr = entry?.formattedDate ?? 'Oct 9, 2026 • 10:14 PM';
-    final wordCount = entry?.wordCount ?? 428;
+        'No reflection content recorded yet. Write or speak freely to begin your sanctuary journey.';
+    final dateStr = entry?.formattedDate ?? 'Today • Stored on device';
+    final wordCount = entry?.wordCount ?? 0;
 
     return Scaffold(
       backgroundColor: SolaceTheme.background,
@@ -126,7 +126,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
                         const SizedBox(height: 16),
 
                         // Original Journal Entry Card
-                        _buildOriginalJournalCard(content, wordCount),
+                        _buildOriginalJournalCard(content, wordCount, entry?.tags),
                         const SizedBox(height: 18),
 
                         // Local Privacy Synthesis Divider
@@ -135,7 +135,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
 
                         // Sol Reflection Section
                         if (!_isDismissed) ...[
-                          _buildSolReflectionCard(context),
+                          _buildSolReflectionCard(context, entry),
                           const SizedBox(height: 16),
                         ],
 
@@ -213,7 +213,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
                 ),
                 child: const Center(
                   child: Text(
-                    'E',
+                    'S',
                     style: TextStyle(
                       fontFamily: SolaceTheme.fontFamily,
                       fontSize: 14,
@@ -299,7 +299,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
     );
   }
 
-  Widget _buildOriginalJournalCard(String content, int wordCount) {
+  Widget _buildOriginalJournalCard(String content, int wordCount, [List<String>? tags]) {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -377,10 +377,12 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: [
-              _buildTagChip('↻ Career Transition'),
-              _buildTagChip('⚖️ Reflective Tension'),
-            ],
+            children: (tags != null && tags.isNotEmpty)
+                ? tags.map((t) => _buildTagChip('• $t')).toList()
+                : [
+                    _buildTagChip('• Mindful Reflection'),
+                    _buildTagChip('• Stored Locally'),
+                  ],
           ),
         ],
       ),
@@ -444,7 +446,16 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
     );
   }
 
-  Widget _buildSolReflectionCard(BuildContext context) {
+  Widget _buildSolReflectionCard(BuildContext context, [dynamic entry]) {
+    final solReflectionText = entry?.solWhisper ??
+        (entry?.reflection != null && (entry?.reflection as String).isNotEmpty
+            ? entry!.reflection as String
+            : '“Sol is observing your thoughts. Your reflection, synthesized themes, and empathetic support will appear here once processed locally.”');
+
+    final connectedMemoryText = entry?.tags != null && (entry?.tags as List).isNotEmpty
+        ? '“Stated priority: ${(entry!.tags as List).join(', ')}”'
+        : '“Synthesizing recurring patterns from your local sanctuary...”';
+
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -573,6 +584,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
 
           // Main Reflection Quote Card
           Container(
+            width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: SolaceTheme.surfaceWhite,
@@ -586,9 +598,9 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
                 ),
               ],
             ),
-            child: const Text(
-              '“It sounds like both opportunities matter to you, and choosing one feels like losing something. Your anxiety seems focused on prestige, but your recorded priorities highlight autonomy and sustainable pacing.”',
-              style: TextStyle(
+            child: Text(
+              solReflectionText,
+              style: const TextStyle(
                 fontFamily: SolaceTheme.fontFamily,
                 fontSize: 14,
                 fontStyle: FontStyle.normal,
@@ -608,10 +620,10 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
               borderRadius: BorderRadius.circular(14),
               border: Border.all(color: const Color(0xFFCEECD9)),
             ),
-            child: const Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
+                const Row(
                   children: [
                     Icon(Icons.link_rounded, size: 14, color: Color(0xFF1B7A52)),
                     SizedBox(width: 5),
@@ -626,10 +638,10 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
                     ),
                   ],
                 ),
-                SizedBox(height: 3),
+                const SizedBox(height: 3),
                 Text(
-                  '“Stated priority: Avoid burnout in Q4” (Oct 2)',
-                  style: TextStyle(
+                  connectedMemoryText,
+                  style: const TextStyle(
                     fontFamily: SolaceTheme.fontFamily,
                     fontSize: 12.5,
                     fontStyle: FontStyle.italic,
@@ -697,13 +709,13 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
           // Secondary Action Buttons
           _buildSecondaryActionTile(
             icon: Icons.lightbulb_outline_rounded,
-            title: 'Explore this anxiety',
+            title: 'Explore underlying themes',
             onTap: widget.onExploreAnxiety ?? () => _showExploreAnxietyDialog(context),
           ),
           const SizedBox(height: 8),
           _buildSecondaryActionTile(
             icon: Icons.article_outlined,
-            title: 'Draft action plan',
+            title: 'Draft mindful action plan',
             onTap: widget.onDraftPlan ?? () => _showActionPlanDialog(context),
           ),
           const SizedBox(height: 14),
@@ -750,12 +762,14 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
                         MemoryService.instance.addMemory(
                           MemoryItem(
                             id: DateTime.now().millisecondsSinceEpoch.toString(),
-                            title: 'Career Dilemma: Research vs Founding Designer',
+                            title: entry?.title ?? 'Personal Insight',
                             quoteOrDescription:
-                                'Prioritizes autonomy & sustainable pacing over institutional prestige.',
-                            source: 'Entry on Oct 9: Two opportunities',
+                                entry?.content != null && (entry!.content as String).length > 80
+                                    ? '${(entry.content as String).substring(0, 80)}...'
+                                    : (entry?.content ?? 'Approved personal priority from reflection.'),
+                            source: 'Entry: ${entry?.title ?? "Reflection"}',
                             category: 'HIGH PRIORITY',
-                            subcategory: 'Career',
+                            subcategory: 'Insight',
                             createdAt: DateTime.now(),
                           ),
                         );
@@ -781,7 +795,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
             children: [
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: () => _showEditInterpretationDialog(context),
+                  onPressed: () => _showEditInterpretationDialog(context, solReflectionText),
                   style: OutlinedButton.styleFrom(
                     backgroundColor: SolaceTheme.surfaceWhite,
                     side: const BorderSide(color: Color(0xFFCEECD9)),
@@ -1002,7 +1016,11 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
   }
 
   void _showDecisionComparison(BuildContext context) {
-    Navigator.of(context).pushNamed('/decision');
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => const DecisionComparisonScreen(),
+      ),
+    );
   }
 
   void _showExploreAnxietyDialog(BuildContext context) {
@@ -1025,7 +1043,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
                     color: SolaceTheme.primaryDark),
                 SizedBox(width: 8),
                 Text(
-                  'Exploring Career Anxiety',
+                  'Exploring Underlying Themes',
                   style: TextStyle(
                     fontFamily: SolaceTheme.fontFamily,
                     fontSize: 18,
@@ -1037,7 +1055,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
             ),
             const SizedBox(height: 12),
             const Text(
-              'Sol detected a tension between internal satisfaction and external expectations. Here is a grounding reflection:',
+              'Sol detected nuanced themes in your reflection. Here is a grounding prompt to explore:',
               style: TextStyle(
                 fontFamily: SolaceTheme.fontFamily,
                 fontSize: 13.5,
@@ -1053,7 +1071,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
                 borderRadius: BorderRadius.circular(14),
               ),
               child: const Text(
-                '“When you imagine waking up on a Tuesday 6 months from now, what energizes you more: the prestige on your CV, or the creative ownership in your studio?”',
+                '“When you pause and check in with yourself right now, what is the one priority or boundary that feels most essential to protect?”',
                 style: TextStyle(
                   fontFamily: SolaceTheme.fontFamily,
                   fontSize: 13.5,
@@ -1102,7 +1120,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
                 Icon(Icons.checklist_rounded, color: SolaceTheme.primaryDark),
                 SizedBox(width: 8),
                 Text(
-                  '3-Step Boundary Action Plan',
+                  '3-Step Mindful Action Plan',
                   style: TextStyle(
                     fontFamily: SolaceTheme.fontFamily,
                     fontSize: 18,
@@ -1114,11 +1132,11 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
             ),
             const SizedBox(height: 14),
             _buildPlanStep(
-                '1', 'List your 3 non-negotiable weekly sprint boundaries.'),
+                '1', 'Define your 3 non-negotiable personal boundaries.'),
             _buildPlanStep(
-                '2', 'Schedule a 30-min clarifying call with the founding team.'),
+                '2', 'Schedule a quiet moment to reflect on each choice.'),
             _buildPlanStep(
-                '3', 'Conduct a somatic check-in before signing any contract.'),
+                '3', 'Conduct a grounding check-in before finalizing decisions.'),
             const SizedBox(height: 18),
             SizedBox(
               width: double.infinity,
@@ -1175,10 +1193,10 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
     );
   }
 
-  void _showEditInterpretationDialog(BuildContext context) {
+  void _showEditInterpretationDialog(BuildContext context, [String? initialText]) {
     final controller = TextEditingController(
-      text:
-          'It sounds like both opportunities matter to you, and choosing one feels like losing something. Your anxiety seems focused on prestige, but your recorded priorities highlight autonomy and sustainable pacing.',
+      text: initialText ??
+          'Your reflection and empathetic synthesis will appear here once Sol processes this entry locally on your device.',
     );
 
     showDialog(

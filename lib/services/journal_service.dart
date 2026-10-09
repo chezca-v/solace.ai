@@ -52,27 +52,27 @@ class JournalService extends ChangeNotifier {
     _entries.addAll([
       JournalEntry(
         id: 'entry-1',
-        title: 'Two paths: Graduate fellowship vs Startup role',
+        title: 'Reflecting on upcoming choices',
         content:
-            'Feeling torn between security and creative freedom. What if I make the wrong jump? The research lab gives steady funding and deep focus, but the startup has incredible agency and immediate impact.',
+            'Taking a moment to pause and write down my thoughts on balancing focus, creative energy, and sustainable pacing.',
         createdAt: DateTime.now().subtract(const Duration(days: 1)),
         type: 'Decision',
-        tags: ['Contemplative', 'Career Crossroads'],
-        solBadge: 'Decision comparison ready',
+        tags: ['Mindful', 'Reflection'],
+        solBadge: 'Reflection ready',
         solWhisper:
-            'I hear the fatigue in your voice when mentioning the sprint cycles. When you\'re ready, tap Reflect with Solace to weigh this against your non-negotiables.',
-        wordCount: 184,
+            'Sol is ready to help you weigh your thoughts against your core priorities and boundaries.',
+        wordCount: 22,
       ),
       JournalEntry(
         id: 'entry-2',
-        title: 'Walking by the reservoir at dusk',
+        title: 'Evening check-in & quiet space',
         content:
-            'Quiet moments help clear out the fog from all-day meetings. Breathing in the cool evening breeze reminded me why space and unhurried focus matter.',
+            'A mindful moment to unwind, disconnect, and restore balance in my offline sanctuary.',
         createdAt: DateTime.now().subtract(const Duration(days: 3)),
         type: 'Gratitude',
-        tags: ['Mindfulness', 'Nature'],
-        solBadge: 'Calm baseline restored',
-        wordCount: 96,
+        tags: ['Mindfulness', 'Evening Check-in'],
+        solBadge: 'Calm space recorded',
+        wordCount: 15,
       ),
     ]);
     notifyListeners();

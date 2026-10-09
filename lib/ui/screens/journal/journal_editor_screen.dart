@@ -29,19 +29,25 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
   late final TextEditingController _contentController;
   bool _showSeed = true;
   bool _isReflecting = false;
+  int _seedIndex = 0;
 
-  final String _currentSeed = 'Something I can\'t stop thinking about';
+  final List<String> _seeds = [
+    'Something I want to explore with honesty today',
+    'A quiet priority I want to hold space for',
+    'Where is my energy naturally drawn right now?',
+    'What felt grounding or clarifying today?',
+  ];
+
+  String get _currentSeed => _seeds[_seedIndex % _seeds.length];
 
   @override
   void initState() {
     super.initState();
     _titleController = TextEditingController(
-      text: widget.initialEntry?.title ??
-          'Two opportunities: Lead researcher vs Founding designer',
+      text: widget.initialEntry?.title ?? '',
     );
     _contentController = TextEditingController(
-      text: widget.initialEntry?.content ??
-          'I have two opportunities coming up, but I\'m afraid that if I choose one, I\'ll miss out on the other. The research lab gives me steady funding and deep focus, but the startup has incredible agency and immediate impact. My core priority this year is autonomy and sustainable pace, but my anxiety keeps pulling me toward perceived prestige...',
+      text: widget.initialEntry?.content ?? '',
     );
   }
 
@@ -66,9 +72,9 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
           : _titleController.text.trim(),
       content: _contentController.text.trim(),
       createdAt: widget.initialEntry?.createdAt ?? DateTime.now(),
-      type: 'Decision',
-      tags: ['Contemplative', 'Career Crossroads'],
-      solBadge: 'Decision comparison ready',
+      type: 'Reflection',
+      tags: ['Personal', 'Mindful'],
+      solBadge: 'Ready for reflection',
       wordCount: _wordCount,
     );
 
@@ -92,13 +98,28 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
       if (!mounted) return;
       setState(() => _isReflecting = false);
 
+      final entry = JournalEntry(
+        id: widget.initialEntry?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
+        title: _titleController.text.trim().isEmpty
+            ? 'Untitled Reflection'
+            : _titleController.text.trim(),
+        content: _contentController.text.trim(),
+        createdAt: widget.initialEntry?.createdAt ?? DateTime.now(),
+        type: 'Reflection',
+        tags: ['Personal', 'Mindful'],
+        solBadge: 'Reflection ready',
+        solWhisper: aiResult.reflection,
+        wordCount: _wordCount,
+      );
+      await JournalService.instance.addEntry(entry);
+
       _showReflectionDialog(aiResult.reflection, aiResult.followUpQuestion);
     } catch (e) {
       if (!mounted) return;
       setState(() => _isReflecting = false);
       _showReflectionDialog(
-        'It sounds like both opportunities matter to you, and choosing one feels like losing something valuable.',
-        'Would you like to compare them based on your priorities of autonomy and sustainable pace?',
+        'Sol has listened carefully to your thoughts. Your reflection and insights will be generated privately on your device.',
+        'Would you like to explore what you\'re feeling further or organize your thoughts into next steps?',
       );
     }
   }
@@ -227,7 +248,7 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
             ),
             child: const Center(
               child: Text(
-                'E',
+                'S',
                 style: TextStyle(
                   fontFamily: SolaceTheme.fontFamily,
                   fontSize: 13,
@@ -270,9 +291,9 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
             ),
           ),
           const SizedBox(width: 6),
-          const Text(
-            'Oct 9, 10:14 PM',
-            style: TextStyle(
+          Text(
+            widget.initialEntry?.formattedDate ?? 'Today • Offline',
+            style: const TextStyle(
               fontFamily: SolaceTheme.fontFamily,
               fontSize: 11.5,
               color: SolaceTheme.textMuted,
@@ -354,6 +375,7 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
           ),
           IconButton(
             onPressed: () {
+              setState(() => _seedIndex++);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('Seed refreshed!'),
@@ -425,10 +447,10 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
           child: const Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.work_outline_rounded, size: 12, color: Colors.white),
+              Icon(Icons.self_improvement_rounded, size: 12, color: Colors.white),
               SizedBox(width: 4),
               Text(
-                'Career Crossroads',
+                'Mindful Reflection',
                 style: TextStyle(
                   fontFamily: SolaceTheme.fontFamily,
                   fontSize: 11,

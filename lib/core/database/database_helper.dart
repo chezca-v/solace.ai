@@ -34,7 +34,7 @@ class DatabaseHelper {
       version: 1,
       onCreate: (db, version) async {
         await db.execute('''
-          CREATE TABLE entries (
+          CREATE TABLE IF NOT EXISTS entries (
             id TEXT PRIMARY KEY,
             title TEXT,
             content TEXT,
@@ -49,9 +49,37 @@ class DatabaseHelper {
           )
         ''');
         await db.execute('''
-          CREATE TABLE user_preferences (
+          CREATE TABLE IF NOT EXISTS user_preferences (
             key TEXT PRIMARY KEY,
             value TEXT
+          )
+        ''');
+        await db.execute('''
+          CREATE TABLE IF NOT EXISTS memories (
+            id TEXT PRIMARY KEY,
+            title TEXT,
+            quote_or_description TEXT,
+            source TEXT,
+            category TEXT,
+            subcategory TEXT,
+            is_quote INTEGER,
+            is_active INTEGER,
+            created_at TEXT
+          )
+        ''');
+      },
+      onOpen: (db) async {
+        await db.execute('''
+          CREATE TABLE IF NOT EXISTS memories (
+            id TEXT PRIMARY KEY,
+            title TEXT,
+            quote_or_description TEXT,
+            source TEXT,
+            category TEXT,
+            subcategory TEXT,
+            is_quote INTEGER,
+            is_active INTEGER,
+            created_at TEXT
           )
         ''');
       },

@@ -309,7 +309,7 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
               ),
               const SizedBox(height: 2),
               Text(
-                'Good morning,\n${OnboardingService.instance.userName.isNotEmpty ? OnboardingService.instance.userName : 'Friend'}',
+                'Good morning,\n${onboarding.userName.isNotEmpty ? onboarding.userName : 'Friend'}',
                 style: const TextStyle(
                   fontFamily: SolaceTheme.fontFamily,
                   fontSize: 26,

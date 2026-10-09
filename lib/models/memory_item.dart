@@ -21,4 +21,32 @@ class MemoryItem {
     this.isActive = true,
     required this.createdAt,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'title': title,
+      'quote_or_description': quoteOrDescription,
+      'source': source,
+      'category': category,
+      'subcategory': subcategory,
+      'is_quote': isQuote ? 1 : 0,
+      'is_active': isActive ? 1 : 0,
+      'created_at': createdAt.toIso8601String(),
+    };
+  }
+
+  factory MemoryItem.fromMap(Map<String, dynamic> map) {
+    return MemoryItem(
+      id: map['id'] as String,
+      title: map['title'] as String,
+      quoteOrDescription: map['quote_or_description'] as String,
+      source: map['source'] as String,
+      category: map['category'] as String,
+      subcategory: map['subcategory'] as String,
+      isQuote: (map['is_quote'] as int?) == 1,
+      isActive: (map['is_active'] as int?) == 1,
+      createdAt: DateTime.parse(map['created_at'] as String),
+    );
+  }
 }

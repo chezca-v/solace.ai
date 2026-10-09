@@ -28,7 +28,18 @@ class _MemoryVaultScreenState extends State<MemoryVaultScreen> {
   final TextEditingController _searchController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    _memoryService.addListener(_onServiceChanged);
+  }
+
+  void _onServiceChanged() {
+    if (mounted) setState(() {});
+  }
+
+  @override
   void dispose() {
+    _memoryService.removeListener(_onServiceChanged);
     _searchController.dispose();
     super.dispose();
   }
@@ -165,7 +176,7 @@ class _MemoryVaultScreenState extends State<MemoryVaultScreen> {
                 ),
                 child: const Center(
                   child: Text(
-                    'E',
+                    'S',
                     style: TextStyle(
                       fontFamily: SolaceTheme.fontFamily,
                       fontSize: 13,
@@ -334,47 +345,62 @@ class _MemoryVaultScreenState extends State<MemoryVaultScreen> {
   }
 
   Widget _buildFilterChips() {
-    final filters = ['All', 'Priorities (3)', 'Life Context (2)', 'Recurring Themes'];
+    return ListenableBuilder(
+      listenable: _memoryService,
+      builder: (context, _) {
+        final all = _memoryService.memories;
+        final priorities = all.where((m) => m.category.contains('PRIORITY')).length;
+        final contextCount = all.where((m) => m.category.contains('CONTEXT') || m.category.contains('VALUE')).length;
+        final themes = all.where((m) => m.category.contains('THEME') || m.category.contains('RULE')).length;
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: List.generate(filters.length, (i) {
-          final isSelected = _selectedFilter == i;
-          return Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: InkWell(
-              onTap: () => setState(() => _selectedFilter = i),
-              borderRadius: BorderRadius.circular(16),
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? SolaceTheme.primary
-                      : SolaceTheme.surfaceWhite,
+        final filters = [
+          'All (${all.length})',
+          'Priorities ($priorities)',
+          'Life Context ($contextCount)',
+          'Themes ($themes)',
+        ];
+
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: List.generate(filters.length, (i) {
+              final isSelected = _selectedFilter == i;
+              return Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: InkWell(
+                  onTap: () => setState(() => _selectedFilter = i),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: isSelected
-                        ? SolaceTheme.primary
-                        : SolaceTheme.cardBorder,
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? SolaceTheme.primary
+                          : SolaceTheme.surfaceWhite,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: isSelected
+                            ? SolaceTheme.primary
+                            : SolaceTheme.cardBorder,
+                      ),
+                    ),
+                    child: Text(
+                      filters[i],
+                      style: TextStyle(
+                        fontFamily: SolaceTheme.fontFamily,
+                        fontSize: 11.5,
+                        fontWeight:
+                            isSelected ? FontWeight.w700 : FontWeight.w500,
+                        color: isSelected ? Colors.white : SolaceTheme.textHeading,
+                      ),
+                    ),
                   ),
                 ),
-                child: Text(
-                  filters[i],
-                  style: TextStyle(
-                    fontFamily: SolaceTheme.fontFamily,
-                    fontSize: 11.5,
-                    fontWeight:
-                        isSelected ? FontWeight.w700 : FontWeight.w500,
-                    color: isSelected ? Colors.white : SolaceTheme.textHeading,
-                  ),
-                ),
-              ),
-            ),
-          );
-        }),
-      ),
+              );
+            }),
+          ),
+        );
+      },
     );
   }
 
@@ -382,7 +408,72 @@ class _MemoryVaultScreenState extends State<MemoryVaultScreen> {
     return ListenableBuilder(
       listenable: _memoryService,
       builder: (context, _) {
-        final memories = _memoryService.memories;
+        final query = _searchController.text.trim().toLowerCase();
+        var memories = _memoryService.memories;
+
+        if (_selectedFilter == 1) {
+          memories = memories.where((m) => m.category.contains('PRIORITY')).toList();
+        } else if (_selectedFilter == 2) {
+          memories = memories.where((m) => m.category.contains('CONTEXT') || m.category.contains('VALUE')).toList();
+        } else if (_selectedFilter == 3) {
+          memories = memories.where((m) => m.category.contains('THEME') || m.category.contains('RULE')).toList();
+        }
+
+        if (query.isNotEmpty) {
+          memories = memories.where((m) {
+            return m.title.toLowerCase().contains(query) ||
+                m.quoteOrDescription.toLowerCase().contains(query) ||
+                m.category.toLowerCase().contains(query);
+          }).toList();
+        }
+
+        if (memories.isEmpty) {
+          return Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 28),
+            decoration: BoxDecoration(
+              color: SolaceTheme.surfaceWhite,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: SolaceTheme.cardBorder),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFE8F6EE),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.psychology_outlined,
+                      size: 22, color: SolaceTheme.primaryDark),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'No memories in this view',
+                  style: TextStyle(
+                    fontFamily: SolaceTheme.fontFamily,
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w700,
+                    color: SolaceTheme.textHeading,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'Insights and core priorities will appear here once saved from your journal reflections or added manually.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: SolaceTheme.fontFamily,
+                    fontSize: 12,
+                    color: SolaceTheme.textMuted,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
 
         return Column(
           children: memories.map((item) {
