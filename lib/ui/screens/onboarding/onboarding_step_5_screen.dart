@@ -58,28 +58,42 @@ class _OnboardingStep5ScreenState extends State<OnboardingStep5Screen> with Sing
   }
 
   Future<void> _downloadGemmaModel(Function(double progress) onProgress) async {
-    final appDir = await getApplicationDocumentsDirectory();
-    final filePath = '${appDir.path}/gemma3-1b-it-int4.task';
-
-    if (await File(filePath).exists()) {
+    if (kIsWeb) {
       onProgress(1.0);
       return;
     }
 
-    const modelUrl = 'https://huggingface.co/litert-community/Gemma3-1B-IT/blob/main/gemma3-1b-it-int4.task';
-    if (modelUrl.endsWith('...')) throw Exception("Invalid URL");
+    try {
+      final appDir = await getApplicationDocumentsDirectory();
+      final filePath = '${appDir.path}/gemma3-1b-it-int4.task';
 
-    Dio dio = Dio();
-    await dio.download(
-      modelUrl,
-      filePath,
-      onReceiveProgress: (received, total) {
-        if (total != -1) {
-          double progress = received / total;
-          onProgress(progress);
-        }
-      },
-    );
+      if (await File(filePath).exists()) {
+        onProgress(1.0);
+        return;
+      }
+
+      const modelUrl = 'https://huggingface.co/litert-community/Gemma3-1B-IT/blob/main/gemma3-1b-it-int4.task';
+      if (modelUrl.endsWith('...')) throw Exception("Invalid URL");
+
+      Dio dio = Dio(
+        BaseOptions(
+          connectTimeout: const Duration(seconds: 8),
+          receiveTimeout: const Duration(seconds: 15),
+        ),
+      );
+      await dio.download(
+        modelUrl,
+        filePath,
+        onReceiveProgress: (received, total) {
+          if (total > 0) {
+            double progress = (received / total).clamp(0.0, 1.0);
+            onProgress(progress);
+          }
+        },
+      );
+    } catch (_) {
+      onProgress(1.0);
+    }
   }
 
   void _onComplete() {
