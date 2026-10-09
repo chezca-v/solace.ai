@@ -773,43 +773,6 @@ class _MemoryVaultScreenState extends State<MemoryVaultScreen> {
     );
   }
 
-  Widget _buildBottomNav() {
-    return NavigationBar(
-      selectedIndex: 2, // Memories tab is index 2
-      onDestinationSelected: (i) {
-        if (i == 0) widget.onHomeTab?.call();
-        if (i == 1) widget.onJournalTab?.call();
-        if (i == 3) widget.onSettingsTab?.call();
-      },
-      backgroundColor: SolaceTheme.surfaceWhite,
-      indicatorColor: const Color(0xFFE5F6EC),
-      destinations: const [
-        NavigationDestination(
-          icon: Icon(Icons.home_outlined),
-          selectedIcon:
-              Icon(Icons.home_rounded, color: SolaceTheme.primaryDark),
-          label: 'Home',
-        ),
-        NavigationDestination(
-          icon: Icon(Icons.book_outlined),
-          selectedIcon:
-              Icon(Icons.book_rounded, color: SolaceTheme.primaryDark),
-          label: 'Journal',
-        ),
-        NavigationDestination(
-          icon: Icon(Icons.psychology_rounded, color: SolaceTheme.primaryDark),
-          label: 'Memories',
-        ),
-        NavigationDestination(
-          icon: Icon(Icons.settings_outlined),
-          selectedIcon:
-              Icon(Icons.settings_rounded, color: SolaceTheme.primaryDark),
-          label: 'Settings',
-        ),
-      ],
-    );
-  }
-
   void _showAddCustomRuleSheet(BuildContext context) {
     final titleCtrl = TextEditingController();
     final contentCtrl = TextEditingController();
