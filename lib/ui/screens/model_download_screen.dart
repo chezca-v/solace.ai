@@ -76,7 +76,7 @@ class _ModelDownloadScreenState extends State<ModelDownloadScreen>
 
   void _simulateSetup() async {
     for (int i = 0; i <= 100; i += 4) {
-      await Future.delayed(const Duration(milliseconds: 45));
+      await Future.delayed(const Duration(milliseconds: 30));
       if (!mounted) return;
       setState(() {
         _progress = (i / 100.0).clamp(0.0, 1.0);
@@ -104,7 +104,7 @@ class _ModelDownloadScreenState extends State<ModelDownloadScreen>
   }
 
   void _autoNavigate() {
-    Future.delayed(const Duration(milliseconds: 900), () {
+    Future.delayed(const Duration(milliseconds: 800), () {
       if (mounted) {
         _navigateToDashboard();
       }
@@ -134,12 +134,12 @@ class _ModelDownloadScreenState extends State<ModelDownloadScreen>
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 480),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Spacer(),
+                  const SizedBox(height: 16),
 
                   // Animated Sol Mascot Logo
                   const SunIllustration(
@@ -147,7 +147,7 @@ class _ModelDownloadScreenState extends State<ModelDownloadScreen>
                     animate: true,
                     showBadge: true,
                   ),
-                  const SizedBox(height: 28),
+                  const SizedBox(height: 24),
 
                   // Step Badge
                   Container(
@@ -164,14 +164,16 @@ class _ModelDownloadScreenState extends State<ModelDownloadScreen>
                           backgroundColor: SolaceTheme.primary,
                         ),
                         SizedBox(width: 6),
-                        Text(
-                          'SETTING UP YOUR PRIVATE OFFLINE BRAIN',
-                          style: TextStyle(
-                            fontFamily: SolaceTheme.fontFamily,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.5,
-                            color: SolaceTheme.badgeText,
+                        Flexible(
+                          child: Text(
+                            'SETTING UP YOUR PRIVATE OFFLINE BRAIN',
+                            style: TextStyle(
+                              fontFamily: SolaceTheme.fontFamily,
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.5,
+                              color: SolaceTheme.badgeText,
+                            ),
                           ),
                         ),
                       ],
@@ -204,7 +206,7 @@ class _ModelDownloadScreenState extends State<ModelDownloadScreen>
                       height: 1.45,
                     ),
                   ),
-                  const SizedBox(height: 28),
+                  const SizedBox(height: 24),
 
                   // Setup Progress Bento Card
                   Container(
@@ -226,39 +228,45 @@ class _ModelDownloadScreenState extends State<ModelDownloadScreen>
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
-                              children: [
-                                if (!_isComplete) ...[
-                                  const SizedBox(
-                                    width: 12,
-                                    height: 12,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                        SolaceTheme.primary,
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  if (!_isComplete) ...[
+                                    const SizedBox(
+                                      width: 12,
+                                      height: 12,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor: AlwaysStoppedAnimation<Color>(
+                                          SolaceTheme.primary,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                  ] else ...[
+                                    const Icon(
+                                      Icons.check_circle_rounded,
+                                      size: 16,
+                                      color: SolaceTheme.primary,
+                                    ),
+                                    const SizedBox(width: 6),
+                                  ],
+                                  Flexible(
+                                    child: Text(
+                                      _statusText,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontFamily: SolaceTheme.fontFamily,
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                        color: SolaceTheme.textHeading,
                                       ),
                                     ),
                                   ),
-                                  const SizedBox(width: 8),
-                                ] else ...[
-                                  const Icon(
-                                    Icons.check_circle_rounded,
-                                    size: 16,
-                                    color: SolaceTheme.primary,
-                                  ),
-                                  const SizedBox(width: 6),
                                 ],
-                                Text(
-                                  _statusText,
-                                  style: const TextStyle(
-                                    fontFamily: SolaceTheme.fontFamily,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w600,
-                                    color: SolaceTheme.textHeading,
-                                  ),
-                                ),
-                              ],
+                              ),
                             ),
+                            const SizedBox(width: 8),
                             Text(
                               '$percentage%',
                               style: const TextStyle(
@@ -286,43 +294,56 @@ class _ModelDownloadScreenState extends State<ModelDownloadScreen>
                         const Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.shield_outlined,
-                                  size: 14,
-                                  color: SolaceTheme.primaryDark,
-                                ),
-                                SizedBox(width: 4),
-                                Text(
-                                  'Encrypted Edge Vault',
-                                  style: TextStyle(
-                                    fontFamily: SolaceTheme.fontFamily,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w500,
-                                    color: SolaceTheme.textMuted,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.bolt_rounded,
-                                  size: 14,
-                                  color: SolaceTheme.primaryDark,
-                                ),
-                                SizedBox(width: 4),
-                                Text(
-                                  'Neural Core Active',
-                                  style: TextStyle(
-                                    fontFamily: SolaceTheme.fontFamily,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w600,
+                            Flexible(
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.shield_outlined,
+                                    size: 14,
                                     color: SolaceTheme.primaryDark,
                                   ),
-                                ),
-                              ],
+                                  SizedBox(width: 4),
+                                  Flexible(
+                                    child: Text(
+                                      'Edge Vault',
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontFamily: SolaceTheme.fontFamily,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w500,
+                                        color: SolaceTheme.textMuted,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            Flexible(
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.bolt_rounded,
+                                    size: 14,
+                                    color: SolaceTheme.primaryDark,
+                                  ),
+                                  SizedBox(width: 4),
+                                  Flexible(
+                                    child: Text(
+                                      'Neural Active',
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontFamily: SolaceTheme.fontFamily,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                        color: SolaceTheme.primaryDark,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -330,7 +351,7 @@ class _ModelDownloadScreenState extends State<ModelDownloadScreen>
                     ),
                   ),
 
-                  const Spacer(),
+                  const SizedBox(height: 28),
 
                   // Enter Sanctuary Button
                   SizedBox(
@@ -346,20 +367,20 @@ class _ModelDownloadScreenState extends State<ModelDownloadScreen>
                           borderRadius: BorderRadius.circular(26),
                         ),
                       ),
-                      child: Row(
+                      child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            _isComplete ? 'Enter Sanctuary' : 'Continue to Sanctuary',
-                            style: const TextStyle(
+                            'Enter Sanctuary',
+                            style: TextStyle(
                               fontFamily: SolaceTheme.fontFamily,
                               fontSize: 15.5,
                               fontWeight: FontWeight.w600,
                               color: Colors.white,
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          const Icon(
+                          SizedBox(width: 8),
+                          Icon(
                             Icons.arrow_forward_rounded,
                             size: 18,
                             color: Colors.white,
@@ -376,16 +397,18 @@ class _ModelDownloadScreenState extends State<ModelDownloadScreen>
                     children: [
                       Icon(
                         Icons.lock_outline_rounded,
-                        size: 15,
+                        size: 14,
                         color: SolaceTheme.textMuted,
                       ),
                       SizedBox(width: 6),
-                      Text(
-                        'No accounts. No telemetry. Fully on-device.',
-                        style: TextStyle(
-                          fontFamily: SolaceTheme.fontFamily,
-                          fontSize: 12,
-                          color: SolaceTheme.textMuted,
+                      Flexible(
+                        child: Text(
+                          'No accounts. No telemetry. Fully on-device.',
+                          style: TextStyle(
+                            fontFamily: SolaceTheme.fontFamily,
+                            fontSize: 11.5,
+                            color: SolaceTheme.textMuted,
+                          ),
                         ),
                       ),
                     ],
