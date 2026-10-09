@@ -6,6 +6,8 @@ import '../../../services/onboarding_service.dart';
 import '../../theme/solace_theme.dart';
 import '../../widgets/sun_illustration.dart';
 import '../journal/journal_editor_screen.dart';
+import '../journal/voice_journaling_screen.dart';
+import '../journal/entry_detail_screen.dart';
 import '../memories/memory_vault_screen.dart';
 import '../settings/settings_screen.dart';
 
@@ -491,7 +493,15 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
           child: SizedBox(
             height: 50,
             child: ElevatedButton.icon(
-              onPressed: widget.onNewEntry,
+              onPressed: () {
+                if (widget.onNewEntry != null) {
+                  widget.onNewEntry!();
+                } else {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => const JournalEditorScreen()),
+                  );
+                }
+              },
               icon: const Icon(Icons.add_rounded, size: 20, color: Colors.white),
               label: const Text(
                 'New Entry',
@@ -524,7 +534,15 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
             border: Border.all(color: const Color(0xFFD4EBDD)),
           ),
           child: IconButton(
-            onPressed: widget.onVoiceEntry,
+            onPressed: () {
+              if (widget.onVoiceEntry != null) {
+                widget.onVoiceEntry!();
+              } else {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const VoiceJournalingScreen()),
+                );
+              }
+            },
             icon: const Icon(Icons.mic_rounded, color: SolaceTheme.primaryDark, size: 22),
           ),
         ),
@@ -709,7 +727,17 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
 
   Widget _buildReflectionCard(dynamic entry) {
     return InkWell(
-      onTap: () => widget.onSelectEntry?.call(entry.id),
+      onTap: () {
+        if (widget.onSelectEntry != null) {
+          widget.onSelectEntry!(entry.id);
+        } else {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => EntryDetailScreen(entryId: entry.id),
+            ),
+          );
+        }
+      },
       borderRadius: BorderRadius.circular(18),
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -903,11 +931,29 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
         if (i == 0) {
           // Home
         } else if (i == 1) {
-          widget.onJournalTab?.call();
+          if (widget.onJournalTab != null) {
+            widget.onJournalTab!();
+          } else {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const JournalEditorScreen()),
+            );
+          }
         } else if (i == 2) {
-          widget.onMemoriesTab?.call();
+          if (widget.onMemoriesTab != null) {
+            widget.onMemoriesTab!();
+          } else {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const MemoryVaultScreen()),
+            );
+          }
         } else if (i == 3) {
-          widget.onSettingsTab?.call();
+          if (widget.onSettingsTab != null) {
+            widget.onSettingsTab!();
+          } else {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const SettingsScreen()),
+            );
+          }
         }
       },
       backgroundColor: SolaceTheme.surfaceWhite,

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../../models/memory_item.dart';
 import '../../../services/memory_service.dart';
 import '../../theme/solace_theme.dart';
+import '../journal/journal_editor_screen.dart';
+import '../settings/settings_screen.dart';
 
 /// 11 — Personal Memory Vault Screen
 class MemoryVaultScreen extends StatefulWidget {
@@ -771,43 +773,6 @@ class _MemoryVaultScreenState extends State<MemoryVaultScreen> {
     );
   }
 
-  Widget _buildBottomNav() {
-    return NavigationBar(
-      selectedIndex: 2, // Memories tab is index 2
-      onDestinationSelected: (i) {
-        if (i == 0) widget.onHomeTab?.call();
-        if (i == 1) widget.onJournalTab?.call();
-        if (i == 3) widget.onSettingsTab?.call();
-      },
-      backgroundColor: SolaceTheme.surfaceWhite,
-      indicatorColor: const Color(0xFFE5F6EC),
-      destinations: const [
-        NavigationDestination(
-          icon: Icon(Icons.home_outlined),
-          selectedIcon:
-              Icon(Icons.home_rounded, color: SolaceTheme.primaryDark),
-          label: 'Home',
-        ),
-        NavigationDestination(
-          icon: Icon(Icons.book_outlined),
-          selectedIcon:
-              Icon(Icons.book_rounded, color: SolaceTheme.primaryDark),
-          label: 'Journal',
-        ),
-        NavigationDestination(
-          icon: Icon(Icons.psychology_rounded, color: SolaceTheme.primaryDark),
-          label: 'Memories',
-        ),
-        NavigationDestination(
-          icon: Icon(Icons.settings_outlined),
-          selectedIcon:
-              Icon(Icons.settings_rounded, color: SolaceTheme.primaryDark),
-          label: 'Settings',
-        ),
-      ],
-    );
-  }
-
   void _showAddCustomRuleSheet(BuildContext context) {
     final titleCtrl = TextEditingController();
     final contentCtrl = TextEditingController();
@@ -887,6 +852,63 @@ class _MemoryVaultScreenState extends State<MemoryVaultScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildBottomNav() {
+    return NavigationBar(
+      selectedIndex: 2, // Memories tab is index 2
+      onDestinationSelected: (i) {
+        if (i == 0) {
+          if (widget.onHomeTab != null) {
+            widget.onHomeTab!();
+          } else {
+            Navigator.of(context).maybePop();
+          }
+        } else if (i == 1) {
+          if (widget.onJournalTab != null) {
+            widget.onJournalTab!();
+          } else {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const JournalEditorScreen()),
+            );
+          }
+        } else if (i == 2) {
+          // Already on Memories
+        } else if (i == 3) {
+          if (widget.onSettingsTab != null) {
+            widget.onSettingsTab!();
+          } else {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const SettingsScreen()),
+            );
+          }
+        }
+      },
+      backgroundColor: SolaceTheme.surfaceWhite,
+      indicatorColor: const Color(0xFFE5F6EC),
+      destinations: const [
+        NavigationDestination(
+          icon: Icon(Icons.home_outlined),
+          selectedIcon: Icon(Icons.home_rounded, color: SolaceTheme.primaryDark),
+          label: 'Home',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.book_outlined),
+          selectedIcon: Icon(Icons.book_rounded, color: SolaceTheme.primaryDark),
+          label: 'Journal',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.psychology_outlined),
+          selectedIcon: Icon(Icons.psychology_rounded, color: SolaceTheme.primaryDark),
+          label: 'Memories',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.settings_outlined),
+          selectedIcon: Icon(Icons.settings_rounded, color: SolaceTheme.primaryDark),
+          label: 'Settings',
+        ),
+      ],
     );
   }
 }

@@ -4,6 +4,7 @@ import '../../../models/journal_entry.dart';
 import '../../../services/journal_service.dart';
 import '../../../services/onboarding_service.dart';
 import '../../theme/solace_theme.dart';
+import 'voice_journaling_screen.dart';
 
 /// 07 — Journal Editor
 class JournalEditorScreen extends StatefulWidget {
@@ -599,7 +600,15 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
                   border: Border.all(color: const Color(0xFFD4EBDD)),
                 ),
                 child: IconButton(
-                  onPressed: widget.onOpenVoice,
+                  onPressed: () {
+                    if (widget.onOpenVoice != null) {
+                      widget.onOpenVoice!();
+                    } else {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context) => const VoiceJournalingScreen()),
+                      );
+                    }
+                  },
                   icon: const Icon(Icons.mic_rounded, color: SolaceTheme.primaryDark, size: 20),
                   padding: EdgeInsets.zero,
                 ),
