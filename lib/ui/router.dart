@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import '../../../dashboard_screen.dart';
 =======
 <<<<<<< HEAD
@@ -14,6 +15,9 @@ import 'screens/onboarding/support_preferences_screen.dart';
 import 'screens/sanctuary_dashboard_screen.dart';
 import 'screens/welcome_screen.dart';
 >>>>>>> 83e377689f89ddf7384f8a324aa1bd224cbd7622
+=======
+import 'screens/sanctuary_dashboard_screen.dart';
+>>>>>>> parent of 1fa430d (restore dependencies)
 
 GoRouter buildRouter() {
   return GoRouter(
@@ -31,6 +35,7 @@ GoRouter buildRouter() {
       return null;
     },
     routes: [
+<<<<<<< HEAD
       GoRoute(
         path: '/welcome',
         builder: (context, state) => WelcomeScreen(
@@ -83,6 +88,9 @@ GoRouter buildRouter() {
       GoRoute(path: '/', builder: (_, __) => const SanctuaryDashboardScreen()),
 >>>>>>> b75fe5860338f5db816c5f982ef257e790856875
 >>>>>>> 83e377689f89ddf7384f8a324aa1bd224cbd7622
+=======
+      GoRoute(path: '/', builder: (_, __) => const SanctuaryDashboardScreen()),
+>>>>>>> parent of 1fa430d (restore dependencies)
     ],
   );
 }
