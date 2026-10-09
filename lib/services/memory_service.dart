@@ -29,7 +29,7 @@ class MemoryService extends ChangeNotifier {
     await _loadFromDb();
 
     if (_memories.isEmpty) {
-      _loadSampleMemories();
+      _loadDynamicMemories();
       final db = await DatabaseHelper.instance.database;
       if (db != null) {
         for (final m in _memories) {
@@ -49,48 +49,172 @@ class MemoryService extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _loadSampleMemories() {
+  void _loadDynamicMemories() {
     if (_memories.isNotEmpty) return;
 
-    _memories.addAll([
-      MemoryItem(
-        id: 'mem-1',
-        title: 'Sustainable Pace & Boundaries',
-        quoteOrDescription:
-            '“Prioritize sustainable pacing and mental clarity over excessive urgency.”',
-        source: 'Sanctuary reflection',
+    final onboarding = OnboardingService.instance;
+    final generated = <MemoryItem>[];
+
+    if (onboarding.workingToward.trim().isNotEmpty) {
+      generated.add(
+        MemoryItem(
+          id: 'mem-focus',
+          title: onboarding.workingToward.trim(),
+          quoteOrDescription: '“${onboarding.workingToward.trim()}”',
+          source: 'Stated Sanctuary Focus',
+          category: 'HIGH PRIORITY',
+          subcategory: 'Current Focus',
+          isQuote: true,
+          isActive: true,
+          createdAt: DateTime.now().subtract(const Duration(days: 1)),
+        ),
+      );
+    }
+
+    if (onboarding.explicitBoundaries.trim().isNotEmpty) {
+      generated.add(
+        MemoryItem(
+          id: 'mem-boundary',
+          title: 'Protected Boundary',
+          quoteOrDescription: '“${onboarding.explicitBoundaries.trim()}”',
+          source: 'Personal Sanctuary Rule',
+          category: 'HIGH PRIORITY',
+          subcategory: 'Boundaries',
+          isQuote: true,
+          isActive: true,
+          createdAt: DateTime.now().subtract(const Duration(days: 2)),
+        ),
+      );
+    }
+
+    for (final goal in onboarding.selectedGoals) {
+      generated.add(
+        MemoryItem(
+          id: 'mem-goal-${goal.hashCode}',
+          title: goal,
+          quoteOrDescription: 'Personal intention: $goal',
+          source: 'Sanctuary Goals',
+          category: 'CORE VALUE',
+          subcategory: 'Growth Goal',
+          isQuote: false,
+          isActive: true,
+          createdAt: DateTime.now().subtract(const Duration(days: 3)),
+        ),
+      );
+    }
+
+    for (final area in onboarding.selectedLifeAreas) {
+      generated.add(
+        MemoryItem(
+          id: 'mem-area-${area.hashCode}',
+          title: 'Life Domain: $area',
+          quoteOrDescription: 'Active life context: $area',
+          source: 'Sanctuary Context',
+          category: 'LIFE CONTEXT',
+          subcategory: 'Context',
+          isQuote: false,
+          isActive: true,
+          createdAt: DateTime.now().subtract(const Duration(days: 4)),
+        ),
+      );
+    }
+
+    if (generated.isEmpty) {
+      generated.addAll([
+        MemoryItem(
+          id: 'mem-default-1',
+          title: 'Sustainable Pace & Boundaries',
+          quoteOrDescription:
+              '“Prioritize sustainable pacing and mental clarity over excessive urgency.”',
+          source: 'Sanctuary reflection',
+          category: 'HIGH PRIORITY',
+          subcategory: 'Boundaries',
+          isQuote: true,
+          isActive: true,
+          createdAt: DateTime.now().subtract(const Duration(days: 2)),
+        ),
+        MemoryItem(
+          id: 'mem-default-2',
+          title: 'Local Privacy & Sovereignty',
+          quoteOrDescription:
+              'All reflections, memories, and decision structures remain strictly encrypted and processed on this local device.',
+          source: 'Sanctuary Protocol',
+          category: 'LIFE CONTEXT',
+          subcategory: 'Privacy',
+          isQuote: false,
+          isActive: true,
+          createdAt: DateTime.now().subtract(const Duration(days: 5)),
+        ),
+      ]);
+    }
+
+    _memories.addAll(generated);
+    notifyListeners();
+  }
+
+  /// Synchronize memories with updated onboarding preferences
+  Future<void> syncWithOnboarding(OnboardingService onboarding) async {
+    final focus = onboarding.workingToward.trim();
+    final boundary = onboarding.explicitBoundaries.trim();
+
+    if (focus.isNotEmpty) {
+      final existingIndex = _memories.indexWhere((m) => m.id == 'mem-focus');
+      final item = MemoryItem(
+        id: 'mem-focus',
+        title: focus,
+        quoteOrDescription: '“$focus”',
+        source: 'Stated Sanctuary Focus',
+        category: 'HIGH PRIORITY',
+        subcategory: 'Current Focus',
+        isQuote: true,
+        isActive: true,
+        createdAt: DateTime.now(),
+      );
+      if (existingIndex != -1) {
+        await updateMemory(item);
+      } else {
+        await addMemory(item);
+      }
+    }
+
+    if (boundary.isNotEmpty) {
+      final existingIndex = _memories.indexWhere((m) => m.id == 'mem-boundary');
+      final item = MemoryItem(
+        id: 'mem-boundary',
+        title: 'Protected Boundary',
+        quoteOrDescription: '“$boundary”',
+        source: 'Personal Sanctuary Rule',
         category: 'HIGH PRIORITY',
         subcategory: 'Boundaries',
         isQuote: true,
         isActive: true,
-        createdAt: DateTime.now().subtract(const Duration(days: 8)),
-      ),
-      MemoryItem(
-        id: 'mem-2',
-        title: 'Core Values & Mindful Living',
-        quoteOrDescription:
-            '“Seek alignment with personal values and intentional decision making.”',
-        source: 'Core Sanctuary Priority',
-        category: 'CORE VALUE',
-        subcategory: 'Values',
-        isQuote: true,
-        isActive: true,
-        createdAt: DateTime.now().subtract(const Duration(days: 12)),
-      ),
-      MemoryItem(
-        id: 'mem-3',
-        title: 'Local Privacy & Sovereignty',
-        quoteOrDescription:
-            'All reflections, memories, and decision structures remain strictly encrypted and processed on this local device.',
-        source: 'Sanctuary Protocol',
-        category: 'LIFE CONTEXT',
-        subcategory: 'Privacy',
-        isQuote: false,
-        isActive: true,
-        createdAt: DateTime.now().subtract(const Duration(days: 20)),
-      ),
-    ]);
-    notifyListeners();
+        createdAt: DateTime.now(),
+      );
+      if (existingIndex != -1) {
+        await updateMemory(item);
+      } else {
+        await addMemory(item);
+      }
+    }
+
+    for (final goal in onboarding.selectedGoals) {
+      final id = 'mem-goal-${goal.hashCode}';
+      if (!_memories.any((m) => m.id == id || m.title == goal)) {
+        await addMemory(
+          MemoryItem(
+            id: id,
+            title: goal,
+            quoteOrDescription: 'Personal intention: $goal',
+            source: 'Sanctuary Goals',
+            category: 'CORE VALUE',
+            subcategory: 'Growth Goal',
+            isQuote: false,
+            isActive: true,
+            createdAt: DateTime.now(),
+          ),
+        );
+      }
+    }
   }
 
   Future<void> toggleMemory(String id) async {
@@ -152,4 +276,15 @@ class MemoryService extends ChangeNotifier {
       );
     }
   }
+
+  Future<void> clearAllMemories() async {
+    _memories.clear();
+    notifyListeners();
+
+    final db = await DatabaseHelper.instance.database;
+    if (db != null) {
+      await db.delete('memories');
+    }
+  }
 }
+

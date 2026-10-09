@@ -5,6 +5,7 @@ import '../../../services/journal_service.dart';
 import '../../../services/onboarding_service.dart';
 import '../../theme/solace_theme.dart';
 import 'voice_journaling_screen.dart';
+import 'entry_detail_screen.dart';
 
 /// 07 — Journal Editor
 class JournalEditorScreen extends StatefulWidget {
@@ -31,12 +32,21 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
   bool _showSeed = true;
   bool _isReflecting = false;
   int _seedIndex = 0;
+  final Set<String> _activeTags = {'Mindful Reflection', 'Contemplative'};
 
   final List<String> _seeds = [
     'Something I want to explore with honesty today',
     'A quiet priority I want to hold space for',
     'Where is my energy naturally drawn right now?',
     'What felt grounding or clarifying today?',
+  ];
+
+  final List<String> _availableTags = [
+    'Contemplative',
+    'Mindful Reflection',
+    'Decision Dilemma',
+    'Gratitude',
+    'Boundary Check',
   ];
 
   String get _currentSeed => _seeds[_seedIndex % _seeds.length];
@@ -50,6 +60,9 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
     _contentController = TextEditingController(
       text: widget.initialEntry?.content ?? '',
     );
+    if (widget.initialEntry != null && widget.initialEntry!.tags.isNotEmpty) {
+      _activeTags.addAll(widget.initialEntry!.tags);
+    }
   }
 
   @override
@@ -65,7 +78,7 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
     return text.split(RegExp(r'\s+')).length;
   }
 
-  void _saveEntry() {
+  Future<JournalEntry> _saveEntryToDb({String? solWhisper, String? solBadge}) async {
     final entry = JournalEntry(
       id: widget.initialEntry?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
       title: _titleController.text.trim().isEmpty
@@ -73,13 +86,20 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
           : _titleController.text.trim(),
       content: _contentController.text.trim(),
       createdAt: widget.initialEntry?.createdAt ?? DateTime.now(),
-      type: 'Reflection',
-      tags: ['Personal', 'Mindful'],
-      solBadge: 'Ready for reflection',
+      type: _activeTags.contains('Decision Dilemma') ? 'Decision' : 'Reflection',
+      tags: _activeTags.toList(),
+      solBadge: solBadge ?? 'Ready for reflection',
+      solWhisper: solWhisper,
       wordCount: _wordCount,
     );
 
-    JournalService.instance.addEntry(entry);
+    await JournalService.instance.addEntry(entry);
+    return entry;
+  }
+
+  void _saveEntry() async {
+    await _saveEntryToDb();
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Reflection saved to private offline vault.'),
@@ -90,6 +110,16 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
   }
 
   Future<void> _handleReflectWithSolace() async {
+    if (_contentController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please write a thought or reflection first.'),
+          backgroundColor: SolaceTheme.primaryDark,
+        ),
+      );
+      return;
+    }
+
     setState(() => _isReflecting = true);
     final userContext = OnboardingService.instance.toUserContext();
     final entryText = '${_titleController.text}\n\n${_contentController.text}';
@@ -99,28 +129,24 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
       if (!mounted) return;
       setState(() => _isReflecting = false);
 
-      final entry = JournalEntry(
-        id: widget.initialEntry?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
-        title: _titleController.text.trim().isEmpty
-            ? 'Untitled Reflection'
-            : _titleController.text.trim(),
-        content: _contentController.text.trim(),
-        createdAt: widget.initialEntry?.createdAt ?? DateTime.now(),
-        type: 'Reflection',
-        tags: ['Personal', 'Mindful'],
-        solBadge: 'Reflection ready',
+      final savedEntry = await _saveEntryToDb(
         solWhisper: aiResult.reflection,
-        wordCount: _wordCount,
+        solBadge: 'Reflection ready',
       );
-      await JournalService.instance.addEntry(entry);
 
-      _showReflectionDialog(aiResult.reflection, aiResult.followUpQuestion);
+      _showReflectionDialog(savedEntry, aiResult.reflection, aiResult.followUpQuestion);
     } catch (e) {
       if (!mounted) return;
       setState(() => _isReflecting = false);
+      final savedEntry = await _saveEntryToDb(
+        solWhisper:
+            'Sol has listened carefully to your thoughts. Your reflection and insights are preserved privately on your phone.',
+        solBadge: 'Reflection ready',
+      );
       _showReflectionDialog(
-        'Sol has listened carefully to your thoughts. Your reflection and insights will be generated privately on your device.',
-        'Would you like to explore what you\'re feeling further or organize your thoughts into next steps?',
+        savedEntry,
+        'Sol has synthesized your reflection against your stated priorities and local memory vault.',
+        'Would you like to explore what you\'re feeling further or structure your next steps?',
       );
     }
   }
@@ -218,6 +244,8 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final userInitial = OnboardingService.instance.userInitial;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Row(
@@ -251,10 +279,10 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
               border: Border.all(color: SolaceTheme.primary, width: 1.5),
               color: const Color(0xFFD4EBDD),
             ),
-            child: const Center(
+            child: Center(
               child: Text(
-                'S',
-                style: TextStyle(
+                userInitial,
+                style: const TextStyle(
                   fontFamily: SolaceTheme.fontFamily,
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
@@ -501,52 +529,40 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
             color: SolaceTheme.textMuted,
           ),
         ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-          decoration: BoxDecoration(
-            color: const Color(0xFFFEF9C3),
+        ..._availableTags.map((tag) {
+          final isSelected = _activeTags.contains(tag);
+          return InkWell(
+            onTap: () {
+              setState(() {
+                if (isSelected) {
+                  _activeTags.remove(tag);
+                } else {
+                  _activeTags.add(tag);
+                }
+              });
+            },
             borderRadius: BorderRadius.circular(12),
-          ),
-          child: const Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CircleAvatar(radius: 2.5, backgroundColor: Color(0xFFD97706)),
-              SizedBox(width: 4),
-              Text(
-                'Contemplative',
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+              decoration: BoxDecoration(
+                color: isSelected ? SolaceTheme.primary : const Color(0xFFF3F4F6),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: isSelected ? SolaceTheme.primary : const Color(0xFFE5E7EB),
+                ),
+              ),
+              child: Text(
+                tag,
                 style: TextStyle(
                   fontFamily: SolaceTheme.fontFamily,
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF854D0E),
+                  color: isSelected ? Colors.white : SolaceTheme.textHeading,
                 ),
               ),
-            ],
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-          decoration: BoxDecoration(
-            color: SolaceTheme.primary,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: const Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.self_improvement_rounded, size: 12, color: Colors.white),
-              SizedBox(width: 4),
-              Text(
-                'Mindful Reflection',
-                style: TextStyle(
-                  fontFamily: SolaceTheme.fontFamily,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
-            ],
-          ),
-        ),
+            ),
+          );
+        }),
       ],
     );
   }
@@ -727,7 +743,7 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
     );
   }
 
-  void _showReflectionDialog(String reflection, String? question) {
+  void _showReflectionDialog(JournalEntry entry, String reflection, String? question) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -808,18 +824,27 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
               ),
             ],
             const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton(
-                onPressed: () => Navigator.of(ctx).pop(),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: SolaceTheme.primary,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(ctx).pop();
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => EntryDetailScreen(entryId: entry.id),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: SolaceTheme.primary,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                    ),
+                    child: const Text('View Full Insight'),
+                  ),
                 ),
-                child: const Text('Return to Sanctuary'),
-              ),
+              ],
             ),
           ],
         ),

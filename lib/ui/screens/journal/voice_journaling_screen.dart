@@ -221,10 +221,10 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
               border: Border.all(color: SolaceTheme.primary, width: 1.5),
               color: const Color(0xFFD4EBDD),
             ),
-            child: const Center(
+            child: Center(
               child: Text(
-                'S',
-                style: TextStyle(
+                OnboardingService.instance.userInitial,
+                style: const TextStyle(
                   fontFamily: SolaceTheme.fontFamily,
                   fontSize: 13,
                   fontWeight: FontWeight.w700,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../services/journal_service.dart';
 import '../../../services/memory_service.dart';
+import '../../../services/onboarding_service.dart';
 import '../../theme/solace_theme.dart';
 import '../../widgets/sun_illustration.dart';
 import '../journal/journal_editor_screen.dart';
@@ -30,14 +31,29 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   int _currentNavIndex = 3; // Active tab is Settings (index 3)
+  final _onboardingService = OnboardingService.instance;
+  final _journalService = JournalService.instance;
+  final _memoryService = MemoryService.instance;
 
-  // Section 1: Edge AI Engine
-  bool _edgeAiEngineEnabled = true;
+  @override
+  void initState() {
+    super.initState();
+    _onboardingService.addListener(_onServiceChanged);
+    _journalService.addListener(_onServiceChanged);
+    _memoryService.addListener(_onServiceChanged);
+  }
 
-  // Section 2: Memory & Context Boundaries
-  bool _allowMemoryRetrieval = true;
-  bool _promptBeforeSavingThemes = true;
-  bool _biometricAppLock = false;
+  void _onServiceChanged() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void dispose() {
+    _onboardingService.removeListener(_onServiceChanged);
+    _journalService.removeListener(_onServiceChanged);
+    _memoryService.removeListener(_onServiceChanged);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,6 +109,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   // Top App Bar
   // ---------------------------------------------------------------------------
   Widget _buildTopBar() {
+    final userInitial = _onboardingService.userInitial;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -166,10 +184,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 border: Border.all(color: SolaceTheme.primary, width: 1.5),
                 color: const Color(0xFFD4EBDD),
               ),
-              child: const Center(
+              child: Center(
                 child: Text(
-                  'S',
-                  style: TextStyle(
+                  userInitial,
+                  style: const TextStyle(
                     fontFamily: SolaceTheme.fontFamily,
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
@@ -249,6 +267,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   // 1. Edge AI Engine Card
   // ---------------------------------------------------------------------------
   Widget _buildEdgeAiEngineCard() {
+    final edgeAiEnabled = _onboardingService.edgeAiEnabled;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -309,11 +329,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               Switch.adaptive(
-                value: _edgeAiEngineEnabled,
+                value: edgeAiEnabled,
                 activeColor: SolaceTheme.primary,
                 activeTrackColor: const Color(0xFF9AE6B4),
                 onChanged: (val) {
-                  setState(() => _edgeAiEngineEnabled = val);
+                  _onboardingService.setEdgeAiEnabled(val);
                 },
               ),
             ],
@@ -434,14 +454,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
   // 2. Memory & Context Boundaries
   // ---------------------------------------------------------------------------
   Widget _buildMemoryBoundariesSection() {
+    final allowMemoryRetrieval = _onboardingService.allowMemoryRetrieval;
+    final promptBeforeSaving = _onboardingService.promptBeforeSavingThemes;
+    final biometricAppLock = _onboardingService.biometricAppLock;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Section Header Row
-        Row(
+        const Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Expanded(
+            Expanded(
               child: Text(
                 'Memory & Context Boundaries',
                 style: TextStyle(
@@ -452,8 +476,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
             ),
-            const SizedBox(width: 8),
-            const Text(
+            SizedBox(width: 8),
+            Text(
               'LOCAL ONLY',
               style: TextStyle(
                 fontFamily: SolaceTheme.fontFamily,
@@ -467,7 +491,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         const SizedBox(height: 10),
 
-        // Settings Card with 3 Toggles
+        // Settings Card with 3 Toggles persisted to SQLite
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -482,8 +506,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: Icons.history_edu_rounded,
                 title: 'Allow local memory retrieval',
                 subtitle: 'Recalls past feelings to enrich reflections',
-                value: _allowMemoryRetrieval,
-                onChanged: (val) => setState(() => _allowMemoryRetrieval = val),
+                value: allowMemoryRetrieval,
+                onChanged: (val) => _onboardingService.setAllowMemoryRetrieval(val),
               ),
               const Divider(height: 24, color: Color(0xFFEEF5F1)),
 
@@ -492,8 +516,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: Icons.chat_bubble_outline_rounded,
                 title: 'Prompt before saving recurring themes',
                 subtitle: 'Asks your permission before storing long-term patterns',
-                value: _promptBeforeSavingThemes,
-                onChanged: (val) => setState(() => _promptBeforeSavingThemes = val),
+                value: promptBeforeSaving,
+                onChanged: (val) => _onboardingService.setPromptBeforeSavingThemes(val),
               ),
               const Divider(height: 24, color: Color(0xFFEEF5F1)),
 
@@ -502,8 +526,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: Icons.fingerprint_rounded,
                 title: 'Biometric App Lock',
                 subtitle: 'Require Face ID or Fingerprint on open',
-                value: _biometricAppLock,
-                onChanged: (val) => setState(() => _biometricAppLock = val),
+                value: biometricAppLock,
+                onChanged: (val) => _onboardingService.setBiometricAppLock(val),
               ),
             ],
           ),
@@ -577,14 +601,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
   // 3. Data Vault & Offline Care
   // ---------------------------------------------------------------------------
   Widget _buildDataVaultSection() {
+    final entryCount = _journalService.entries.length;
+    final memCount = _memoryService.memories.length;
+    final approxSize = ((entryCount * 0.4) + (memCount * 0.1) + 8.4).toStringAsFixed(1);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Section Header Row
-        Row(
+        const Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Expanded(
+            Expanded(
               child: Text(
                 'Data Vault & Offline Care',
                 style: TextStyle(
@@ -595,8 +623,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
             ),
-            const SizedBox(width: 8),
-            const Text(
+            SizedBox(width: 8),
+            Text(
               '100% Client-Side',
               style: TextStyle(
                 fontFamily: SolaceTheme.fontFamily,
@@ -627,7 +655,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Sol Animated Mascot
+                    // Sol Mascot
                     const SunIllustration(size: 46),
                     const SizedBox(width: 12),
                     Expanded(
@@ -856,7 +884,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '${JournalService.instance.entries.length} reflections, ${MemoryService.instance.memories.length} vault items',
+                      '$entryCount reflections, $memCount vault items',
                       style: const TextStyle(
                         fontFamily: SolaceTheme.fontFamily,
                         fontSize: 11,
@@ -875,7 +903,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   border: Border.all(color: const Color(0xFFDCFCE7)),
                 ),
                 child: Text(
-                  '${((JournalService.instance.entries.length * 0.4) + (MemoryService.instance.memories.length * 0.1) + 8.4).toStringAsFixed(1)} MB',
+                  '$approxSize MB',
                   style: const TextStyle(
                     fontFamily: SolaceTheme.fontFamily,
                     fontSize: 11.5,
@@ -1052,76 +1080,83 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       builder: (ctx) => Padding(
         padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const SunIllustration(size: 36),
-                const SizedBox(width: 10),
-                const Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Offline Crisis & Emergency Hub',
-                        style: TextStyle(
-                          fontFamily: SolaceTheme.fontFamily,
-                          fontSize: 17,
-                          fontWeight: FontWeight.w800,
-                          color: SolaceTheme.textHeading,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const SunIllustration(size: 36),
+                  const SizedBox(width: 10),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Offline Crisis & Emergency Hub',
+                          style: TextStyle(
+                            fontFamily: SolaceTheme.fontFamily,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w800,
+                            color: SolaceTheme.textHeading,
+                          ),
                         ),
-                      ),
-                      Text(
-                        'Zero-cloud local disaster protocols',
-                        style: TextStyle(
-                          fontFamily: SolaceTheme.fontFamily,
-                          fontSize: 12,
-                          color: SolaceTheme.textMuted,
+                        Text(
+                          'Zero-cloud local disaster protocols',
+                          style: TextStyle(
+                            fontFamily: SolaceTheme.fontFamily,
+                            fontSize: 12,
+                            color: SolaceTheme.textMuted,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                IconButton(
-                  onPressed: () => Navigator.of(ctx).pop(),
-                  icon: const Icon(Icons.close_rounded),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            _buildCrisisProtocolItem(
-              title: '🌪️ Typhoon & Flood Protocol',
-              desc: 'Offline shelter maps, emergency contacts (911/NDRRMC), and power preservation guidelines cached locally.',
-            ),
-            const SizedBox(height: 10),
-            _buildCrisisProtocolItem(
-              title: '🌋 Earthquake Preparedness',
-              desc: 'Duck, Cover, Hold instructions, evacuation checklist, and local community emergency beacons.',
-            ),
-            const SizedBox(height: 10),
-            _buildCrisisProtocolItem(
-              title: '🧘 Psychological First Aid',
-              desc: 'Grounded box-breathing audio and 5-4-3-2-1 sensory grounding techniques.',
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton(
-                onPressed: () => Navigator.of(ctx).pop(),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: SolaceTheme.primary,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+                  IconButton(
+                    onPressed: () => Navigator.of(ctx).pop(),
+                    icon: const Icon(Icons.close_rounded),
                   ),
-                ),
-                child: const Text('All Protocols Verified Offline'),
+                ],
               ),
-            ),
-          ],
+              const SizedBox(height: 16),
+              _buildCrisisProtocolItem(
+                title: '⚡ Power Outage & Brownout Checklist',
+                desc: 'Device battery conservation settings, local offline emergency radio frequencies, and non-perishable resource list.',
+              ),
+              const SizedBox(height: 10),
+              _buildCrisisProtocolItem(
+                title: '🌪️ Typhoon & Flood Protocol',
+                desc: 'Offline shelter maps, emergency contacts (911/NDRRMC), and power preservation guidelines cached locally.',
+              ),
+              const SizedBox(height: 10),
+              _buildCrisisProtocolItem(
+                title: '🌋 Earthquake Preparedness',
+                desc: 'Duck, Cover, Hold instructions, evacuation checklist, and local community emergency beacons.',
+              ),
+              const SizedBox(height: 10),
+              _buildCrisisProtocolItem(
+                title: '🧘 Psychological First Aid',
+                desc: 'Grounded box-breathing audio and 5-4-3-2-1 sensory grounding techniques.',
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: SolaceTheme.primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  child: const Text('All Protocols Verified Offline'),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -1193,7 +1228,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ],
         ),
         content: const Text(
-          'Are you sure you want to permanently delete all local reflections, memory patterns, and on-device model cache?\n\nThis operation is irreversible.',
+          'Are you sure you want to permanently delete all local reflections, memory patterns, user preferences, and on-device model cache?\n\nThis operation wipes SQLite tables and is irreversible.',
           style: TextStyle(
             fontFamily: SolaceTheme.fontFamily,
             fontSize: 13.5,
@@ -1206,8 +1241,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.of(ctx).pop();
+              await _onboardingService.wipeAllData();
+              if (!context.mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('All local data wiped. Solace reset to factory state.'),
