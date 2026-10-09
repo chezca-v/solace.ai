@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import '../../services/model_download_service.dart';
@@ -36,6 +37,12 @@ class _ModelDownloadScreenState extends State<ModelDownloadScreen> {
       _isChecking = true;
       _errorMessage = null;
     });
+
+    // Web doesn't support path_provider or local model files — skip straight to dashboard
+    if (kIsWeb) {
+      _navigateToDashboard();
+      return;
+    }
 
     try {
       final appDir = await getApplicationDocumentsDirectory();
