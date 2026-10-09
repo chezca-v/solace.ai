@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../services/journal_service.dart';
+import '../../../services/onboarding_service.dart';
 import '../../theme/solace_theme.dart';
 import '../../widgets/sun_illustration.dart';
 
@@ -292,11 +293,11 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Expanded(
+        Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 'SANCTUARY SPACE',
                 style: TextStyle(
                   fontFamily: SolaceTheme.fontFamily,
@@ -306,10 +307,10 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
                   color: SolaceTheme.primaryDark,
                 ),
               ),
-              SizedBox(height: 2),
+              const SizedBox(height: 2),
               Text(
-                'Good morning,\nElena',
-                style: TextStyle(
+                'Good morning,\n${OnboardingService.instance.userName.isNotEmpty ? OnboardingService.instance.userName : 'Friend'}',
+                style: const TextStyle(
                   fontFamily: SolaceTheme.fontFamily,
                   fontSize: 26,
                   fontWeight: FontWeight.w800,
@@ -350,6 +351,17 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
   }
 
   Widget _buildGentlePromptCard() {
+    final onboarding = OnboardingService.instance;
+    final priorities = onboarding.workingToward;
+    final goals = onboarding.selectedGoals;
+    
+    String promptText = 'Take a breath. How does your mind feel right now?';
+    if (priorities.isNotEmpty) {
+      promptText = 'Take a breath. You mentioned wanting clarity on: $priorities. How does your mind feel right now?';
+    } else if (goals.isNotEmpty) {
+      promptText = 'Take a breath. You are focusing on ${goals.first}. How does your mind feel right now?';
+    }
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -377,9 +389,9 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
             ],
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Take a breath. You mentioned wanting clarity on your upcoming projects—how does your mind feel right now?',
-            style: TextStyle(
+          Text(
+            promptText,
+            style: const TextStyle(
               fontFamily: SolaceTheme.fontFamily,
               fontSize: 13,
               fontStyle: FontStyle.normal,
