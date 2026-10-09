@@ -25,3 +25,7 @@ Thumbs.db
 
 .idea/
 *.iml
+
+#Flutter
+.flutter-plugins
+.flutter-plugins-dependencies
