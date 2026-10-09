@@ -17,3 +17,8 @@ build/
 # OS Specific Files
 .DS_Store
 Thumbs.db
+
+# Model Files (On-Device AI)
+*.task
+*.litertlm
+*.bin
