@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+<<<<<<< HEAD
 import 'screens/home/sanctuary_home_screen.dart';
 import 'screens/journal/journal_editor_screen.dart';
 import 'screens/journal/voice_journaling_screen.dart';
+=======
+>>>>>>> d522cf191db37f3c5de497b8c25103064042fb9f
 import 'screens/model_download_screen.dart';
 import 'screens/onboarding/journaling_goals_screen.dart';
 import 'screens/onboarding/personal_context_screen.dart';
 import 'screens/onboarding/support_preferences_screen.dart';
+<<<<<<< HEAD
 import 'screens/welcome_screen.dart';
 
 /// Global router defining navigation across Solace AI
@@ -28,6 +32,20 @@ final GoRouter solaceRouter = GoRouter(
         onContinue: () => context.go('/onboarding/preferences'),
         onBack: () => context.go('/welcome'),
         onSkip: () => context.go('/onboarding/preferences'),
+=======
+import 'screens/sanctuary_dashboard_screen.dart';
+import 'screens/welcome_screen.dart';
+
+GoRouter buildRouter() {
+  return GoRouter(
+    initialLocation: '/welcome',
+    routes: [
+      GoRoute(
+        path: '/welcome',
+        builder: (context, state) => WelcomeScreen(
+          onGetStarted: () => context.go('/onboarding/goals'),
+        ),
+>>>>>>> d522cf191db37f3c5de497b8c25103064042fb9f
       ),
     ),
 
@@ -75,6 +93,7 @@ final GoRouter solaceRouter = GoRouter(
         onBack: () => context.go('/'),
         onOpenVoice: () => context.go('/journal/voice'),
       ),
+<<<<<<< HEAD
     ),
 
     // 07A & 07B — Voice Journaling (Recording & Transcribed Reflection)
@@ -87,3 +106,8 @@ final GoRouter solaceRouter = GoRouter(
     ),
   ],
 );
+=======
+    ],
+  );
+}
+>>>>>>> d522cf191db37f3c5de497b8c25103064042fb9f

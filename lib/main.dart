@@ -16,7 +16,11 @@ class SolaceApp extends StatelessWidget {
       title: 'Solace AI',
       debugShowCheckedModeBanner: false,
       theme: SolaceTheme.themeData,
+<<<<<<< HEAD
       routerConfig: solaceRouter,
+=======
+      routerConfig: buildRouter(),
+>>>>>>> d522cf191db37f3c5de497b8c25103064042fb9f
     );
   }
 }
