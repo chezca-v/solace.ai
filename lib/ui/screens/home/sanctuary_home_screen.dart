@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../services/journal_service.dart';
+import '../../../services/onboarding_service.dart';
 import '../../theme/solace_theme.dart';
 import '../../widgets/sun_illustration.dart';
 import '../journal/journal_editor_screen.dart';
@@ -166,7 +167,7 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
               ),
               child: const Center(
                 child: Text(
-                  'S',
+                  'E',
                   style: TextStyle(
                     fontFamily: SolaceTheme.fontFamily,
                     fontSize: 14,
@@ -251,10 +252,10 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
             ],
           ),
           const SizedBox(height: 8),
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
+              const Expanded(
                 child: Row(
                   children: [
                     Icon(Icons.circle, size: 6, color: Color(0xFF10B981)),
@@ -276,9 +277,9 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
                   ],
                 ),
               ),
-              SizedBox(width: 8),
-              Text(
-                'Today • Offline Sanctuary',
+              const SizedBox(width: 8),
+              const Text(
+                'Wednesday, Oct 11',
                 style: TextStyle(
                   fontFamily: SolaceTheme.fontFamily,
                   fontSize: 11,
@@ -297,11 +298,11 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Expanded(
+        Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 'SANCTUARY SPACE',
                 style: TextStyle(
                   fontFamily: SolaceTheme.fontFamily,
@@ -311,10 +312,10 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
                   color: SolaceTheme.primaryDark,
                 ),
               ),
-              SizedBox(height: 2),
+              const SizedBox(height: 2),
               Text(
-                'Good morning,\nFriend',
-                style: TextStyle(
+                'Good morning,\n${onboarding.userName.isNotEmpty ? onboarding.userName : 'Friend'}',
+                style: const TextStyle(
                   fontFamily: SolaceTheme.fontFamily,
                   fontSize: 26,
                   fontWeight: FontWeight.w800,
@@ -355,6 +356,17 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
   }
 
   Widget _buildGentlePromptCard() {
+    final onboarding = OnboardingService.instance;
+    final priorities = onboarding.workingToward;
+    final goals = onboarding.selectedGoals;
+    
+    String promptText = 'Take a breath. How does your mind feel right now?';
+    if (priorities.isNotEmpty) {
+      promptText = 'Take a breath. You mentioned wanting clarity on: $priorities. How does your mind feel right now?';
+    } else if (goals.isNotEmpty) {
+      promptText = 'Take a breath. You are focusing on ${goals.first}. How does your mind feel right now?';
+    }
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -382,9 +394,9 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
             ],
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Take a breath. You mentioned wanting clarity on your upcoming projects—how does your mind feel right now?',
-            style: TextStyle(
+          Text(
+            promptText,
+            style: const TextStyle(
               fontFamily: SolaceTheme.fontFamily,
               fontSize: 13,
               fontStyle: FontStyle.normal,

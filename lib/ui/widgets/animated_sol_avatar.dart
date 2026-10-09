@@ -74,21 +74,18 @@ class _AnimatedSolAvatarState extends State<AnimatedSolAvatar> with TickerProvid
             builder: (context, child) {
               return Transform.scale(
                 scale: _glowScaleAnimation.value,
-                child: Opacity(
-                  opacity: _glowOpacityAnimation.value,
-                  child: Container(
-                    width: widget.size,
-                    height: widget.size,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Color(0xFF93F6C4),
-                          blurRadius: 20,
-                          spreadRadius: 10,
-                        ),
-                      ],
-                    ),
+                child: Container(
+                  width: widget.size,
+                  height: widget.size,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF93F6C4).withOpacity(_glowOpacityAnimation.value),
+                        blurRadius: 20,
+                        spreadRadius: 10,
+                      ),
+                    ],
                   ),
                 ),
               );

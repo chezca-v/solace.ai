@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../theme/app_colors.dart';
 import '../../../services/onboarding_service.dart';
+import '../../widgets/onboarding_app_bar.dart';
+import '../../widgets/onboarding_progress_header.dart';
 import 'onboarding_step_2_screen.dart';
 
 class OnboardingStep1Screen extends StatefulWidget {
@@ -39,88 +41,27 @@ class _OnboardingStep1ScreenState extends State<OnboardingStep1Screen> {
   ];
 
   final Set<int> _selectedIndices = {};
+  final TextEditingController _nameController = TextEditingController();
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: const OnboardingAppBar(
+        title: 'Welcome to Solace',
+        showBackButton: false,
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             children: [
-              // Top Navigation & Progress Bar
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // Back Button
-                    InkWell(
-                      onTap: () => Navigator.of(context).pop(),
-                      borderRadius: BorderRadius.circular(20),
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: const BoxDecoration(
-                          color: AppColors.surfaceContainerLowest,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black12,
-                              blurRadius: 2,
-                              offset: Offset(0, 1),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(Icons.arrow_back, color: AppColors.bodyForest, size: 20),
-                      ),
-                    ),
-                    // Step Badge
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: AppColors.aiBubble,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 6,
-                            height: 6,
-                            decoration: const BoxDecoration(
-                              color: AppColors.primary,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'STEP 1 OF 5',
-                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 1.2,
-                              fontSize: 11,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    // Skip Action
-                    TextButton(
-                      onPressed: () {},
-                      style: TextButton.styleFrom(
-                        foregroundColor: AppColors.primary,
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      ),
-                      child: const Text(
-                        'Skip',
-                        style: TextStyle(fontSize: 13, color: AppColors.secondary),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
+              const OnboardingProgressHeader(step: 1, label: 'Goals'),
               Expanded(
                 child: SingleChildScrollView(
                   physics: const BouncingScrollPhysics(),
@@ -208,7 +149,43 @@ class _OnboardingStep1ScreenState extends State<OnboardingStep1Screen> {
                         ),
                       ),
                       const SizedBox(height: 24),
+                      
+                      // Name Input
+                      const Text(
+                        'What should Solace call you?',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: _nameController,
+                        decoration: InputDecoration(
+                          hintText: 'Enter your preferred name',
+                          filled: true,
+                          fillColor: AppColors.surfaceContainerLowest,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                        ),
+                        onChanged: (val) => setState(() {}),
+                      ),
+                      const SizedBox(height: 24),
+
                       // Multi-select Goal Cards List
+                      const Text(
+                        'What brings you here?',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
                       ...List.generate(_goals.length, (index) {
                         final goal = _goals[index];
                         final isSelected = _selectedIndices.contains(index);
@@ -301,9 +278,10 @@ class _OnboardingStep1ScreenState extends State<OnboardingStep1Screen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     ElevatedButton(
-                      onPressed: _selectedIndices.isNotEmpty ? () {
+                      onPressed: (_selectedIndices.isNotEmpty && _nameController.text.trim().isNotEmpty) ? () {
                          final selectedGoalStrings = _selectedIndices.map((i) => _goals[i]['title']!).toSet();
                          OnboardingService.instance.setGoals(selectedGoalStrings);
+                         OnboardingService.instance.setUserName(_nameController.text.trim());
                          Navigator.of(context).push(
                            MaterialPageRoute(
                              builder: (context) => const OnboardingStep2Screen(),

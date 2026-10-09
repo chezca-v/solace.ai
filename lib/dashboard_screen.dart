@@ -23,81 +23,80 @@ class DashboardScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: canvasBackground,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Avatar Section
-              const Expanded(
-                flex: 3,
-                child: Center(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Avatar Section
+                const SizedBox(height: 16),
+                const Center(
                   child: AnimatedSolAvatar(size: 130),
                 ),
-              ),
+                const SizedBox(height: 32),
 
-              // Title Section
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: aiBubble,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.verified_user, size: 16, color: primary),
-                    SizedBox(width: 6),
-                    Text(
-                      'Private by design. Useful offline.',
-                      style: TextStyle(
-                        color: onTertiaryContainer,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
+                // Title Section
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: aiBubble,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.verified_user, size: 16, color: primary),
+                      SizedBox(width: 6),
+                      Text(
+                        'Private by design. Useful offline.',
+                        style: TextStyle(
+                          color: onTertiaryContainer,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Solace AI',
-                style: TextStyle(
-                  color: onSurface,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w600,
+                const SizedBox(height: 16),
+                const Text(
+                  'Solace AI',
+                  style: TextStyle(
+                    color: onSurface,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'A space to come back to yourself.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: inverseSurface,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  height: 1.2,
+                const SizedBox(height: 8),
+                const Text(
+                  'A space to come back to yourself.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: inverseSurface,
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    height: 1.2,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Your private AI journal that understands you, remembers what matters, and helps you think clearly—even without an internet connection.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: bodyForest,
-                  fontSize: 16,
-                  height: 1.5,
+                const SizedBox(height: 16),
+                const Text(
+                  'Your private AI journal that understands you, remembers what matters, and helps you think clearly—even without an internet connection.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: bodyForest,
+                    fontSize: 16,
+                    height: 1.5,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 32),
+                const SizedBox(height: 32),
 
-              // Features List
-              Expanded(
-                flex: 4,
-                child: ListView(
+                // Features List
+                ListView(
                   physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
                   children: [
-                    _FeatureCard(
+                    const _FeatureCard(
                       icon: Icons.wifi_off,
                       title: '100% Offline Capable',
                       description: 'Journal and reflect anywhere, from airplanes to off-grid retreats.',
@@ -108,7 +107,7 @@ class DashboardScreen extends StatelessWidget {
                       descColor: bodyForest,
                     ),
                     const SizedBox(height: 12),
-                    _FeatureCard(
+                    const _FeatureCard(
                       icon: Icons.enhanced_encryption,
                       title: 'Zero Cloud Leakage',
                       description: 'Stored in encrypted SQLite locally on your physical device.',
@@ -119,7 +118,7 @@ class DashboardScreen extends StatelessWidget {
                       descColor: bodyForest,
                     ),
                     const SizedBox(height: 12),
-                    _FeatureCard(
+                    const _FeatureCard(
                       icon: Icons.draw,
                       title: 'Capture First, Assist Third',
                       description: 'Write freely; Solace only assists thoughtfully when invited.',
@@ -131,7 +130,6 @@ class DashboardScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-              ),
 
               // Bottom Buttons
               SizedBox(
@@ -179,6 +177,7 @@ class DashboardScreen extends StatelessWidget {
               const SizedBox(height: 8),
             ],
           ),
+        ),
         ),
       ),
     );

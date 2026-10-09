@@ -19,6 +19,7 @@ class OnboardingService extends ChangeNotifier {
   Set<String> _selectedLifeAreas = {};
   String _workingToward = '';
   String _explicitBoundaries = '';
+  String _userName = '';
 
   // Getters
   Set<String> get selectedGoals => Set.unmodifiable(_selectedGoals);
@@ -26,6 +27,7 @@ class OnboardingService extends ChangeNotifier {
   Set<String> get selectedLifeAreas => Set.unmodifiable(_selectedLifeAreas);
   String get workingToward => _workingToward;
   String get explicitBoundaries => _explicitBoundaries;
+  String get userName => _userName;
 
   Future<void> init() async {
     if (_isInitialized) return;
@@ -47,6 +49,7 @@ class OnboardingService extends ChangeNotifier {
           if (key == 'selectedLifeAreas') _selectedLifeAreas = Set<String>.from(jsonDecode(value));
           if (key == 'workingToward') _workingToward = value;
           if (key == 'explicitBoundaries') _explicitBoundaries = value;
+          if (key == 'userName') _userName = value;
         } catch (_) {}
       }
     }
@@ -90,6 +93,12 @@ class OnboardingService extends ChangeNotifier {
     _explicitBoundaries = text;
     notifyListeners();
     await _saveToDb('explicitBoundaries', text);
+  }
+
+  Future<void> setUserName(String name) async {
+    _userName = name;
+    notifyListeners();
+    await _saveToDb('userName', name);
   }
 
   /// Converts the captured onboarding preferences into a UserContext for the local AI engine

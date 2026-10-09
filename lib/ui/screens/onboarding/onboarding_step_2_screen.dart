@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../theme/app_colors.dart';
 import '../../../services/onboarding_service.dart';
+import '../../widgets/onboarding_app_bar.dart';
+import '../../widgets/onboarding_progress_header.dart';
 import 'onboarding_step_3_screen.dart';
 
 class OnboardingStep2Screen extends StatefulWidget {
@@ -45,102 +47,13 @@ class _OnboardingStep2ScreenState extends State<OnboardingStep2Screen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.canvasBackground,
-      appBar: AppBar(
-        backgroundColor: AppColors.canvasBackground.withOpacity(0.9),
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.bodyForest),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: const Text(
-          'Journaling Goals',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: AppColors.inverseSurface,
-          ),
-        ),
-        centerTitle: true,
-        actions: [
-          TextButton(
-            onPressed: () {},
-            child: const Text(
-              'Skip',
-              style: TextStyle(fontSize: 13, color: AppColors.secondary),
-            ),
-          ),
-          const SizedBox(width: 8),
-          const CircleAvatar(
-            radius: 16,
-            backgroundImage: NetworkImage('https://lh3.googleusercontent.com/aida/AEtjO1VTW28s9F5nAumb5HD_s_f6oKhP829n6u7izTeQXvnBc1xHEElSdKPl5yjjXLiYiGHXfxeMRALGF1imafC384vVcuTgtCaFnRJGkHSK34rT0f8Et6jFzBAkvO-EQT-GE2AAgSX4sSKV4nHXlxW9V8Z8mblgPgjU8LjavRZpQMjUJz1oUERs7kp_XBRyjfOX_gv9r1f6TlLvGoHLLPQK-4iG6-Mj2HoAixOVyMEfEIX5-80NjOwzXpAMHpA'),
-          ),
-          const SizedBox(width: 16),
-        ],
-      ),
+      appBar: const OnboardingAppBar(title: 'Journaling Goals'),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             children: [
-              // Progress Header
-              Padding(
-                padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: AppColors.aiBubble,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.spa, color: AppColors.primary, size: 16),
-                              const SizedBox(width: 6),
-                              Text(
-                                'STEP 2 OF 5',
-                                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                  color: AppColors.bodyForest,
-                                  fontWeight: FontWeight.w600,
-                                  letterSpacing: 1.2,
-                                  fontSize: 11,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const Text(
-                          'Intentions',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: AppColors.secondary,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    // Multi-segment Progress Bar
-                    Row(
-                      children: List.generate(5, (index) {
-                        return Expanded(
-                          child: Container(
-                            height: 6,
-                            margin: EdgeInsets.only(right: index < 4 ? 6 : 0),
-                            decoration: BoxDecoration(
-                              color: index < 2 ? AppColors.primaryContainer : AppColors.surfaceVariant.withOpacity(0.8),
-                              borderRadius: BorderRadius.circular(3),
-                            ),
-                          ),
-                        );
-                      }),
-                    ),
-                  ],
-                ),
-              ),
+              const OnboardingProgressHeader(step: 2, label: 'Intentions'),
 
               Expanded(
                 child: SingleChildScrollView(
