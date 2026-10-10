@@ -186,11 +186,7 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
 
                 // Your Recent Reflections Feed
                 _buildRecentReflectionsSection(),
-                const SizedBox(height: 16),
-
-                // Mindful Exhale Soundscape Player Card
-                _buildMindfulAudioCard(),
-                const SizedBox(height: 20),
+                const SizedBox(height: 36),
               ],
             ),
           ),
@@ -512,11 +508,7 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
             children: [
               ElevatedButton.icon(
                 onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => const JournalEditorScreen(),
-                    ),
-                  );
+                  setState(() => _currentNavIndex = 1);
                 },
                 icon: const Icon(Icons.auto_awesome, size: 14, color: Colors.white),
                 label: const Text(
@@ -576,10 +568,7 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
                 if (widget.onNewEntry != null) {
                   widget.onNewEntry!();
                 } else {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                        builder: (context) => const JournalEditorScreen()),
-                  );
+                  setState(() => _currentNavIndex = 1);
                 }
               },
               icon: const Icon(Icons.add_rounded, size: 20, color: Colors.white),
@@ -807,10 +796,7 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
                 if (widget.onJournalTab != null) {
                   widget.onJournalTab!();
                 } else {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                        builder: (context) => const JournalEditorScreen()),
-                  );
+                  setState(() => _currentNavIndex = 1);
                 }
               },
               child: const Text(
@@ -1077,35 +1063,9 @@ class _SanctuaryHomeScreenState extends State<SanctuaryHomeScreen> {
       selectedIndex: _currentNavIndex,
       onDestinationSelected: (i) {
         setState(() => _currentNavIndex = i);
-        if (i == 0) {
-          // Home
-        } else if (i == 1) {
-          if (widget.onJournalTab != null) {
-            widget.onJournalTab!();
-          } else {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                  builder: (context) => const JournalEditorScreen()),
-            );
-          }
-        } else if (i == 2) {
-          if (widget.onMemoriesTab != null) {
-            widget.onMemoriesTab!();
-          } else {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                  builder: (context) => const MemoryVaultScreen()),
-            );
-          }
-        } else if (i == 3) {
-          if (widget.onSettingsTab != null) {
-            widget.onSettingsTab!();
-          } else {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const SettingsScreen()),
-            );
-          }
-        }
+        if (i == 1 && widget.onJournalTab != null) widget.onJournalTab!();
+        if (i == 2 && widget.onMemoriesTab != null) widget.onMemoriesTab!();
+        if (i == 3 && widget.onSettingsTab != null) widget.onSettingsTab!();
       },
       backgroundColor: SolaceTheme.surfaceWhite,
       indicatorColor: const Color(0xFFE5F6EC),

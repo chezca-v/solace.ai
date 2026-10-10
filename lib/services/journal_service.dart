@@ -21,23 +21,11 @@ class JournalService extends ChangeNotifier {
     
     // SQLite does not support web. If running on web, fallback to in-memory list
     if (kIsWeb) {
-      _loadInitialDynamicEntries();       
       _isInitialized = true;
       return;
     }
 
     await _loadFromDb();
-    
-    // If DB is empty, populate with samples
-    if (_entries.isEmpty) {
-      _loadInitialDynamicEntries();
-      final db = await DatabaseHelper.instance.database;
-      if (db != null) {
-        for (final e in _entries) {
-          await db.insert('entries', e.toMap());
-        }
-      }
-    }
     _isInitialized = true;
   }
 
@@ -50,44 +38,7 @@ class JournalService extends ChangeNotifier {
   }
 
   void _loadInitialDynamicEntries() {
-    final onboarding = OnboardingService.instance;
-    final focus = onboarding.workingToward.trim();
-    final goals = onboarding.selectedGoals;
-
-    final initialTitle = focus.isNotEmpty
-        ? 'Reflecting on: $focus'
-        : (goals.isNotEmpty ? 'Focus: ${goals.first}' : 'Reflecting on upcoming choices');
-
-    final initialContent = focus.isNotEmpty
-        ? 'Taking a moment to pause and write down my thoughts on $focus, focusing on sustainable energy and clear boundaries.'
-        : 'Taking a moment to pause and write down my thoughts on balancing focus, creative energy, and sustainable pacing.';
-
-    _entries.addAll([
-      JournalEntry(
-        id: 'entry-1',
-        title: initialTitle,
-        content: initialContent,
-        createdAt: DateTime.now().subtract(const Duration(days: 1)),
-        type: 'Decision',
-        tags: ['Mindful', 'Reflection', if (focus.isNotEmpty) 'Focus'],
-        solBadge: 'Reflection ready',
-        solWhisper:
-            'Sol is ready to help you weigh your thoughts against your core priorities and boundaries.',
-        wordCount: initialContent.split(' ').length,
-      ),
-      JournalEntry(
-        id: 'entry-2',
-        title: 'Evening check-in & quiet space',
-        content:
-            'A mindful moment to unwind, disconnect, and restore balance in my offline sanctuary.',
-        createdAt: DateTime.now().subtract(const Duration(days: 3)),
-        type: 'Gratitude',
-        tags: ['Mindfulness', 'Evening Check-in'],
-        solBadge: 'Calm space recorded',
-        wordCount: 15,
-      ),
-    ]);
-    notifyListeners();
+    // Unused, removed mock data seeding.
   }
 
   Future<void> addEntry(JournalEntry entry) async {

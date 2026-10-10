@@ -107,7 +107,6 @@ class _MemoryVaultScreenState extends State<MemoryVaultScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: _buildBottomNav(),
     );
   }
 
