@@ -51,7 +51,8 @@ class GemmaAi implements LocalAi {
 
       _isReady = true;
       return true;
-    } catch (_) {
+    } catch (e, stack) {
+      print('Gemma Init Error: $e\n$stack');
       _isReady = false;
       return false;
     }

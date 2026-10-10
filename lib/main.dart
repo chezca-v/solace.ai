@@ -4,12 +4,14 @@ import 'dashboard_screen.dart';
 import 'services/journal_service.dart';
 import 'services/onboarding_service.dart';
 import 'services/memory_service.dart';
+import 'ai/ai_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await JournalService.instance.init();
   await OnboardingService.instance.init();
   await MemoryService.instance.init();
+  await AiService.instance.init();
   runApp(const SolaceApp());
 }
 

@@ -58,11 +58,16 @@ class AiService {
             .timeout(const Duration(seconds: 30));
 
         if (result.error == null && result.reflection.trim().isNotEmpty) {
+          print('AISERVICE: Gemma success');
           return result;
         }
-      } catch (_) {
+        print('AISERVICE: Gemma returned error: ${result.error}');
+      } catch (e, stack) {
+        print('AISERVICE: Gemma exception: $e\n$stack');
         // Fall through to rule-based fallback on timeout, error, or invalid output
       }
+    } else {
+      print('AISERVICE: _isModelReady is FALSE');
     }
 
     final fallbackResult = await _ruleBasedEngine.reflect(entry, ctx);

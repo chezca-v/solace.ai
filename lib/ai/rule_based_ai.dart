@@ -246,12 +246,21 @@ class RuleBasedAi implements LocalAi {
               'Which direction feels most aligned with your personal values right now?';
           break;
         default:
-          sentence1 =
-              'It sounds like you might be reflecting deeply on $topic today.';
-          sentence2 =
-              'Putting your experiences into words creates meaningful space to understand yourself better.';
-          question =
-              'What thought or feeling stands out most to you from what you just wrote?';
+          sentence1 = _randomize([
+            'It sounds like you are deeply reflecting on "$topic" today.',
+            'I hear your thoughts about $topic.',
+            'You are bringing a lot of awareness to $topic right now.'
+          ]);
+          sentence2 = _randomize([
+            'Putting your experiences into words creates meaningful space to understand yourself better.',
+            'Taking time to unpack this shows a lot of care for your mental well-being.',
+            'Acknowledging these feelings is the first step toward clarity.'
+          ]);
+          question = _randomize([
+            'What thought or feeling stands out most to you from what you just wrote?',
+            'How does it feel to finally express this?',
+            'What is the kindest thing you could tell yourself about this right now?'
+          ]);
       }
     }
 
@@ -394,12 +403,18 @@ class RuleBasedAi implements LocalAi {
   }
 
   String _extractKeyTopic(String entry) {
-    final words = entry
-        .replaceAll(RegExp(r'[^\w\s]'), ' ')
-        .split(RegExp(r'\s+'))
-        .where((w) => w.length > 3)
-        .take(4)
-        .join(' ');
-    return words.isNotEmpty ? 'what is happening ($words)' : 'your situation';
+    final cleanText = entry.replaceAll(RegExp(r'[^\w\s]'), ' ').trim();
+    if (cleanText.isEmpty) return 'your situation';
+    
+    // Just take the first few words as a natural phrase instead of wrapping it in parentheses
+    final words = cleanText.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).toList();
+    if (words.length <= 6) return cleanText.toLowerCase();
+    
+    return '${words.take(6).join(' ').toLowerCase()}...';
+  }
+
+  // Add some randomization to sentence structures so it feels dynamic
+  String _randomize(List<String> options) {
+    return options[DateTime.now().millisecondsSinceEpoch % options.length];
   }
 }
