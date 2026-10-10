@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/brand/SolaceLogo.png" alt="Solace.ai logo" width="220" />
+</p>
+
 <div align="center">
   <h1>Solace.ai</h1>
   <p><strong>A private space to reflect, remember what matters, and think clearly.</strong></p>
@@ -124,6 +128,12 @@ flutter pub get
 ```powershell
 flutter devices
 flutter run
+```
+
+4. To build an Android APK:
+
+```powershell
+flutter build apk
 ```
 
 If more than one device is available, specify one with `flutter run -d <device-id>`. For a browser build, run `flutter run -d chrome` with Chrome installed.
