@@ -1,10 +1,10 @@
 <div align="center">
   <h1>Solace.ai</h1>
-  <p><strong>A private journal that helps you understand yourself and think clearly—even offline.</strong></p>
+  <p><strong>A private space to reflect, remember what matters, and think clearly.</strong></p>
 </div>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Status-Early%20Prototype-blueviolet.svg" alt="Project Status: Early Prototype">
+  <img src="https://img.shields.io/badge/Status-Prototype-39a981.svg" alt="Project Status: Prototype">
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
 </p>
 
@@ -30,54 +30,45 @@ Journaling can feel directionless, personal context is easy to lose, and generic
 
 ### Current project status
 
-This repository is an early Flutter prototype, not yet the complete journaling app. [lib/main.dart](lib/main.dart) still launches Flutter's starter counter screen. The Gemma inference call is a stub, so a model file alone does not provide working on-device inference. See [docs/PRODUCT.md](docs/PRODUCT.md) for intended behavior and [docs/AI.md](docs/AI.md) for implementation limitations.
+Solace is an actively developed Flutter prototype. It includes onboarding, a home dashboard, journal writing and reflection flows, and a personal memory vault. The deployed web demo is available below. Some capabilities vary by platform: the web build uses in-memory journal state, while SQLite persistence is used on supported native platforms. On-device model availability and behavior depend on the device and runtime; Solace also has a rule-based fallback. See [docs/AI.md](docs/AI.md) and [docs/DEVICE_TESTING_GUIDE.md](docs/DEVICE_TESTING_GUIDE.md) for current limitations and verification guidance.
 
 ---
 
-## 🚀 Live App
+## 🚀 Live Demo
 
-[https://your-live-app-url.com/](https://your-live-app-url.com/)
-There is no published live app yet. The project is being developed as a local Flutter application, with Android as the initial target.
+[Open Solace AI](https://solace-ai-delta.vercel.app/)
+
+The web demo is useful for exploring the interface. Browser storage and native device features differ from the mobile app; do not use the demo for sensitive journal content.
 
 ---
 
 ## 📸 Screenshots
 
-_(Optional: Describe where your detailed screenshot folders are located or showcase a walkthrough GIF below)_
+| Landing page | Onboarding |
+| --- | --- |
+| ![Solace landing page](docs/screenshots/Landing.png) | ![Solace onboarding](docs/screenshots/Onboarding.png) |
 
-![Walkthrough GIF](docs/screenshots/walkthrough.gif)
+| Home | Journal |
+| --- | --- |
+| ![Solace home dashboard](docs/screenshots/Home.png) | ![Solace journal editor](docs/screenshots/Journal.png) |
 
-### Portal / View A Screenshots
-
-<table width="100%">
-  <tr>
-    <td align="center" valign="top">
-      <strong>Dashboard View</strong><br><br>
-      <img src="docs/screenshots/dashboard.png" alt="Dashboard" width="400"/>
-    </td>
-    <td align="center" valign="top">
-      <strong>Calendar View</strong><br><br>
-      <img src="docs/screenshots/calendar.png" alt="Calendar" width="400"/>
-    </td>
-  </tr>
-</table>
----
+![Personal Memory Vault](docs/screenshots/Memories.png)
 
 ## 🛠️ Tech Stack
 
 | #   | Tool / Technology                          | Category               | Description                                                                     |
 | --- | ------------------------------------------ | ---------------------- | ------------------------------------------------------------------------------- |
-| 1   | Flutter / Dart                             | Mobile application     | Cross-platform UI framework; Android-first for the initial prototype.           |
-| 2   | SQLite / `sqflite`                         | Local persistence      | Intended local storage for journal entries, preferences, and approved memories. |
-| 3   | `dio`, `path_provider`, `path`             | File management        | Declared packages for model download and application file paths.                |
-| 4   | `flutter_gemma`, `flutter_gemma_mediapipe` | On-device AI candidate | Declared dependencies; runtime integration and inference are not yet working.   |
-| 5   | Plus Jakarta Sans                         | Typography             | Bundled and applied through Flutter's shared theme across supported targets.    |
+| 1   | Flutter / Dart                             | Cross-platform app     | Shared UI for mobile, web, and desktop targets.                                  |
+| 2   | SQLite / `sqflite`                         | Native persistence     | Journal entries, preferences, and memories on supported native platforms.       |
+| 3   | `flutter_gemma`, `flutter_gemma_mediapipe` | On-device AI           | Optional local model integration with a rule-based fallback.                    |
+| 4   | `speech_to_text`, `record`, `audioplayers` | Voice features         | Dependencies used by voice journaling flows.                                    |
+| 5   | Plus Jakarta Sans                         | Typography             | Bundled font used by the app theme.                                              |
 
 ---
 
 ## 🏗️ System Architecture
 
-The intended application keeps journaling, search, user-approved context, and supported AI processing on the device. The model runtime is optional and must be verified on the target phone. No cloud backend is required for the offline core.
+Native builds store journal data in SQLite on the device. The web build currently keeps journal state in memory, so data does not persist across reloads. The AI service attempts to use the local Gemma runtime when available and falls back to rule-based responses. Verify model behavior and offline operation on each target device.
 
 ```text
 [Flutter UI] ---> [Local App Workflows] ---> [SQLite on device]
@@ -93,7 +84,7 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for component responsibilities 
 
 ## 🔒 Security & Data Privacy
 
-These are product requirements and should not be read as claims that every control is already implemented.
+Privacy behavior depends on the platform and current implementation. Native storage is local SQLite; web journal state is in memory and is cleared on reload. Local storage alone does not guarantee encryption or protection from device compromise.
 
 - **Local-first:** Journal content should stay on the device by default; do not send it to cloud AI or analytics.
 - **User control:** Use only context the user permits, and ask before saving inferred themes as long-term memories.
@@ -135,9 +126,9 @@ flutter devices
 flutter run
 ```
 
-If more than one device is available, specify one with `flutter run -d <device-id>`. The current app still opens the starter counter screen.
+If more than one device is available, specify one with `flutter run -d <device-id>`. For a browser build, run `flutter run -d chrome` with Chrome installed.
 
-No `.env` file or backend service is required to run the current Flutter prototype. The root `.env.example` documents that no environment variables are currently needed.
+No `.env` file or backend service is required to run the current app.
 
 ---
 
