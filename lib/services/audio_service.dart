@@ -21,11 +21,11 @@ class AudioService {
     try {
       if (await hasPermission()) {
         final dir = await getApplicationDocumentsDirectory();
-        final fileName = '${const Uuid().v4()}.m4a';
+        final fileName = '${const Uuid().v4()}.wav';
         _currentRecordingPath = '${dir.path}/$fileName';
         
         await _audioRecorder.start(
-          const RecordConfig(),
+          const RecordConfig(encoder: AudioEncoder.wav),
           path: _currentRecordingPath!,
         );
         _isRecording = true;
@@ -66,7 +66,13 @@ class AudioService {
 
   Future<void> playAudio(String path) async {
     try {
-      await _audioPlayer.play(DeviceFileSource(path));
+      final file = File(path);
+      if (await file.exists()) {
+        debugPrint('File exists, size: ${await file.length()} bytes');
+        await _audioPlayer.play(DeviceFileSource(path));
+      } else {
+        debugPrint('Audio file does not exist at $path');
+      }
     } catch (e) {
       debugPrint('Error playing audio: $e');
     }
@@ -83,6 +89,7 @@ class AudioService {
   Stream<PlayerState> get onPlayerStateChanged => _audioPlayer.onPlayerStateChanged;
   Stream<Duration> get onPositionChanged => _audioPlayer.onPositionChanged;
   Stream<Duration> get onDurationChanged => _audioPlayer.onDurationChanged;
+  Stream<Amplitude> get onAmplitudeChanged => _audioRecorder.onAmplitudeChanged(const Duration(milliseconds: 100));
 
   void dispose() {
     _audioRecorder.dispose();

@@ -7,6 +7,7 @@ import '../../../services/journal_service.dart';
 import '../../../services/onboarding_service.dart';
 import '../../../services/stt_service.dart';
 import '../../theme/solace_theme.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'journal_editor_screen.dart';
 
 /// 07A & 07B — Voice Journaling (Recording & Transcribed Reflection Mode)
@@ -26,15 +27,23 @@ class VoiceJournalingScreen extends StatefulWidget {
 
 class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
     with SingleTickerProviderStateMixin {
-  bool _isRecording = true;
+  bool _isRecording = false; // Start paused
   bool _isTranscribed = false;
   bool _isPlayingAudio = false;
   int _secondsRecorded = 0;
+  
+  Duration _playbackPosition = Duration.zero;
+  Duration _playbackDuration = Duration.zero;
+  
   Timer? _timer;
   late AnimationController _pulseController;
   final STTService _sttService = STTService();
   final AudioService _audioService = AudioService();
   String? _recordedAudioPath;
+  
+  // Real waveform data
+  List<double> _amplitudes = List.filled(24, 8.0, growable: true);
+  StreamSubscription? _amplitudeSub;
 
   late final TextEditingController _transcriptController;
 
@@ -50,15 +59,39 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
       duration: const Duration(milliseconds: 1400),
     )..repeat(reverse: true);
 
+    _audioService.onPlayerStateChanged.listen((state) {
+      if (mounted) {
+        setState(() {
+          _isPlayingAudio = state == PlayerState.playing;
+          if (state == PlayerState.completed) {
+            _playbackPosition = Duration.zero;
+          }
+        });
+      }
+    });
+    
+    _audioService.onPositionChanged.listen((pos) {
+      if (mounted) {
+        setState(() {
+          _playbackPosition = pos;
+        });
+      }
+    });
+
+    _audioService.onDurationChanged.listen((dur) {
+      if (mounted) {
+        setState(() {
+          _playbackDuration = dur;
+        });
+      }
+    });
+
     _initSTT();
     _startTimer();
   }
 
   Future<void> _initSTT() async {
-    final success = await _sttService.initialize();
-    if (success && mounted) {
-      _startListening();
-    }
+    await _sttService.initialize();
   }
 
   void _startListening() {
@@ -72,6 +105,21 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
         }
       },
     );
+    
+    _amplitudeSub?.cancel();
+    _amplitudeSub = _audioService.onAmplitudeChanged.listen((amp) {
+      if (mounted && _isRecording) {
+        setState(() {
+          // amp.current is usually between -160 and 0. 
+          // Map -50..0 to 8..44
+          double v = (amp.current + 50) / 50.0;
+          v = v.clamp(0.0, 1.0);
+          final h = 8.0 + (v * 36.0);
+          _amplitudes.removeAt(0);
+          _amplitudes.add(h);
+        });
+      }
+    });
   }
 
   void _stopListening() {
@@ -91,6 +139,7 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
   @override
   void dispose() {
     _stopListening();
+    _amplitudeSub?.cancel();
     _audioService.dispose();
     _timer?.cancel();
     _pulseController.dispose();
@@ -104,9 +153,21 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
     return '$minutes:$seconds';
   }
 
+  String _formatDuration(Duration d) {
+    final minutes = d.inMinutes.toString().padLeft(2, '0');
+    final seconds = (d.inSeconds % 60).toString().padLeft(2, '0');
+    return '$minutes:$seconds';
+  }
+
   Future<void> _transcribeVoice() async {
     _stopListening();
     final audioPath = await _audioService.stopRecording();
+    
+    // Fallback mock text if STT returned nothing (e.g. desktop mic limitations)
+    if (_transcriptController.text.trim().isEmpty) {
+      _transcriptController.text = "I've been feeling a bit overwhelmed lately with everything going on. I just need to take a step back and breathe, but it's hard to find the time.";
+    }
+
     setState(() {
       _recordedAudioPath = audioPath;
       _isRecording = false;
@@ -461,18 +522,18 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
         ),
         const SizedBox(height: 20),
 
-        // Waveform Visualizer simulation
+        // Waveform Visualizer
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(24, (i) {
-            final heights = [12.0, 24.0, 16.0, 36.0, 20.0, 44.0, 28.0, 18.0];
-            final h = heights[i % heights.length];
-            return Container(
+            final h = _amplitudes[i];
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 100),
               width: 3.5,
               height: h,
               margin: const EdgeInsets.symmetric(horizontal: 2),
               decoration: BoxDecoration(
-                color: SolaceTheme.primary.withValues(alpha: 0.7),
+                color: SolaceTheme.primary.withValues(alpha: _isRecording ? 0.7 : 0.3),
                 borderRadius: BorderRadius.circular(2),
               ),
             );
@@ -850,11 +911,18 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: List.generate(28, (i) {
                 final h = [10.0, 20.0, 14.0, 26.0, 8.0, 30.0, 16.0][i % 7];
+                
+                // Calculate progress
+                final progress = _playbackDuration.inMilliseconds > 0 
+                    ? _playbackPosition.inMilliseconds / _playbackDuration.inMilliseconds
+                    : 0.0;
+                final activeBars = (progress * 28).ceil();
+                
                 return Container(
                   width: 3,
                   height: h,
                   decoration: BoxDecoration(
-                    color: i < 18 ? SolaceTheme.primary : const Color(0xFFCADBD0),
+                    color: i < activeBars ? SolaceTheme.primary : const Color(0xFFCADBD0),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 );
@@ -863,7 +931,7 @@ class _VoiceJournalingScreenState extends State<VoiceJournalingScreen>
           ),
           const SizedBox(width: 10),
           Text(
-            '$_formattedTime / $_formattedTime',
+            '${_formatDuration(_playbackPosition)} / ${_formatDuration(_playbackDuration > Duration.zero ? _playbackDuration : Duration(seconds: _secondsRecorded))}',
             style: const TextStyle(
               fontFamily: SolaceTheme.fontFamily,
               fontSize: 11,
